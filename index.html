@@ -124,11 +124,11 @@
       <!-- ========== DATA SISWA ========== -->
       <section id="page-siswa" class="page">
         <div class="flex flex-col sm:flex-row gap-3 mb-4">
-          <div class="relative flex-1"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-sm"></i><input type="text" id="searchSiswa" class="input pl-9" placeholder="Cari nama atau kode QR..." oninput="filterSiswaTable()"></div>
+          <div class="relative flex-1"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-sm"></i><input type="text" id="searchSiswa" class="input pl-9" placeholder="Cari nama atau NIS..." oninput="filterSiswaTable()"></div>
           <label class="btn btn-secondary cursor-pointer"><i class="fas fa-file-import"></i> Impor Excel<input type="file" id="fileImport" accept=".xlsx,.xls" class="hidden" onchange="handleImportExcel(event)"></label>
         </div>
         <div class="card p-0 overflow-hidden"><div class="overflow-x-auto max-h-[60vh] overflow-y-auto">
-          <table class="data-table"><thead><tr><th style="width:50px">No</th><th>Nama Siswa</th><th>Kelas</th><th>Kode QR</th><th>Tgl Daftar</th><th style="width:100px">Aksi</th></tr></thead>
+          <table class="data-table"><thead><tr><th style="width:50px">No</th><th>Nama Siswa</th><th>Kelas</th><th>NIS</th><th>Tgl Daftar</th><th style="width:100px">Aksi</th></tr></thead>
           <tbody id="tbodySiswa"><tr><td colspan="6"><div class="empty-state"><i class="fas fa-users block"></i><p class="text-sm">Belum ada data siswa</p></div></td></tr></tbody></table>
         </div></div>
       </section>
@@ -190,7 +190,7 @@
                     <div>
                       <div id="nameMasuk" class="font-semibold"></div>
                       <div id="classMasuk" class="text-sm text-[var(--muted)]"></div>
-                      <div id="codeMasuk" class="text-xs text-[var(--muted)] font-mono mt-0.5"></div>
+                      <div id="nisMasuk" class="text-xs text-[var(--muted)] font-mono mt-0.5"></div>
                     </div>
                   </div>
                   <div class="flex gap-3 mt-4">
@@ -227,7 +227,7 @@
                     <div>
                       <div id="namePulang" class="font-semibold"></div>
                       <div id="classPulang" class="text-sm text-[var(--muted)]"></div>
-                      <div id="codePulang" class="text-xs text-[var(--muted)] font-mono mt-0.5"></div>
+                      <div id="nisPulang" class="text-xs text-[var(--muted)] font-mono mt-0.5"></div>
                     </div>
                   </div>
                   <div class="flex gap-3 mt-4">
@@ -288,7 +288,7 @@
             </div>
             <div class="overflow-x-auto"><table class="data-table"><thead><tr><th style="width:50px">No</th><th>Kelas</th><th>Jam Masuk</th><th>Jam Pulang</th><th style="width:120px">Aksi</th></tr></thead><tbody id="jadwalTableBody"><tr><td colspan="5"><div class="empty-state py-6"><i class="fas fa-calendar-alt block"></i><p class="text-sm">Belum ada jadwal kelas</p></div></td></tr></tbody></table></div>
           </div>
-          <div class="card"><h3 class="font-display font-semibold text-base mb-1">Informasi Sistem</h3><div class="mt-3 p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-sm space-y-1"><div class="flex justify-between"><span class="text-[var(--muted)]">Versi</span><span>1.8.0</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Format Kode QR</span><span>Kelas-00xx</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Backend</span><span>Google Apps Script</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Frontend</span><span>GitHub Pages</span></div></div></div>
+          <div class="card"><h3 class="font-display font-semibold text-base mb-1">Informasi Sistem</h3><div class="mt-3 p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-sm space-y-1"><div class="flex justify-between"><span class="text-[var(--muted)]">Versi</span><span>2.0.0</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Format Kode QR</span><span>NIS Siswa</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Backend</span><span>Google Apps Script</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Frontend</span><span>GitHub Pages</span></div></div></div>
         </div>
       </section>
 
@@ -333,7 +333,7 @@
       <div id="qr-display" class="bg-white rounded-xl p-4 inline-block mb-4"></div>
       <div id="qrStudentName" class="font-display font-bold text-lg"></div>
       <div id="qrStudentDetail" class="text-sm text-[var(--muted)] mb-1"></div>
-      <div id="qrStudentCode" class="font-mono text-2xl font-bold text-[var(--accent)] mb-4"></div>
+      <div id="qrStudentNis" class="font-mono text-2xl font-bold text-[var(--accent)] mb-4"></div>
       <button class="btn btn-primary" onclick="downloadQR()"><i class="fas fa-download"></i> Download QR</button>
     </div>
   </div>
@@ -482,7 +482,6 @@
       return siswaLoadPromise;
     }
 
-    // Reset promise supaya saat refresh selalu ambil data terbaru
     function invalidateSiswaCache() {
       siswaLoadPromise = null;
       allSiswa = [];
@@ -552,13 +551,13 @@
       var tb = document.getElementById('tbodySiswa');
       if (!data || data.length === 0) { tb.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-users block"></i><p class="text-sm">Belum ada data siswa</p></div></td></tr>'; return; }
       tb.innerHTML = data.map(function(s, i) {
-        return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">' + escapeHtml(s.nama.charAt(0)) + '</div><span class="font-medium">' + escapeHtml(s.nama) + '</span></div></td><td>' + escapeHtml(s.kelas) + '</td><td><code class="text-[var(--accent)] bg-[var(--accent-glow)] px-2 py-0.5 rounded text-xs font-mono">' + escapeHtml(s.kodeQR) + '</code></td><td class="text-[var(--muted)] text-sm">' + formatTanggal(s.tanggalDaftar) + '</td><td><button class="btn btn-secondary py-1 px-2 text-xs" onclick="showQR(\'' + escapeHtml(s.kodeQR) + '\',\'' + escapeHtml(s.nama) + '\',\'' + escapeHtml(s.kelas) + '\')"><i class="fas fa-qrcode"></i></button></td></tr>';
+        return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">' + escapeHtml(s.nama.charAt(0)) + '</div><span class="font-medium">' + escapeHtml(s.nama) + '</span></div></td><td>' + escapeHtml(s.kelas) + '</td><td><code class="text-[var(--accent)] bg-[var(--accent-glow)] px-2 py-0.5 rounded text-xs font-mono">' + escapeHtml(s.nis) + '</code></td><td class="text-[var(--muted)] text-sm">' + formatTanggal(s.tanggalDaftar) + '</td><td>' + (s.nis ? '<button class="btn btn-secondary py-1 px-2 text-xs" onclick="showQR(\'' + escapeHtml(s.nis) + '\',\'' + escapeHtml(s.nama) + '\',\'' + escapeHtml(s.kelas) + '\')"><i class="fas fa-qrcode"></i></button>' : '<span class="text-xs text-[var(--muted)]">-</span>') + '</td></tr>';
       }).join('');
     }
 
     function filterSiswaTable() {
       var q = document.getElementById('searchSiswa').value.toLowerCase();
-      renderSiswaTable(allSiswa.filter(function(s) { return s.nama.toLowerCase().indexOf(q) !== -1 || s.kodeQR.toLowerCase().indexOf(q) !== -1 || s.kelas.toLowerCase().indexOf(q) !== -1; }));
+      renderSiswaTable(allSiswa.filter(function(s) { return s.nama.toLowerCase().indexOf(q) !== -1 || s.nis.toLowerCase().indexOf(q) !== -1 || s.kelas.toLowerCase().indexOf(q) !== -1; }));
     }
 
     function handleImportExcel(event) {
@@ -574,7 +573,11 @@
           var f = json[0];
           if (!(f.Nama||f.nama||f.NAMA) || !(f.Kelas||f.kelas||f.KELAS)) { showToast('Pastikan ada kolom "Nama" dan "Kelas"', 'error'); return; }
           var imp = json.map(function(r) {
-            return { nama: (r.Nama||r.nama||r.NAMA||'').toString().trim(), kelas: (r.Kelas||r.kelas||r.KELAS||'').toString().trim() };
+            return {
+              nama: (r.Nama||r.nama||r.NAMA||'').toString().trim(),
+              kelas: (r.Kelas||r.kelas||r.KELAS||'').toString().trim(),
+              nis: (r.NIS||r.nis||r.Nis||'').toString().trim()
+            };
           }).filter(function(r) { return r.nama !== ''; });
           if (imp.length === 0) { showToast('Tidak ada data valid', 'error'); return; }
           showToast('Mengimpor ' + imp.length + ' data...', 'info');
@@ -586,27 +589,27 @@
     }
 
     var currentQRInstance = null;
-    function showQR(kode, nama, kelas) {
+    function showQR(nis, nama, kelas) {
       document.getElementById('qrStudentName').textContent = nama;
       document.getElementById('qrStudentDetail').textContent = 'Kelas: ' + kelas;
-      document.getElementById('qrStudentCode').textContent = kode;
+      document.getElementById('qrStudentNis').textContent = nis;
       var qd = document.getElementById('qr-display'); qd.innerHTML = '';
-      currentQRInstance = new QRCode(qd, { text: kode, width: 200, height: 200, colorDark: '#0F172A', colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.H });
+      currentQRInstance = new QRCode(qd, { text: nis, width: 200, height: 200, colorDark: '#0F172A', colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.H });
       openModal('modalQR');
     }
 
     function downloadQR() {
+      var nisVal = document.getElementById('qrStudentNis').textContent;
       var c = document.querySelector('#qr-display canvas');
-      if (c) { var a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = 'QR-' + document.getElementById('qrStudentCode').textContent + '.png'; a.click(); }
-      else { var img = document.querySelector('#qr-display img'); if (img) { var a2 = document.createElement('a'); a2.href = img.src; a2.download = 'QR-' + document.getElementById('qrStudentCode').textContent + '.png'; a2.click(); } }
+      if (c) { var a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = 'QR-' + nisVal + '.png'; a.click(); }
+      else { var img = document.querySelector('#qr-display img'); if (img) { var a2 = document.createElement('a'); a2.href = img.src; a2.download = 'QR-' + nisVal + '.png'; a2.click(); } }
       showToast('QR didownload', 'success');
     }
 
     // =============================================
-    // DROPDOWN KELAS (digunakan di Absensi & Laporan)
+    // DROPDOWN KELAS
     // =============================================
     function getClassesFromCache() {
-      // Prioritas: cachedClasses dari dashboard, fallback dari allSiswa
       if (cachedClasses && cachedClasses.length > 0) return cachedClasses.slice();
       if (allSiswa && allSiswa.length > 0) {
         var map = {}, arr = [];
@@ -627,7 +630,6 @@
       selectEl.value = current;
     }
 
-    // Isi semua dropdown kelas di halaman absensi
     function populateAllKelasDropdowns() {
       fillKelasSelect(document.getElementById('masukKelas'), false);
       fillKelasSelect(document.getElementById('pulangKelas'), false);
@@ -639,7 +641,7 @@
     }
 
     // =============================================
-    // ABSENSI - TAB SWITCHING
+    // ABSENSI - TAB SWITCHING & SCANNER
     // =============================================
     var currentAbsenTab = 'masuk';
     var scannerRunning = false;
@@ -647,14 +649,15 @@
     var selectedSiswaMasuk = null;
     var selectedSiswaPulang = null;
 
-    // --- ANTI SCAN BERULANG ---
     var SCAN_COOLDOWN_MS = 5000;
     var lastScannedCode = '';
     var lastScanTime = 0;
     var cooldownTimer = null;
     var cooldownAnimFrame = null;
 
-    function isCooldownActive() { return (Date.now() - lastScanTime) < SCAN_COOLDOWN_MS; }
+    function isCooldownActive() {
+      return (Date.now() - lastScanTime) < SCAN_COOLDOWN_MS && lastScannedCode !== '';
+    }
 
     function startCooldown() {
       lastScanTime = Date.now();
@@ -668,277 +671,215 @@
       if (cooldownTimer) clearTimeout(cooldownTimer);
       function tick() {
         var elapsed = Date.now() - start;
-        var remaining = SCAN_COOLDOWN_MS - elapsed;
-        if (remaining <= 0) { wrap.classList.add('hidden'); bar.style.width = '0%'; return; }
-        bar.style.width = (remaining / SCAN_COOLDOWN_MS * 100) + '%';
-        txt.textContent = Math.ceil(remaining / 1000) + 's';
-        cooldownAnimFrame = requestAnimationFrame(tick);
+        var pct = Math.max(0, 1 - elapsed / SCAN_COOLDOWN_MS) * 100;
+        bar.style.width = pct + '%';
+        txt.textContent = Math.ceil((SCAN_COOLDOWN_MS - elapsed) / 1000) + 's';
+        if (elapsed < SCAN_COOLDOWN_MS) { cooldownAnimFrame = requestAnimationFrame(tick); }
+        else { wrap.classList.add('hidden'); lastScannedCode = ''; }
       }
-      tick();
-      cooldownTimer = setTimeout(function() { wrap.classList.add('hidden'); bar.style.width = '0%'; lastScannedCode = ''; }, SCAN_COOLDOWN_MS);
-    }
-
-    // --- KAMERA DEPAN/BELAKANG ---
-    var useFrontCamera = false;
-
-    function switchCamera() {
-      useFrontCamera = !useFrontCamera;
-      if (scannerRunning) { stopScanner().then(function() { startScanner(); }); }
-      showToast(useFrontCamera ? 'Kamera depan aktif' : 'Kamera belakang aktif', 'info');
+      cooldownAnimFrame = requestAnimationFrame(tick);
     }
 
     function switchAbsenTab(tab) {
       currentAbsenTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.toggle('active', el.getAttribute('data-tab') === tab); });
-      document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.toggle('active', el.id === 'tab-' + tab); });
-      var scanContainer = document.getElementById('scanContainer');
-      if (tab === 'tidak') {
-        scanContainer.style.display = 'none';
-        if (scannerRunning) stopScanner();
-      } else {
-        scanContainer.style.display = 'block';
-      }
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-tab') === tab); });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.toggle('active', c.id === 'tab-' + tab); });
     }
 
-    // =============================================
-    // QR SCANNER
-    // =============================================
+    function toggleScanner() {
+      if (scannerRunning) { stopScanner(); }
+      else { startScanner(); }
+    }
+
     function startScanner() {
-      if (scannerRunning) return Promise.resolve();
-      html5QrCode = new Html5Qrcode("qr-reader");
-      var facingMode = useFrontCamera ? "user" : "environment";
-      return html5QrCode.start(
-        { facingMode: facingMode },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        onScanSuccess, function() {}
-      ).then(function() {
-        scannerRunning = true;
-        document.getElementById('btnToggleScan').innerHTML = '<i class="fas fa-stop"></i> Stop Scanner';
-      }).catch(function(e) {
-        if (useFrontCamera) {
-          useFrontCamera = false;
-          html5QrCode = new Html5Qrcode("qr-reader");
-          return html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            onScanSuccess, function() {}
-          ).then(function() {
-            scannerRunning = true;
-            document.getElementById('btnToggleScan').innerHTML = '<i class="fas fa-stop"></i> Stop Scanner';
-            showToast('Kamera depan tidak tersedia, menggunakan kamera belakang', 'info');
-          }).catch(function(e2) { showToast('Gagal memulai scanner: ' + e2.message, 'error'); });
-        }
-        showToast('Gagal memulai scanner: ' + e.message, 'error');
+      if (scannerRunning) return;
+      var btn = document.getElementById('btnToggleScan');
+      btn.innerHTML = '<i class="fas fa-stop"></i> Stop Scanner';
+      btn.classList.remove('btn-secondary'); btn.classList.add('btn-danger');
+      document.getElementById('scanResult').classList.add('hidden');
+      scannerRunning = true;
+
+      html5QrCode = new Html5Qrcode('qr-reader');
+      html5QrCode.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+        onScanSuccess,
+        function() {}
+      ).catch(function(err) {
+        showToast('Gagal mengakses kamera: ' + err, 'error');
+        resetScannerUI();
       });
     }
 
     function stopScanner() {
-      if (!scannerRunning || !html5QrCode) return Promise.resolve();
-      return html5QrCode.stop().then(function() {
-        scannerRunning = false;
-        document.getElementById('btnToggleScan').innerHTML = '<i class="fas fa-qrcode"></i> Mulai Scanner';
-      }).catch(function() {
-        scannerRunning = false;
-        document.getElementById('btnToggleScan').innerHTML = '<i class="fas fa-qrcode"></i> Mulai Scanner';
-      });
+      if (!scannerRunning || !html5QrCode) return;
+      html5QrCode.stop().then(function() { resetScannerUI(); }).catch(function() { resetScannerUI(); });
     }
 
-    function toggleScanner() { if (scannerRunning) stopScanner(); else startScanner(); }
+    function resetScannerUI() {
+      scannerRunning = false;
+      html5QrCode = null;
+      var btn = document.getElementById('btnToggleScan');
+      btn.innerHTML = '<i class="fas fa-qrcode"></i> Mulai Scanner';
+      btn.classList.remove('btn-danger'); btn.classList.add('btn-secondary');
+    }
+
+    function switchCamera() {
+      if (!scannerRunning || !html5QrCode) { showToast('Scanner belum aktif', 'error'); return; }
+      html5QrCode.stop().then(function() {
+        html5QrCode.start(
+          { facingMode: 'environment' === 'environment' ? 'user' : 'environment' },
+          { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+          onScanSuccess,
+          function() {}
+        ).catch(function(err) { showToast('Gagal ganti kamera: ' + err, 'error'); });
+      });
+    }
 
     function onScanSuccess(decodedText) {
-      var code = decodedText.trim();
-      if (code === lastScannedCode && isCooldownActive()) return;
-      lastScannedCode = code;
-      playSuccessBeep();
+      if (isCooldownActive() && decodedText === lastScannedCode) return;
+      lastScannedCode = decodedText;
+      startCooldown();
+
+      // Flash effect
       var reader = document.getElementById('qr-reader');
       reader.classList.add('scan-flash');
-      setTimeout(function() { reader.classList.remove('scan-flash'); }, 500);
-      processQRCode(code);
-      startCooldown();
-    }
+      setTimeout(function() { reader.classList.remove('scan-flash'); }, 400);
 
-    function processQRCode(kode) {
-      var found = null;
-      for (var i = 0; i < allSiswa.length; i++) {
-        if (allSiswa[i].kodeQR === kode) { found = allSiswa[i]; break; }
-      }
-      if (found) { handleScannedSiswa(found); }
-      else {
-        apiGet('cariSiswa', { keyword: kode }).then(function(results) {
-          if (!results || results.length === 0) { playErrorBeep(); showScanResult(false, 'Kode QR "' + kode + '" tidak ditemukan'); return; }
-          handleScannedSiswa(results[0]);
-        }).catch(function(e) { playErrorBeep(); showScanResult(false, e.message); });
-      }
-    }
-
-    function handleScannedSiswa(s) {
-      if (currentAbsenTab === 'masuk') {
-        selectedSiswaMasuk = s;
-        fillAbsenInfoCard('masuk', s);
-        doAbsensi('masuk');
-      } else if (currentAbsenTab === 'pulang') {
-        selectedSiswaPulang = s;
-        fillAbsenInfoCard('pulang', s);
-        doAbsensi('pulang');
-      }
-      showScanResult(true, s.nama + ' — ' + s.kelas);
-    }
-
-    function showScanResult(success, msg) {
-      var el = document.getElementById('scanResult');
-      var content = document.getElementById('scanResultContent');
-      el.classList.remove('hidden');
-      if (success) {
-        content.className = 'rounded-lg p-4 border text-center bg-[rgba(16,185,129,0.08)] border-[rgba(16,185,129,0.3)] text-[#34D399]';
-        content.innerHTML = '<i class="fas fa-check-circle text-2xl mb-2 block"></i><div class="font-semibold">' + escapeHtml(msg) + '</div>';
-      } else {
-        content.className = 'rounded-lg p-4 border text-center bg-[rgba(239,68,68,0.08)] border-[rgba(239,68,68,0.3)] text-[#FCA5A5]';
-        content.innerHTML = '<i class="fas fa-times-circle text-2xl mb-2 block"></i><div class="font-semibold">' + escapeHtml(msg) + '</div>';
-      }
-      setTimeout(function() { el.classList.add('hidden'); }, 5000);
-    }
-
-    // =============================================
-    // DROPDOWN KELAS >> SISWA DI TAB MASUK/PULANG
-    // =============================================
-    function onAbsenKelasChange(tab) {
-      var kelasEl = document.getElementById(tab + 'Kelas');
-      var siswaEl = document.getElementById(tab + 'SiswaSelect');
-      var kelas = kelasEl.value;
-
-      // Reset info card
-      resetAbsenInfo(tab);
-
-      if (!kelas) {
-        siswaEl.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+      var tipe = currentAbsenTab === 'pulang' ? 'pulang' : 'masuk';
+      if (currentAbsenTab === 'tidak') {
+        showToast('Gunakan tab Masuk/Pulang untuk scan QR', 'info');
         return;
       }
 
-      var filtered = allSiswa.filter(function(s) { return s.kelas === kelas; });
-      filtered.sort(function(a, b) { return a.nama.localeCompare(b.nama); });
+      apiPost('prosesAbsensi', { nis: decodedText, tipe: tipe })
+        .then(function(r) {
+          playSuccessBeep();
+          showScanResult(true, r.message, r.status);
+          showToast(r.message, 'success');
+        })
+        .catch(function(e) {
+          playErrorBeep();
+          showScanResult(false, e.message, '');
+          showToast(e.message, 'error');
+        });
+    }
 
+    function showScanResult(success, message, status) {
+      var wrap = document.getElementById('scanResult');
+      var content = document.getElementById('scanResultContent');
+      wrap.classList.remove('hidden');
+      if (success) {
+        var bc = status === 'Terlambat' ? 'badge-terlambat' : 'badge-hadir';
+        content.className = 'rounded-lg p-4 border text-center border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.05)]';
+        content.innerHTML = '<i class="fas fa-check-circle text-3xl text-[var(--accent)] mb-2"></i><div class="font-semibold mb-1">' + escapeHtml(message) + '</div>' + (status ? '<span class="badge ' + bc + '">' + escapeHtml(status) + '</span>' : '');
+      } else {
+        content.className = 'rounded-lg p-4 border text-center border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.05)]';
+        content.innerHTML = '<i class="fas fa-times-circle text-3xl text-[var(--danger)] mb-2"></i><div class="font-semibold text-[var(--danger)]">' + escapeHtml(message) + '</div>';
+      }
+    }
+
+    // =============================================
+    // ABSENSI MANUAL
+    // =============================================
+    function onAbsenKelasChange(tipe) {
+      var kelasEl = document.getElementById(tipe + 'Kelas');
+      var siswaEl = document.getElementById(tipe + 'SiswaSelect');
+      var kelas = kelasEl.value;
       siswaEl.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+      if (tipe === 'masuk') { selectedSiswaMasuk = null; document.getElementById('masukInfo').classList.add('hidden'); document.getElementById('emptyMasuk').classList.remove('hidden'); }
+      if (tipe === 'pulang') { selectedSiswaPulang = null; document.getElementById('pulangInfo').classList.add('hidden'); document.getElementById('emptyPulang').classList.remove('hidden'); }
+      if (!kelas) return;
+      var filtered = allSiswa.filter(function(s) { return s.kelas === kelas; });
       filtered.forEach(function(s) {
-        siswaEl.innerHTML += '<option value="' + escapeHtml(s.kodeQR) + '">' + escapeHtml(s.nama) + ' (' + escapeHtml(s.kodeQR) + ')</option>';
+        var opt = document.createElement('option');
+        opt.value = s.nis;
+        opt.textContent = s.nama + (s.nis ? ' (' + s.nis + ')' : '');
+        siswaEl.appendChild(opt);
       });
     }
 
-    function onAbsenSiswaChange(tab) {
-      var siswaEl = document.getElementById(tab + 'SiswaSelect');
-      var kode = siswaEl.value;
-
-      if (!kode) { resetAbsenInfo(tab); return; }
-
-      var s = allSiswa.find(function(x) { return x.kodeQR === kode; });
-      if (!s) { resetAbsenInfo(tab); return; }
-
-      if (tab === 'masuk') selectedSiswaMasuk = s;
-      else selectedSiswaPulang = s;
-
-      fillAbsenInfoCard(tab, s);
+    function onAbsenSiswaChange(tipe) {
+      var siswaEl = document.getElementById(tipe + 'SiswaSelect');
+      var nis = siswaEl.value;
+      if (tipe === 'masuk') {
+        if (!nis) { selectedSiswaMasuk = null; document.getElementById('masukInfo').classList.add('hidden'); document.getElementById('emptyMasuk').classList.remove('hidden'); return; }
+        selectedSiswaMasuk = allSiswa.find(function(s) { return s.nis === nis; });
+        if (selectedSiswaMasuk) {
+          document.getElementById('avatar').textContent = selectedSiswaMasuk.nama.charAt(0);
+          document.getElementById('nameMasuk').textContent = selectedSiswaMasuk.nama;
+          document.getElementById('classMasuk').textContent = selectedSiswaMasuk.kelas;
+          document.getElementById('nisMasuk').textContent = 'NIS: ' + selectedSiswaMasuk.nis;
+          document.getElementById('masukInfo').classList.remove('hidden');
+          document.getElementById('emptyMasuk').classList.add('hidden');
+        }
+      } else if (tipe === 'pulang') {
+        if (!nis) { selectedSiswaPulang = null; document.getElementById('pulangInfo').classList.add('hidden'); document.getElementById('emptyPulang').classList.remove('hidden'); return; }
+        selectedSiswaPulang = allSiswa.find(function(s) { return s.nis === nis; });
+        if (selectedSiswaPulang) {
+          document.getElementById('avatarPulang').textContent = selectedSiswaPulang.nama.charAt(0);
+          document.getElementById('namePulang').textContent = selectedSiswaPulang.nama;
+          document.getElementById('classPulang').textContent = selectedSiswaPulang.kelas;
+          document.getElementById('nisPulang').textContent = 'NIS: ' + selectedSiswaPulang.nis;
+          document.getElementById('pulangInfo').classList.remove('hidden');
+          document.getElementById('emptyPulang').classList.add('hidden');
+        }
+      }
     }
 
-    function fillAbsenInfoCard(tab, s) {
-      var infoEl = document.getElementById(tab + 'Info');
-      var emptyEl = document.getElementById('empty' + tab.charAt(0).toUpperCase() + tab.slice(1));
-      var avatarEl = document.getElementById(tab === 'masuk' ? 'avatar' : 'avatarPulang');
-      var nameEl = document.getElementById('name' + tab.charAt(0).toUpperCase() + tab.slice(1));
-      var classEl = document.getElementById('class' + tab.charAt(0).toUpperCase() + tab.slice(1));
-      var codeEl = document.getElementById('code' + tab.charAt(0).toUpperCase() + tab.slice(1));
-
-      avatarEl.textContent = s.nama.charAt(0);
-      nameEl.textContent = s.nama;
-      classEl.textContent = 'Kelas: ' + s.kelas;
-      codeEl.textContent = s.kodeQR;
-      infoEl.classList.remove('hidden');
-      emptyEl.classList.add('hidden');
+    function doAbsensi(tipe) {
+      var siswa = tipe === 'masuk' ? selectedSiswaMasuk : selectedSiswaPulang;
+      if (!siswa || !siswa.nis) { showToast('Pilih siswa terlebih dahulu', 'error'); return; }
+      var btn = document.getElementById(tipe === 'masuk' ? 'btnMasuk' : 'btnPulang');
+      btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Memproses...';
+      apiPost('prosesAbsensi', { nis: siswa.nis, tipe: tipe })
+        .then(function(r) {
+          playSuccessBeep();
+          showToast(r.message, 'success');
+          btn.disabled = false;
+          btn.innerHTML = tipe === 'masuk' ? '<i class="fas fa-sign-in-alt"></i> Absen Masuk' : '<i class="fas fa-sign-out-alt"></i> Absen Pulang';
+        })
+        .catch(function(e) {
+          playErrorBeep();
+          showToast(e.message, 'error');
+          btn.disabled = false;
+          btn.innerHTML = tipe === 'masuk' ? '<i class="fas fa-sign-in-alt"></i> Absen Masuk' : '<i class="fas fa-sign-out-alt"></i> Absen Pulang';
+        });
     }
 
-    function resetAbsenInfo(tab) {
-      var infoEl = document.getElementById(tab + 'Info');
-      var emptyEl = document.getElementById('empty' + tab.charAt(0).toUpperCase() + tab.slice(1));
-      if (tab === 'masuk') selectedSiswaMasuk = null;
-      else selectedSiswaPulang = null;
-      if (infoEl) infoEl.classList.add('hidden');
-      if (emptyEl) emptyEl.classList.remove('hidden');
-    }
-
-    // =============================================
-    // DROPDOWN SISWA DI TAB TIDAK HADIR
-    // =============================================
-    function loadSiswaByKelas(tab) {
-      var kelasEl = document.getElementById(tab + 'Kelas');
-      var siswaEl = document.getElementById(tab + 'Siswa');
+    function loadSiswaByKelas(tipe) {
+      var kelasEl = document.getElementById(tipe + 'Kelas');
+      var siswaEl = document.getElementById(tipe + 'Siswa');
       var kelas = kelasEl.value;
-
       siswaEl.innerHTML = '<option value="">-- Pilih Siswa --</option>';
       if (!kelas) return;
-
       var filtered = allSiswa.filter(function(s) { return s.kelas === kelas; });
-      filtered.sort(function(a, b) { return a.nama.localeCompare(b.nama); });
-
-      if (filtered.length === 0) {
-        showToast('Tidak ada siswa di kelas ini', 'info');
-        return;
-      }
-
       filtered.forEach(function(s) {
-        siswaEl.innerHTML += '<option value="' + escapeHtml(s.kodeQR) + '">' + escapeHtml(s.nama) + ' (' + escapeHtml(s.kodeQR) + ')</option>';
+        var opt = document.createElement('option');
+        opt.value = s.nis;
+        opt.textContent = s.nama + (s.nis ? ' (' + s.nis + ')' : '');
+        siswaEl.appendChild(opt);
       });
     }
 
-    // =============================================
-    // PROSES ABSENSI MASUK / PULANG
-    // =============================================
-    function doAbsensi(tipe) {
-      var s = tipe === 'masuk' ? selectedSiswaMasuk : selectedSiswaPulang;
-      if (!s) { showToast('Pilih siswa terlebih dahulu', 'error'); return; }
-
-      var btn = document.getElementById(tipe === 'masuk' ? 'btnMasuk' : 'btnPulang');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:1rem;height:1rem;border-width:2px"></div> Memproses...';
-
-      apiPost('prosesAbsensi', { kode: s.kodeQR, tipe: tipe }).then(function(r) {
-        playSuccessBeep();
-        showToast(r.message || 'Absensi berhasil', 'success');
-        // Reset form setelah berhasil
-        document.getElementById(tipe + 'Kelas').value = '';
-        document.getElementById(tipe + 'SiswaSelect').innerHTML = '<option value="">-- Pilih Siswa --</option>';
-        resetAbsenInfo(tipe);
-      }).catch(function(e) {
-        playErrorBeep();
-        showToast('Gagal: ' + e.message, 'error');
-      }).finally(function() {
-        btn.disabled = false;
-        btn.innerHTML = tipe === 'masuk' ? '<i class="fas fa-sign-in-alt"></i> Absen Masuk' : '<i class="fas fa-sign-out-alt"></i> Absen Pulang';
-      });
-    }
-
-    // =============================================
-    // TIDAK HADIR (SAKIT / IZIN / ALPA)
-    // =============================================
     function doTidakHadir() {
-      var kode = document.getElementById('tidakSiswa').value;
+      var nis = document.getElementById('tidakSiswa').value;
       var keterangan = document.getElementById('tidakKeterangan').value;
-      if (!kode) { showToast('Pilih siswa terlebih dahulu', 'error'); return; }
+      if (!nis) { showToast('Pilih siswa terlebih dahulu', 'error'); return; }
       if (!keterangan) { showToast('Pilih keterangan', 'error'); return; }
-
       var btn = document.getElementById('btnTidak');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:1rem;height:1rem;border-width:2px"></div> Memproses...';
-
-      apiPost('prosesTidakHadir', { kode: kode, keterangan: keterangan }).then(function(r) {
-        playSuccessBeep();
-        showToast(r.message || 'Ketidakhadiran direkam', 'success');
-        document.getElementById('tidakSiswa').value = '';
-        document.getElementById('tidakKeterangan').value = '';
-      }).catch(function(e) {
-        playErrorBeep();
-        showToast('Gagal: ' + e.message, 'error');
-      }).finally(function() {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-user-xmark"></i> Rekam Ketidakhadiran';
-      });
+      btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Memproses...';
+      apiPost('prosesTidakHadir', { nis: nis, keterangan: keterangan })
+        .then(function(r) {
+          showToast(r.message, 'success');
+          btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-xmark"></i> Rekam Ketidakhadiran';
+          document.getElementById('tidakSiswa').value = '';
+          document.getElementById('tidakKeterangan').value = '';
+        })
+        .catch(function(e) {
+          showToast(e.message, 'error');
+          btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-xmark"></i> Rekam Ketidakhadiran';
+        });
     }
 
     // =============================================
@@ -946,94 +887,75 @@
     // =============================================
     function loadKonfigurasi() {
       apiGet('getKonfigurasi').then(function(c) {
-        if (c) {
-          document.getElementById('configJamMasuk').value = c.jam_masuk_default || '07:00';
-          document.getElementById('configJamPulang').value = c.jam_pulang_default || '14:00';
-        }
-      }).catch(function() {});
+        if (c.jam_masuk_default) document.getElementById('configJamMasuk').value = c.jam_masuk_default;
+        if (c.jam_pulang_default) document.getElementById('configJamPulang').value = c.jam_pulang_default;
+      }).catch(function(e) { showToast('Gagal muat konfigurasi: ' + e.message, 'error'); });
     }
 
     function saveConfig() {
-      var jm = document.getElementById('configJamMasuk').value;
-      var jp = document.getElementById('configJamPulang').value;
-      if (!jm || !jp) { showToast('Jam masuk dan pulang wajib diisi', 'error'); return; }
-      apiPost('updateKonfigurasi', { data: { jam_masuk_default: jm, jam_pulang_default: jp } }).then(function() {
-        showToast('Konfigurasi default disimpan', 'success');
-      }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
+      var data = {
+        jam_masuk_default: document.getElementById('configJamMasuk').value,
+        jam_pulang_default: document.getElementById('configJamPulang').value
+      };
+      apiPost('updateKonfigurasi', { data: data }).then(function() { showToast('Konfigurasi default disimpan', 'success'); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
     }
 
     // =============================================
-    // JADWAL PER KELAS
+    // JADWAL
     // =============================================
-    var jadwalData = [];
-    var editingJadwalIndex = -1;
+    var editJadwalRowIndex = null;
 
     function loadJadwal() {
-      apiGet('getJadwal').then(function(d) {
-        jadwalData = d || [];
-        renderJadwalTable();
-      }).catch(function(e) { showToast('Gagal memuat jadwal: ' + e.message, 'error'); });
+      apiGet('getJadwal').then(function(data) {
+        var tb = document.getElementById('jadwalTableBody');
+        if (!data || data.length === 0) { tb.innerHTML = '<tr><td colspan="5"><div class="empty-state py-6"><i class="fas fa-calendar-alt block"></i><p class="text-sm">Belum ada jadwal kelas</p></div></td></tr>'; return; }
+        tb.innerHTML = data.map(function(j, i) {
+          return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td class="font-medium">' + escapeHtml(j.kelas) + '</td><td>' + escapeHtml(j.jamMasuk) + '</td><td>' + escapeHtml(j.jamPulang) + '</td><td><button class="btn btn-secondary py-1 px-2 text-xs mr-1" onclick="editJadwal(' + j.rowIndex + ',\'' + escapeHtml(j.kelas) + '\',\'' + escapeHtml(j.jamMasuk) + '\',\'' + escapeHtml(j.jamPulang) + '\')"><i class="fas fa-edit"></i></button><button class="btn btn-danger py-1 px-2 text-xs" onclick="hapusJadwal(' + j.rowIndex + ',\'' + escapeHtml(j.kelas) + '\')"><i class="fas fa-trash"></i></button></td></tr>';
+        }).join('');
+      }).catch(function(e) { showToast('Gagal muat jadwal: ' + e.message, 'error'); });
     }
 
-    function renderJadwalTable() {
-      var tb = document.getElementById('jadwalTableBody');
-      if (!jadwalData || jadwalData.length === 0) {
-        tb.innerHTML = '<tr><td colspan="5"><div class="empty-state py-6"><i class="fas fa-calendar-alt block"></i><p class="text-sm">Belum ada jadwal kelas</p></div></td></tr>';
-        return;
-      }
-      tb.innerHTML = jadwalData.map(function(j, i) {
-        return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td class="font-medium">' + escapeHtml(j.kelas) + '</td><td>' + escapeHtml(j.jamMasuk) + '</td><td>' + escapeHtml(j.jamPulang) + '</td><td><div class="flex gap-1"><button class="btn btn-secondary py-1 px-2 text-xs" onclick="editJadwal(' + i + ')"><i class="fas fa-edit"></i></button><button class="btn btn-danger py-1 px-2 text-xs" onclick="deleteJadwal(' + i + ')"><i class="fas fa-trash"></i></button></div></td></tr>';
-      }).join('');
-    }
-
-    function openModalJadwal(idx) {
-      editingJadwalIndex = (idx !== undefined && idx !== null) ? idx : -1;
-      if (editingJadwalIndex >= 0 && jadwalData[editingJadwalIndex]) {
-        document.getElementById('modalJadwalTitle').textContent = 'Edit Jadwal Kelas';
-        document.getElementById('inputJadwalKelas').value = jadwalData[editingJadwalIndex].kelas;
-        document.getElementById('inputJadwalMasuk').value = jadwalData[editingJadwalIndex].jamMasuk;
-        document.getElementById('inputJadwalPulang').value = jadwalData[editingJadwalIndex].jamPulang;
-      } else {
-        document.getElementById('modalJadwalTitle').textContent = 'Tambah Jadwal Kelas';
-        document.getElementById('inputJadwalKelas').value = '';
-        document.getElementById('inputJadwalMasuk').value = '';
-        document.getElementById('inputJadwalPulang').value = '';
-      }
+    function openModalJadwal() {
+      editJadwalRowIndex = null;
+      document.getElementById('modalJadwalTitle').textContent = 'Tambah Jadwal Kelas';
+      document.getElementById('inputJadwalKelas').value = '';
+      document.getElementById('inputJadwalKelas').disabled = false;
+      document.getElementById('inputJadwalMasuk').value = '';
+      document.getElementById('inputJadwalPulang').value = '';
+      document.getElementById('btnSubmitJadwal').innerHTML = '<i class="fas fa-save"></i> Simpan';
       openModal('modalJadwal');
     }
 
-    function editJadwal(idx) { openModalJadwal(idx); }
-
-    function submitJadwal() {
-      var kls = document.getElementById('inputJadwalKelas').value.trim();
-      var jm = document.getElementById('inputJadwalMasuk').value;
-      var jp = document.getElementById('inputJadwalPulang').value;
-      if (!kls || !jm || !jp) { showToast('Semua field wajib diisi', 'error'); return; }
-      var btn = document.getElementById('btnSubmitJadwal');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:1rem;height:1rem;border-width:2px"></div> Menyimpan...';
-      var payload = { data: { kelas: kls, jamMasuk: jm, jamPulang: jp } };
-      if (editingJadwalIndex >= 0) payload.rowIndex = jadwalData[editingJadwalIndex].rowIndex;
-      apiPost(editingJadwalIndex >= 0 ? 'updateJadwal' : 'addJadwal', payload).then(function() {
-        showToast('Jadwal disimpan', 'success');
-        closeModal('modalJadwal');
-        loadJadwal();
-      }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); }).finally(function() {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
-      });
+    function editJadwal(rowIndex, kelas, jamMasuk, jamPulang) {
+      editJadwalRowIndex = rowIndex;
+      document.getElementById('modalJadwalTitle').textContent = 'Edit Jadwal Kelas';
+      document.getElementById('inputJadwalKelas').value = kelas;
+      document.getElementById('inputJadwalKelas').disabled = true;
+      document.getElementById('inputJadwalMasuk').value = jamMasuk;
+      document.getElementById('inputJadwalPulang').value = jamPulang;
+      document.getElementById('btnSubmitJadwal').innerHTML = '<i class="fas fa-save"></i> Perbarui';
+      openModal('modalJadwal');
     }
 
-    function deleteJadwal(idx) {
-      var j = jadwalData[idx];
-      document.getElementById('konfirmasiTitle').textContent = 'Hapus Jadwal?';
-      document.getElementById('konfirmasiMessage').textContent = 'Jadwal kelas "' + j.kelas + '" akan dihapus.';
+    function submitJadwal() {
+      var kelas = document.getElementById('inputJadwalKelas').value.trim();
+      var jamMasuk = document.getElementById('inputJadwalMasuk').value;
+      var jamPulang = document.getElementById('inputJadwalPulang').value;
+      if (!kelas) { showToast('Nama kelas wajib diisi', 'error'); return; }
+      if (!jamMasuk || !jamPulang) { showToast('Jam masuk dan pulang wajib diisi', 'error'); return; }
+      var d = { kelas: kelas, jamMasuk: jamMasuk, jamPulang: jamPulang };
+      if (editJadwalRowIndex) {
+        apiPost('updateJadwal', { rowIndex: editJadwalRowIndex, data: d }).then(function(r) { showToast(r.message, 'success'); closeModal('modalJadwal'); loadJadwal(); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
+      } else {
+        apiPost('addJadwal', { data: d }).then(function(r) { showToast(r.message, 'success'); closeModal('modalJadwal'); loadJadwal(); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
+      }
+    }
+
+    function hapusJadwal(rowIndex, kelas) {
+      document.getElementById('konfirmasiTitle').textContent = 'Hapus Jadwal';
+      document.getElementById('konfirmasiMessage').textContent = 'Yakin ingin menghapus jadwal kelas "' + kelas + '"?';
       document.getElementById('btnKonfirmasiYa').onclick = function() {
-        apiPost('deleteJadwal', { rowIndex: j.rowIndex }).then(function() {
-          showToast('Jadwal dihapus', 'success');
-          closeModal('modalKonfirmasi');
-          loadJadwal();
-        }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
+        apiPost('deleteJadwal', { rowIndex: rowIndex }).then(function() { showToast('Jadwal dihapus', 'success'); closeModal('modalKonfirmasi'); loadJadwal(); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
       };
       openModal('modalKonfirmasi');
     }
@@ -1042,61 +964,58 @@
     // LAPORAN
     // =============================================
     function loadLaporan() {
-      var tgl = document.getElementById('laporanTanggal').value;
-      var kls = document.getElementById('laporanKelas').value;
-      if (!tgl) {
+      var tanggal = document.getElementById('laporanTanggal').value;
+      var kelas = document.getElementById('laporanKelas').value;
+      if (!tanggal) {
         var today = new Date();
-        tgl = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-        document.getElementById('laporanTanggal').value = tgl;
+        tanggal = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+        document.getElementById('laporanTanggal').value = tanggal;
       }
-      var params = { tanggal: tgl };
-      if (kls && kls !== 'Semua') params.kelas = kls;
-      apiGet('getAbsensi', params).then(function(d) {
+      apiGet('getAbsensi', { tanggal: tanggal, kelas: kelas }).then(function(data) {
         var tb = document.getElementById('tbodyLaporan');
-        if (!d || d.length === 0) {
-          tb.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-file-alt block"></i><p class="text-sm">Tidak ada data untuk filter ini</p></div></td></tr>';
-          document.getElementById('laporanSummary').classList.add('hidden');
+        var summary = document.getElementById('laporanSummary');
+        if (!data || data.length === 0) {
+          tb.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-file-alt block"></i><p class="text-sm">Tidak ada data absensi untuk tanggal ini</p></div></td></tr>';
+          summary.classList.add('hidden');
           return;
         }
-        tb.innerHTML = d.map(function(r, i) {
-          var bc = r.status === 'Hadir' ? 'badge-hadir' : r.status === 'Terlambat' ? 'badge-terlambat' : r.status === 'Pulang' ? 'badge-pulang' : (r.status === 'Sakit' ? 'badge-sakit' : (r.status === 'Izin' ? 'badge-izin' : 'badge-alpa'));
-          return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td class="font-medium">' + escapeHtml(r.nama) + '</td><td>' + escapeHtml(r.kelas) + '</td><td class="text-sm">' + formatTanggal(r.tanggal) + '</td><td>' + escapeHtml(r.jamMasuk || '-') + '</td><td>' + escapeHtml(r.jamPulang || '-') + '</td><td><span class="badge ' + bc + '">' + escapeHtml(r.status) + '</span></td></tr>';
+        tb.innerHTML = data.map(function(r, i) {
+          var bc = r.status === 'Hadir' ? 'badge-hadir' : r.status === 'Terlambat' ? 'badge-terlambat' : (r.status === 'Sakit' ? 'badge-sakit' : (r.status === 'Izin' ? 'badge-izin' : 'badge-alpa'));
+          return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td><span class="font-medium">' + escapeHtml(r.nama) + '</span></td><td>' + escapeHtml(r.kelas) + '</td><td class="text-[var(--muted)]">' + formatTanggal(r.tanggal) + '</td><td>' + escapeHtml(r.jamMasuk || '-') + '</td><td>' + escapeHtml(r.jamPulang || '-') + '</td><td><span class="badge ' + bc + '">' + escapeHtml(r.status) + '</span></td></tr>';
         }).join('');
-        var hadir = d.filter(function(r) { return r.status === 'Hadir'; }).length;
-        var terlambat = d.filter(function(r) { return r.status === 'Terlambat'; }).length;
-        var sakit = d.filter(function(r) { return r.status === 'Sakit'; }).length;
-        var izin = d.filter(function(r) { return r.status === 'Izin'; }).length;
-        var alpa = d.filter(function(r) { return r.status === 'Alpa'; }).length;
-        var sum = document.getElementById('laporanSummary');
-        sum.classList.remove('hidden');
-        sum.innerHTML = 'Total: ' + d.length + ' siswa &mdash; <span class="text-[#34D399]">Hadir: ' + hadir + '</span> &mdash; <span class="text-[#FBBF24]">Terlambat: ' + terlambat + '</span> &mdash; <span class="text-[#FCA5A5]">Sakit: ' + sakit + '</span> &mdash; <span class="text-[#FBBF24]">Izin: ' + izin + '</span> &mdash; <span class="text-[#94A3B8]">Alpa: ' + alpa + '</span>';
-      }).catch(function(e) { showToast('Gagal memuat laporan: ' + e.message, 'error'); });
+        var h = data.filter(function(r) { return r.status === 'Hadir'; }).length;
+        var t = data.filter(function(r) { return r.status === 'Terlambat'; }).length;
+        var s = data.filter(function(r) { return r.status === 'Sakit'; }).length;
+        var iz = data.filter(function(r) { return r.status === 'Izin'; }).length;
+        var a = data.filter(function(r) { return r.status === 'Alpa'; }).length;
+        summary.innerHTML = 'Total: <strong>' + data.length + '</strong> &mdash; Hadir: <strong class="text-[var(--accent)]">' + h + '</strong> &mdash; Terlambat: <strong class="text-[var(--warning)]">' + t + '</strong> &mdash; Sakit: <strong class="text-[var(--danger)]">' + s + '</strong> &mdash; Izin: <strong class="text-[var(--warning)]">' + iz + '</strong> &mdash; Alpa: <strong class="text-[var(--muted)]">' + a + '</strong>';
+        summary.classList.remove('hidden');
+      }).catch(function(e) { showToast('Gagal muat laporan: ' + e.message, 'error'); });
     }
 
     function exportExcel() {
-      var tgl = document.getElementById('laporanTanggal').value;
-      var kls = document.getElementById('laporanKelas').value;
-      if (!tgl) { showToast('Pilih tanggal terlebih dahulu', 'error'); return; }
-      showToast('Mengunduh laporan...', 'info');
-      var params = { tanggal: tgl };
-      if (kls && kls !== 'Semua') params.kelas = kls;
-      apiGet('getAbsensi', params).then(function(d) {
-        if (!d || d.length === 0) { showToast('Tidak ada data untuk diekspor', 'error'); return; }
+      var tanggal = document.getElementById('laporanTanggal').value;
+      var kelas = document.getElementById('laporanKelas').value;
+      if (!tanggal) { showToast('Pilih tanggal terlebih dahulu', 'error'); return; }
+      apiGet('getAbsensi', { tanggal: tanggal, kelas: kelas }).then(function(data) {
+        if (!data || data.length === 0) { showToast('Tidak ada data untuk diekspor', 'error'); return; }
         var rows = [['No', 'Nama Siswa', 'Kelas', 'Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status']];
-        d.forEach(function(r, i) { rows.push([i + 1, r.nama, r.kelas, r.tanggal, r.jamMasuk || '-', r.jamPulang || '-', r.status]); });
+        data.forEach(function(r, i) { rows.push([i+1, r.nama, r.kelas, r.tanggal, r.jamMasuk || '-', r.jamPulang || '-', r.status]); });
         var ws = XLSX.utils.aoa_to_sheet(rows);
         var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Laporan Absensi');
-        XLSX.writeFile(wb, 'Laporan_Absensi_' + tgl + '.xlsx');
-        showToast('File Excel berhasil diunduh', 'success');
-      }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
+        XLSX.utils.book_append_sheet(wb, ws, 'Absensi');
+        XLSX.writeFile(wb, 'Absensi_' + tanggal + (kelas !== 'Semua' ? '_' + kelas : '') + '.xlsx');
+        showToast('File Excel berhasil didownload', 'success');
+      }).catch(function(e) { showToast('Gagal ekspor: ' + e.message, 'error'); });
     }
 
     // =============================================
-    // INISIALISASI
+    // INIT
     // =============================================
-    checkApiConnection();
-    loadDashboard();
+    document.addEventListener('DOMContentLoaded', function() {
+      checkApiConnection();
+      loadDashboard();
+    });
   </script>
 </body>
 </html>
