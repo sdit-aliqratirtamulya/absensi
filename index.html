@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cyber Attendance System</title>
-  
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -158,20 +158,24 @@
 
     <div class="p-6 space-y-6">
 
-      <!-- SECTION: DASHBOARD -->
+      <!-- SECTION: DASHBOARD (STATISTIK LENGKAP DIPERBAIKI) -->
       <section id="sec-dashboard" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div class="cyber-card p-5 rounded-xl border-l-4 border-l-cyan-500">
             <p class="text-xs text-slate-400 font-semibold uppercase">Total Siswa</p>
             <h3 id="dash-total" class="text-3xl font-tech font-bold text-cyan-400 mt-1">0</h3>
           </div>
           <div class="cyber-card p-5 rounded-xl border-l-4 border-l-emerald-500">
-            <p class="text-xs text-slate-400 font-semibold uppercase">Hadir Hari Ini</p>
+            <p class="text-xs text-slate-400 font-semibold uppercase">Hadir</p>
             <h3 id="dash-hadir" class="text-3xl font-tech font-bold text-emerald-400 mt-1">0</h3>
           </div>
           <div class="cyber-card p-5 rounded-xl border-l-4 border-l-amber-500">
-            <p class="text-xs text-slate-400 font-semibold uppercase">Izin / Sakit</p>
-            <h3 id="dash-izinsakit" class="text-3xl font-tech font-bold text-amber-400 mt-1">0</h3>
+            <p class="text-xs text-slate-400 font-semibold uppercase">Izin</p>
+            <h3 id="dash-izin" class="text-3xl font-tech font-bold text-amber-400 mt-1">0</h3>
+          </div>
+          <div class="cyber-card p-5 rounded-xl border-l-4 border-l-sky-500">
+            <p class="text-xs text-slate-400 font-semibold uppercase">Sakit</p>
+            <h3 id="dash-sakit" class="text-3xl font-tech font-bold text-sky-400 mt-1">0</h3>
           </div>
           <div class="cyber-card p-5 rounded-xl border-l-4 border-l-rose-500">
             <p class="text-xs text-slate-400 font-semibold uppercase">Alpha</p>
@@ -182,7 +186,7 @@
 
       <!-- SECTION: DATA SISWA -->
       <section id="sec-siswa" class="hidden space-y-4">
-        <div class="cyber-card p-4 rounded-xl flex justify-between items-center">
+        <div class="cyber-card p-4 rounded-xl flex justify-between items-center flex-wrap gap-3">
           <input type="text" id="search-siswa" onkeyup="filterSiswaTable()" placeholder="Cari NIS atau Nama Siswa..." class="bg-slate-900 border border-slate-700 text-sm rounded-lg px-4 py-2 w-72 focus:outline-none focus:border-cyan-500 text-white">
           <div class="flex gap-2">
             <button onclick="cetakSemuaKartu()" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-2">
@@ -194,24 +198,24 @@
           </div>
         </div>
 
-        <div class="cyber-card rounded-xl overflow-hidden">
+        <div class="cyber-card rounded-xl overflow-x-auto">
           <table class="w-full text-left border-collapse text-sm">
-  <thead>
-    <tr class="bg-slate-900 text-cyan-400">
-      <th class="p-4">NIS</th>
-      <th class="p-4">Nama Siswa</th>
-      <th class="p-4">Kelas</th>
-      <th class="p-4">L/P</th>
-      <th class="p-4">No. HP Orang Tua</th>
-    </tr>
-  </thead>
-  <!-- ID ini harus persis sama dengan yang dipanggil di JS -->
-  <tbody id="tb-siswa">
-    <tr>
-      <td colspan="5" class="text-center p-4 text-slate-500">Memuat data...</td>
-    </tr>
-  </tbody>
-</table>
+            <thead>
+              <tr class="bg-slate-900 text-cyan-400">
+                <th class="p-4">NIS</th>
+                <th class="p-4">Nama Siswa</th>
+                <th class="p-4">Kelas</th>
+                <th class="p-4">L/P</th>
+                <th class="p-4">No. HP Orang Tua</th>
+                <th class="p-4 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tb-siswa">
+              <tr>
+                <td colspan="6" class="text-center p-4 text-slate-500">Memuat data...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -279,7 +283,7 @@
           </button>
         </div>
 
-        <div class="cyber-card rounded-xl overflow-hidden">
+        <div class="cyber-card rounded-xl overflow-x-auto">
           <table class="w-full text-left text-sm text-slate-300">
             <thead class="bg-slate-900/80 text-cyan-400 font-tech uppercase text-xs border-b border-slate-800">
               <tr>
@@ -335,20 +339,20 @@
   </div>
 
   <script>
-    // URL Deployment Google Apps Script (Ganti dengan URL milik Anda)
+    // URL Deployment Google Apps Script
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby1RPI2OISPWTKmDuUS4eM8PNfNkdIRdgjAGB7IIzy_BP30rBl5d9HqYG68k5Z0ODfi/exec";
 
     let html5QrCode = null;
-    let currentCameraFacingMode = "environment"; // Kamera belakang default
+    let currentCameraFacingMode = "environment"; 
     let globalDataSiswa = [];
 
-    // Init Application
-    // MENJADI INI:
-window.onload = function() {
-  loadDashboard(); // <- Sesuaikan dengan nama fungsi yang ada
-  loadDataSiswa();
-  loadDataLaporan();
-};
+    // Init App Saat Halaman Di-load
+    window.onload = function() {
+      startClock();
+      loadDashboard();
+      loadDataSiswa();
+      loadDataLaporan();
+    };
 
     function startClock() {
       setInterval(() => {
@@ -378,70 +382,68 @@ window.onload = function() {
       }
 
       if (tab === 'laporan') loadDataLaporan();
-      if (tab === 'dashboard') loadDashboardData();
+      if (tab === 'dashboard') loadDashboard();
     }
 
     // Load Data Dashboard
     function loadDashboard() {
-  fetch(`${GAS_API_URL}?action=getDashboard`)
-    .then(res => res.json())
-    .then(res => {
-      if (res.status === 'success') {
-        const s = res.summary;
-        document.getElementById('dash-total').innerText = s.totalSiswa || 0;
-        document.getElementById('dash-hadir').innerText = s.hadir || 0;
-        document.getElementById('dash-sakit').innerText = s.sakit || 0;
-        document.getElementById('dash-izin').innerText  = s.izin || 0;
-        document.getElementById('dash-alpha').innerText = s.alpha || 0;
-      }
-    })
-    .catch(err => {
-      console.error("Gagal memuat dashboard:", err);
-    });
-}
+      fetch(`${GAS_API_URL}?action=getDashboard`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            const s = res.summary;
+
+            const elTotal = document.getElementById('dash-total');
+            const elHadir = document.getElementById('dash-hadir');
+            const elSakit = document.getElementById('dash-sakit');
+            const elIzin  = document.getElementById('dash-izin');
+            const elAlpha = document.getElementById('dash-alpha');
+
+            if (elTotal) elTotal.innerText = s.totalSiswa || 0;
+            if (elHadir) elHadir.innerText = s.hadir || 0;
+            if (elSakit) elSakit.innerText = s.sakit || 0;
+            if (elIzin)  elIzin.innerText  = s.izin || 0;
+            if (elAlpha) elAlpha.innerText = s.alpha || 0;
+          }
+        })
+        .catch(err => {
+          console.error("Gagal memuat dashboard:", err);
+        });
+    }
 
     // Load Data Siswa
-    // Fungsi untuk memuat Data Siswa dari Google Sheets
-function loadDataSiswa() {
-  const tbSiswa = document.getElementById('tb-siswa');
-  if (!tbSiswa) return;
+    function loadDataSiswa() {
+      const tbSiswa = document.getElementById('tb-siswa');
+      if (!tbSiswa) return;
 
-  tbSiswa.innerHTML = '<tr><td colspan="5" class="text-center p-4">Memuat data siswa...</td></tr>';
+      tbSiswa.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-slate-400">Memuat data siswa...</td></tr>';
 
-  fetch(`${GAS_API_URL}?action=getSiswa`)
-    .then(res => res.json())
-    .then(res => {
-      if (res.status === 'success' && res.data.length > 0) {
-        let html = '';
-        res.data.forEach(r => {
-          // r[0]: NIS, r[1]: Nama, r[2]: Kelas, r[3]: JK, r[4]: No HP Ortu
-          html += `<tr class="border-b border-slate-800 hover:bg-slate-900/50">
-            <td class="p-4 font-tech text-cyan-400">${r[0]}</td>
-            <td class="p-4 font-semibold text-white">${r[1]}</td>
-            <td class="p-4 font-tech">${r[2]}</td>
-            <td class="p-4">${r[3] === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
-            <td class="p-4 text-slate-300">${r[4] || '-'}</td>
-          </tr>`;
+      fetch(`${GAS_API_URL}?action=getSiswa`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success' && res.data.length > 0) {
+            globalDataSiswa = res.data; // DILENGKAPI: Simpan data global untuk pencarian & cetak
+            renderSiswaTable(globalDataSiswa);
+            populateKelasDropdown(globalDataSiswa);
+          } else {
+            tbSiswa.innerHTML = '<tr><td colspan="6" class="text-center p-4">Belum ada data siswa.</td></tr>';
+          }
+        })
+        .catch(err => {
+          console.error("Gagal memuat siswa:", err);
+          tbSiswa.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-rose-500">Gagal mengambil data dari server. Batasan CORS atau URL invalid.</td></tr>';
         });
-        tbSiswa.innerHTML = html;
-      } else {
-        tbSiswa.innerHTML = '<tr><td colspan="5" class="text-center p-4">Belum ada data siswa.</td></tr>';
-      }
-    })
-    .catch(err => {
-      console.error("Gagal memuat siswa:", err);
-      tbSiswa.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-rose-500">Gagal mengambil data dari server. Batasan CORS atau URL invalid.</td></tr>';
-    });
-}
+    }
 
     function renderSiswaTable(data) {
       let html = '';
       data.forEach(r => {
-        html += `<tr class="hover:bg-slate-900/50">
+        html += `<tr class="border-b border-slate-800 hover:bg-slate-900/50">
           <td class="p-4 font-tech text-cyan-400">${r[0]}</td>
           <td class="p-4 font-semibold text-white">${r[1]}</td>
-          <td class="p-4">${r[2]}</td>
-          <td class="p-4 text-slate-400">${r[4]}</td>
+          <td class="p-4 font-tech">${r[2]}</td>
+          <td class="p-4">${r[3] === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
+          <td class="p-4 text-slate-300">${r[4] || '-'}</td>
           <td class="p-4 text-center">
             <button onclick="cetakKartuSiswa('${r[0]}', '${r[1]}', '${r[2]}')" class="bg-cyan-950 text-cyan-400 border border-cyan-800 hover:bg-cyan-900 px-3 py-1 rounded text-xs transition">
               <i class="fa-solid fa-id-card mr-1"></i> Kartu
@@ -449,7 +451,7 @@ function loadDataSiswa() {
           </td>
         </tr>`;
       });
-      document.getElementById('tb-siswa').innerHTML = html || '<tr><td colspan="5" class="text-center p-4">Kosong</td></tr>';
+      document.getElementById('tb-siswa').innerHTML = html || '<tr><td colspan="6" class="text-center p-4 text-slate-500">Data tidak ditemukan.</td></tr>';
     }
 
     function filterSiswaTable() {
@@ -492,7 +494,7 @@ function loadDataSiswa() {
       .then(res => res.json())
       .then(res => {
         alert(res.message);
-        if (res.status === 'success') loadDashboardData();
+        if (res.status === 'success') loadDashboard();
       });
     }
 
@@ -543,49 +545,45 @@ function loadDataSiswa() {
     }
 
     // Laporan
-   // Laporan
-function loadDataLaporan() {
-  fetch(`${GAS_API_URL}?action=getLaporan`)
-    .then(res => res.json())
-    .then(res => {
-      if (res.status === 'success') {
-        let html = '';
-        // Membalik urutan agar data presensi terbaru muncul di paling atas
-        res.data.reverse().forEach(r => {
-          const waktuFormatted = r[0] || '-';
-          const tanggalFormatted = r[1] ? new Date(r[1]).toLocaleDateString('id-ID') : '-';
-          
-          html += `<tr class="hover:bg-slate-900/50">
-            <td class="p-4 text-cyan-400 font-tech">${waktuFormatted}</td>
-            <td class="p-4">${tanggalFormatted}</td>
-            <td class="p-4 font-tech">${r[2]}</td>
-            <td class="p-4 font-semibold text-white">${r[3]}</td>
-            <td class="p-4">${r[4]}</td>
-            <td class="p-4">
-              <span class="px-2 py-1 rounded text-xs font-bold ${
-                r[5] === 'Hadir' 
-                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' 
-                  : 'bg-amber-950 text-amber-400 border border-amber-800'
-              }">
-                ${r[5]}
-              </span>
-            </td>
-          </tr>`;
+    function loadDataLaporan() {
+      fetch(`${GAS_API_URL}?action=getLaporan`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            let html = '';
+            res.data.reverse().forEach(r => {
+              const waktuFormatted = r[0] || '-';
+              const tanggalFormatted = r[1] ? new Date(r[1]).toLocaleDateString('id-ID') : '-';
+              
+              html += `<tr class="hover:bg-slate-900/50">
+                <td class="p-4 text-cyan-400 font-tech">${waktuFormatted}</td>
+                <td class="p-4">${tanggalFormatted}</td>
+                <td class="p-4 font-tech">${r[2]}</td>
+                <td class="p-4 font-semibold text-white">${r[3]}</td>
+                <td class="p-4">${r[4]}</td>
+                <td class="p-4">
+                  <span class="px-2 py-1 rounded text-xs font-bold ${
+                    r[5] === 'Hadir' 
+                      ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' 
+                      : 'bg-amber-950 text-amber-400 border border-amber-800'
+                  }">
+                    ${r[5]}
+                  </span>
+                </td>
+              </tr>`;
+            });
+            document.getElementById('tb-laporan').innerHTML = html || '<tr><td colspan="6" class="text-center p-4">Belum ada data presensi</td></tr>';
+          }
+        })
+        .catch(err => {
+          console.error("Gagal memuat laporan:", err);
+          document.getElementById('tb-laporan').innerHTML = '<tr><td colspan="6" class="text-center p-4 text-rose-500">Gagal memuat data laporan</td></tr>';
         });
-        document.getElementById('tb-laporan').innerHTML = html || '<tr><td colspan="6" class="text-center p-4">Belum ada data presensi</td></tr>';
-      }
-    })
-    .catch(err => {
-      console.error("Gagal memuat laporan:", err);
-      document.getElementById('tb-laporan').innerHTML = '<tr><td colspan="6" class="text-center p-4 text-rose-500">Gagal memuat data laporan</td></tr>';
-    });
-}
+    }
 
     // GENERATOR KARTU PELAJAR FUNCTIONS
     function cetakKartuSiswa(nis, nama, kelas) {
       const container = document.getElementById('print-area');
-      container.innerHTML = '';
-      
       container.innerHTML = createCardHTML(nis, nama, kelas);
       
       new QRCode(document.getElementById(`qrcode-${nis}`), {
@@ -632,7 +630,6 @@ function loadDataLaporan() {
     function createCardHTML(nis, nama, kelas) {
       return `
       <div class="card-container id-card rounded-xl p-3 border border-cyan-500/40 relative flex flex-col justify-between text-white overflow-hidden shadow-xl">
-        
         <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-cyan-500/10 rounded-full blur-xl"></div>
         
         <!-- Card Header -->
