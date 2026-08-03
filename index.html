@@ -3,1019 +3,1017 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absensi - SDIT AL-IQRA</title>
+  <title>Sistem Absensi Siswa QR Code</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script>tailwind.config={theme:{extend:{fontFamily:{display:['Space Grotesk','sans-serif'],body:['DM Sans','sans-serif']}}}}</script>
+  <!-- html5-qrcode CDN -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <!-- qrcode.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- XLSX CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    :root{--bg:#0F172A;--bg-deep:#0B1222;--card:#1E293B;--card-hover:#263448;--border:#334155;--text:#F1F5F9;--muted:#94A3B8;--accent:#10B981;--accent-hover:#059669;--accent-glow:rgba(16,185,129,0.12);--warning:#F59E0B;--danger:#EF4444;--info:#06B6D4}
-    *{box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
-    body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 15% 50%,rgba(16,185,129,0.04) 0%,transparent 50%),radial-gradient(ellipse at 85% 20%,rgba(6,182,212,0.03) 0%,transparent 50%),radial-gradient(ellipse at 50% 85%,rgba(245,158,11,0.02) 0%,transparent 50%);animation:bgShift 25s ease-in-out infinite alternate;z-index:-1;pointer-events:none}
-    @keyframes bgShift{0%{transform:translate(0,0) rotate(0deg)}100%{transform:translate(-3%,-3%) rotate(3deg)}}
-    .sidebar{background:var(--bg-deep);border-right:1px solid var(--border)}
-    .nav-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1.5rem;cursor:pointer;color:var(--muted);transition:all .2s;position:relative;border-left:3px solid transparent;font-weight:500;font-size:.9rem}
-    .nav-item:hover{color:var(--text);background:rgba(30,41,59,0.5)}
-    .nav-item.active{color:var(--accent);background:var(--accent-glow);border-left-color:var(--accent)}
-    .nav-item i{width:1.25rem;text-align:center}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;transition:all .25s}
-    .card:hover{border-color:rgba(16,185,129,0.3)}
-    .stat-card{position:relative;overflow:hidden}.stat-card::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;opacity:.06;transition:opacity .3s}.stat-card:hover::after{opacity:.12}
-    .stat-card.emerald::after{background:var(--accent)}.stat-card.cyan::after{background:var(--info)}.stat-card.amber::after{background:var(--warning)}.stat-card.red::after{background:var(--danger)}.stat-card.blue::after{background:#3B82F6}
-    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;border-radius:.5rem;font-weight:600;font-size:.875rem;cursor:pointer;transition:all .2s;border:none;font-family:'DM Sans',sans-serif}
-    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 15px rgba(16,185,129,0.3)}
-    .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{background:var(--card-hover);border-color:var(--accent)}
-    .btn-danger{background:rgba(239,68,68,0.15);color:var(--danger);border:1px solid rgba(239,68,68,0.3)}.btn-danger:hover{background:rgba(239,68,68,0.25)}
-    .btn-info{background:rgba(6,182,212,0.15);color:var(--info);border:1px solid rgba(6,182,212,0.3)}.btn-info:hover{background:rgba(6,182,212,0.25)}
-    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
-    .input{background:var(--bg);border:1px solid var(--border);border-radius:.5rem;padding:.6rem 1rem;color:var(--text);font-size:.875rem;width:100%;font-family:'DM Sans',sans-serif;transition:border-color .2s}
-    .input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-    .input::placeholder{color:var(--muted)}
-    .data-table{width:100%;border-collapse:separate;border-spacing:0}
-    .data-table thead th{background:var(--bg-deep);color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;padding:.75rem 1rem;text-align:left;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
-    .data-table tbody td{padding:.75rem 1rem;border-bottom:1px solid rgba(51,65,85,0.5);font-size:.875rem;vertical-align:middle}
-    .data-table tbody tr{transition:background .15s}.data-table tbody tr:hover{background:rgba(16,185,129,0.04)}
-    .badge{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .6rem;border-radius:9999px;font-size:.75rem;font-weight:600}
-    .badge-hadir{background:rgba(16,185,129,0.15);color:#34D399}.badge-terlambat{background:rgba(245,158,11,0.15);color:#FBBF24}
-    .badge-pulang{background:rgba(6,182,212,0.15);color:#22D3EE}
-    .badge-sakit{background:rgba(239,68,68,0.15);color:#FCA5A5}
-    .badge-izin{background:rgba(245,158,11,0.15);color:#FBBF24}
-    .badge-alpa{background:rgba(148,163,184,0.15);color:#94A3B8}
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}.modal-overlay.show{opacity:1;pointer-events:auto}
-    .modal-content{background:var(--card);border:1px solid var(--border);border-radius:1rem;padding:2rem;width:90%;max-width:500px;transform:translateY(20px) scale(.97);transition:transform .25s;max-height:90vh;overflow-y:auto}.modal-overlay.show .modal-content{transform:translateY(0) scale(1)}
-    .toast{padding:.85rem 1.25rem;border-radius:.5rem;font-size:.875rem;font-weight:500;display:flex;align-items:center;gap:.5rem;animation:toastIn .35s ease-out;box-shadow:0 10px 30px rgba(0,0,0,0.3);border:1px solid transparent;min-width:300px;max-width:440px}
-    .toast-success{background:#065F46;color:#A7F3D0;border-color:#10B981}.toast-error{background:#7F1D1D;color:#FCA5A5;border-color:#EF4444}.toast-info{background:#164E63;color:#A5F3FC;border-color:#06B6D4}
-    @keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes toastOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
-    .page{display:none;animation:pageIn .3s ease-out}.page.active{display:block}@keyframes pageIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    #qr-reader{border-radius:.75rem;overflow:hidden;border:2px solid var(--border)}
-    #qr-reader video{border-radius:.5rem}
-    .scan-flash{animation:scanFlash .4s ease-out}@keyframes scanFlash{0%{box-shadow:0 0 0 0 rgba(16,185,129,0.6)}100%{box-shadow:0 0 0 20px rgba(16,185,129,0)}}
-    .tab-btn{padding:.6rem 1.5rem;border-radius:.5rem .5rem 0 0;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif}
-    .tab-btn.active{background:var(--card);color:var(--accent);border-color:var(--border)}.tab-btn:hover:not(.active){color:var(--text)}
-    .tab-content{display:none}.tab-content.active{display:block;animation:pageIn .2s ease-out}
-    ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--muted)}
-    .empty-state{text-align:center;padding:3rem 1rem;color:var(--muted)}.empty-state i{font-size:3rem;margin-bottom:1rem;opacity:.3}
-    .spinner{width:1.25rem;height:1.25rem;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-    .count-up{transition:all .5s ease-out}
-    @media(max-width:1023px){.sidebar{transform:translateX(-100%);transition:transform .3s ease;z-index:50}.sidebar.open{transform:translateX(0)}}
-    #qr-display{display:flex;justify-content:center;padding:1rem}#qr-display img,#qr-display canvas{border-radius:.5rem}
-    .label{font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;display:block;text-transform:uppercase;letter-spacing:.04em}
-    .api-status{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
-    .api-status.connected{background:var(--accent);box-shadow:0 0 6px var(--accent)}.api-status.disconnected{background:var(--danger);box-shadow:0 0 6px var(--danger)}.api-status.checking{background:var(--warning);animation:pulse 1s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-    .school-badge{background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(6,182,212,0.05));border:1px solid rgba(16,185,129,0.2);border-radius:.5rem;padding:.6rem .8rem}
-    .cooldown-bar{height:3px;background:var(--accent);border-radius:2px;transition:width 0.1s linear}
-    .divider-text{display:flex;align-items:center;gap:.75rem;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-    .divider-text::before,.divider-text::after{content:'';flex:1;height:1px;background:var(--border)}
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    #reader video { object-fit: cover !important; border-radius: 0.75rem; }
+    @media print {
+      body * { visibility: hidden; }
+      #qrPrintArea, #qrPrintArea * { visibility: visible; }
+      #qrPrintArea { position: absolute; left: 0; top: 0; width: 100%; }
+    }
   </style>
 </head>
-<body>
-  <div id="toastContainer" style="position:fixed;top:1rem;right:1rem;z-index:200;display:flex;flex-direction:column;gap:.5rem"></div>
-  <button id="mobileMenuBtn" onclick="toggleSidebar()" class="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 flex items-center justify-center rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--text)]"><i class="fas fa-bars"></i></button>
-  <div id="sidebarOverlay" onclick="toggleSidebar()" class="lg:hidden fixed inset-0 bg-black/50 z-40 hidden"></div>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-  <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-64 flex flex-col z-50">
-    <div class="px-5 py-4 border-b border-[var(--border)]">
-      <div class="flex items-center gap-3 mb-3"><div class="w-9 h-9 rounded-lg bg-[var(--accent)] flex items-center justify-center flex-shrink-0"><i class="fas fa-school text-white text-sm"></i></div><div class="min-w-0"><h1 class="font-display font-bold text-sm text-[var(--text)] leading-tight">SDIT AL-IQRA</h1><p class="text-[0.6rem] text-[var(--muted)]">Sistem Absensi Siswa</p></div></div>
-      <div class="school-badge text-[0.65rem] text-[var(--muted)] space-y-0.5"><div class="flex items-start gap-1.5"><i class="fas fa-map-marker-alt mt-0.5 text-[var(--accent)] text-[0.55rem]"></i><span>Kp. Tangkil - Citarik</span></div><div class="flex items-start gap-1.5"><i class="fas fa-map-pin mt-0.5 text-[var(--accent)] text-[0.55rem]"></i><span>Kecamatan Tirtamulya - Kabupaten Karawang</span></div></div>
+  <!-- TOPBAR -->
+  <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/60 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-500/20 p-2 rounded-xl border border-emerald-500/30 text-emerald-400">
+          <i data-lucide="qr-code" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-slate-100 leading-tight">Presensi QR Code</h1>
+          <p class="text-xs text-slate-400">SDN Cikampek Barat II / SDIT AL-IQRA</p>
+        </div>
+      </div>
+
+      <!-- Live Clock & Status Api -->
+      <div class="flex items-center space-x-4">
+        <div class="text-right hidden sm:block">
+          <div id="liveClock" class="font-mono text-sm font-semibold text-emerald-400">00:00:00 WIB</div>
+          <div id="liveDate" class="text-xs text-slate-400">Loading...</div>
+        </div>
+        <div id="apiStatus" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <span>Menghubungkan...</span>
+        </div>
+      </div>
     </div>
-    <nav class="flex-1 py-4">
-      <div class="px-4 mb-2 text-[0.65rem] font-semibold text-[var(--muted)] uppercase tracking-wider">Menu Utama</div>
-      <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
-      <a class="nav-item" data-page="siswa" onclick="showPage('siswa')"><i class="fas fa-users"></i><span>Data Siswa</span></a>
-      <a class="nav-item" data-page="absensi" onclick="showPage('absensi')"><i class="fas fa-qrcode"></i><span>Absensi</span></a>
-      <a class="nav-item" data-page="konfigurasi" onclick="showPage('konfigurasi')"><i class="fas fa-sliders"></i><span>Konfigurasi</span></a>
-      <a class="nav-item" data-page="laporan" onclick="showPage('laporan')"><i class="fas fa-file-export"></i><span>Laporan</span></a>
+  </header>
+
+  <!-- APP CONTAINER -->
+  <div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- SETTINGS / GAS URL BAR -->
+    <div id="gasConfigBanner" class="bg-slate-800 border border-slate-700 rounded-2xl p-4 mb-6 shadow-lg">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <i data-lucide="link" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i>
+          <div>
+            <h3 class="text-sm font-medium text-slate-200">Google Apps Script Web App URL</h3>
+            <p class="text-xs text-slate-400">URL Web App sudah dikonfigurasi secara bawaan</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 w-full md:w-auto">
+          <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" 
+            class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs w-full md:w-96 text-slate-200 focus:outline-none focus:border-emerald-500">
+          <button onclick="saveGasUrl()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-xl font-medium transition flex items-center space-x-1 whitespace-nowrap">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Simpan</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="flex space-x-2 border-b border-slate-800 mb-6 overflow-x-auto pb-2 scrollbar-none">
+      <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2 bg-emerald-600 text-white">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span>Dashboard</span>
+      </button>
+      <button onclick="switchTab('scanner')" id="tab-scanner" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+        <i data-lucide="scan-line" class="w-4 h-4"></i>
+        <span>Scanner QR</span>
+      </button>
+      <button onclick="switchTab('siswa')" id="tab-siswa" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        <span>Data Siswa</span>
+      </button>
+      <button onclick="switchTab('absensi')" id="tab-absensi" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+        <span>Laporan Absensi</span>
+      </button>
+      <button onclick="switchTab('pengaturan')" id="tab-pengaturan" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+        <span>Pengaturan</span>
+      </button>
     </nav>
-    <div class="px-5 py-4 border-t border-[var(--border)]">
-      <div class="flex items-center text-xs text-[var(--muted)] mb-2"><span id="apiStatusDot" class="api-status disconnected"></span><span id="apiStatusText">Memeriksa...</span></div>
-      <div id="currentDate" class="text-xs text-[var(--muted)]"></div>
-      <div id="currentTime" class="text-lg font-display font-bold text-[var(--accent)]"></div>
-    </div>
-  </aside>
 
-  <main class="lg:ml-64 min-h-screen">
-    <header class="sticky top-0 z-30 bg-[var(--bg)]/80 backdrop-blur-md border-b border-[var(--border)] px-6 py-4">
-      <div class="flex items-center justify-between"><div class="lg:hidden w-10"></div><h2 id="pageTitle" class="font-display font-bold text-lg">Dashboard</h2>
-        <button onclick="refreshCurrentPage()" class="w-9 h-9 rounded-lg bg-[var(--card)] border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-all" title="Refresh"><i class="fas fa-sync-alt text-sm"></i></button>
-      </div>
-    </header>
-
-    <div class="p-4 md:p-6">
-
-      <!-- ========== DASHBOARD ========== -->
-      <section id="page-dashboard" class="page active">
-        <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
-          <div class="card stat-card emerald"><div class="flex items-center justify-between mb-2"><span class="text-[var(--muted)] text-xs font-medium">Total Siswa</span><div class="w-10 h-10 rounded-lg bg-[var(--accent-glow)] flex items-center justify-center"><i class="fas fa-users text-[var(--accent)]"></i></div></div><div id="statTotal" class="text-2xl font-display font-bold count-up">0</div></div>
-          <div class="card stat-card cyan"><div class="flex items-center justify-between mb-2"><span class="text-[var(--muted)] text-xs font-medium">Hadir Hari Ini</span><div class="w-10 h-10 rounded-lg bg-[rgba(6,182,212,0.12)] flex items-center justify-center"><i class="fas fa-check-circle text-[var(--info)]"></i></div></div><div id="statHadir" class="text-2xl font-display font-bold count-up text-[var(--info)]">0</div></div>
-          <div class="card stat-card amber"><div class="flex items-center justify-between mb-2"><span class="text-[var(--muted)] text-xs font-medium">Terlambat</span><div class="w-10 h-10 rounded-lg bg-[rgba(245,158,11,0.12)] flex items-center justify-center"><i class="fas fa-clock text-[var(--warning)]"></i></div></div><div id="statTerlambat" class="text-2xl font-display font-bold text-[var(--warning)] count-up">0</div></div>
-          <div class="card stat-card red"><div class="flex items-center justify-between mb-2"><span class="text-[var(--muted)] text-xs font-medium">Belum Absen</span><div class="w-10 h-10 rounded-lg bg-[rgba(239,68,68,0.12)] flex items-center justify-center"><i class="fas fa-user-times text-[var(--danger)]"></i></div></div><div id="statBelum" class="text-2xl font-display font-bold text-[var(--danger)] count-up">0</div></div>
-          <div class="card stat-card blue"><div class="flex items-center justify-between mb-2"><span class="text-[var(--muted)] text-xs font-medium">Sudah Pulang</span><div class="w-10 h-10 rounded-lg bg-[rgba(59,130,246,0.12)] flex items-center justify-center"><i class="fas fa-sign-out-alt text-[#3B82F6]"></i></div></div><div id="statPulang" class="text-2xl font-display font-bold text-[#3B82F6] count-up">0</div></div>
-        </div>
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <div class="card xl:col-span-2"><h3 class="font-display font-semibold text-base mb-4">Tren Absensi 7 Hari Terakhir</h3><div style="position:relative;height:280px"><canvas id="attendanceChart"></canvas></div></div>
-          <div class="card"><h3 class="font-display font-semibold text-base mb-4">Aktivitas Terbaru</h3><div id="recentActivity" class="space-y-2 max-h-[280px] overflow-y-auto"><div class="empty-state py-8"><i class="fas fa-history block"></i><p class="text-sm">Belum ada aktivitas</p></div></div></div>
-        </div>
-      </section>
-
-      <!-- ========== DATA SISWA ========== -->
-      <section id="page-siswa" class="page">
-        <div class="flex flex-col sm:flex-row gap-3 mb-4">
-          <div class="relative flex-1"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-sm"></i><input type="text" id="searchSiswa" class="input pl-9" placeholder="Cari nama atau NIS..." oninput="filterSiswaTable()"></div>
-          <label class="btn btn-secondary cursor-pointer"><i class="fas fa-file-import"></i> Impor Excel<input type="file" id="fileImport" accept=".xlsx,.xls" class="hidden" onchange="handleImportExcel(event)"></label>
-        </div>
-        <div class="card p-0 overflow-hidden"><div class="overflow-x-auto max-h-[60vh] overflow-y-auto">
-          <table class="data-table"><thead><tr><th style="width:50px">No</th><th>Nama Siswa</th><th>Kelas</th><th>NIS</th><th>Tgl Daftar</th><th style="width:100px">Aksi</th></tr></thead>
-          <tbody id="tbodySiswa"><tr><td colspan="6"><div class="empty-state"><i class="fas fa-users block"></i><p class="text-sm">Belum ada data siswa</p></div></td></tr></tbody></table>
-        </div></div>
-      </section>
-
-      <!-- ========== ABSENSI ========== -->
-      <section id="page-absensi" class="page">
-        <div class="flex gap-1 mb-0">
-          <button class="tab-btn active" data-tab="masuk" onclick="switchAbsenTab('masuk')"><i class="fas fa-sign-in-alt mr-1"></i> Absen Masuk</button>
-          <button class="tab-btn" data-tab="pulang" onclick="switchAbsenTab('pulang')"><i class="fas fa-sign-out-alt mr-1"></i> Absen Pulang</button>
-          <button class="tab-btn" data-tab="tidak" onclick="switchAbsenTab('tidak')"><i class="fas fa-user-xmark mr-1"></i> Tidak Hadir</button>
-        </div>
-
-        <!-- Scanner -->
-        <div id="scanContainer" class="card mb-0" style="border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:0">
-          <div class="max-w-lg mx-auto py-4">
-            <div id="qr-reader" style="width:100%"></div>
-            <div id="scanResult" class="mt-4 hidden"><div id="scanResultContent" class="rounded-lg p-4 border text-center"></div></div>
-            <div id="cooldownWrap" class="mt-2 hidden">
-              <div class="flex items-center justify-between text-xs text-[var(--muted)] mb-1">
-                <span>Menunggu scan berikutnya...</span>
-                <span id="cooldownText">5s</span>
-              </div>
-              <div class="w-full h-[3px] bg-[var(--border)] rounded-full overflow-hidden">
-                <div id="cooldownBar" class="cooldown-bar" style="width:100%"></div>
-              </div>
-            </div>
-            <div class="mt-3 text-center flex items-center justify-center gap-2">
-              <button id="btnToggleScan" class="btn btn-secondary" onclick="toggleScanner()"><i class="fas fa-qrcode"></i> Mulai Scanner</button>
-              <button id="btnSwitchCam" class="btn btn-secondary" onclick="switchCamera()" title="Ganti Kamera"><i class="fas fa-camera-rotate"></i></button>
-            </div>
+    <!-- ==================== 1. DASHBOARD TAB ==================== -->
+    <div id="content-dashboard" class="tab-content active space-y-6">
+      <!-- STAT CARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs text-slate-400">Total Siswa</span>
+            <div class="p-2 bg-blue-500/10 text-blue-400 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
           </div>
+          <div id="statTotalSiswa" class="text-2xl font-bold text-slate-100">0</div>
         </div>
-
-        <!-- Tab contents -->
-        <div class="card" style="border-top-left-radius:0;border-top-right-radius:0;">
-
-          <!-- Tab Masuk -->
-          <div id="tab-masuk" class="tab-content active">
-            <div class="max-w-lg mx-auto py-4">
-              <div class="divider-text mb-4">Pilih Manual</div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="label">Pilih Kelas</label>
-                  <select id="masukKelas" class="input" onchange="onAbsenKelasChange('masuk')">
-                    <option value="">-- Pilih Kelas --</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="label">Nama Siswa</label>
-                  <select id="masukSiswaSelect" class="input" onchange="onAbsenSiswaChange('masuk')">
-                    <option value="">-- Pilih Siswa --</option>
-                  </select>
-                </div>
-              </div>
-              <div id="masukInfo" class="mt-4 hidden">
-                <div class="bg-[var(--bg)] rounded-lg p-4 border border-[var(--border)]">
-                  <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] font-bold text-lg font-display" id="avatar">?</div>
-                    <div>
-                      <div id="nameMasuk" class="font-semibold"></div>
-                      <div id="classMasuk" class="text-sm text-[var(--muted)]"></div>
-                      <div id="nisMasuk" class="text-xs text-[var(--muted)] font-mono mt-0.5"></div>
-                    </div>
-                  </div>
-                  <div class="flex gap-3 mt-4">
-                    <button id="btnMasuk" class="btn btn-primary flex-1" onclick="doAbsensi('masuk')"><i class="fas fa-sign-in-alt"></i> Absen Masuk</button>
-                  </div>
-                </div>
-              </div>
-              <div id="emptyMasuk" class="text-center py-6 text-[var(--muted)]"><p class="text-sm">Pilih kelas lalu siswa untuk memulai absensi</p></div>
-            </div>
+        <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs text-slate-400">Hadir Tepat Waktu</span>
+            <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i data-lucide="user-check" class="w-4 h-4"></i></div>
           </div>
-
-          <!-- Tab Pulang -->
-          <div id="tab-pulang" class="tab-content">
-            <div class="max-w-lg mx-auto py-4">
-              <div class="divider-text mb-4">Pilih Manual</div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="label">Pilih Kelas</label>
-                  <select id="pulangKelas" class="input" onchange="onAbsenKelasChange('pulang')">
-                    <option value="">-- Pilih Kelas --</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="label">Nama Siswa</label>
-                  <select id="pulangSiswaSelect" class="input" onchange="onAbsenSiswaChange('pulang')">
-                    <option value="">-- Pilih Siswa --</option>
-                  </select>
-                </div>
-              </div>
-              <div id="pulangInfo" class="mt-4 hidden">
-                <div class="bg-[var(--bg)] rounded-lg p-4 border border-[var(--border)]">
-                  <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] font-bold text-lg font-display" id="avatarPulang">?</div>
-                    <div>
-                      <div id="namePulang" class="font-semibold"></div>
-                      <div id="classPulang" class="text-sm text-[var(--muted)]"></div>
-                      <div id="nisPulang" class="text-xs text-[var(--muted)] font-mono mt-0.5"></div>
-                    </div>
-                  </div>
-                  <div class="flex gap-3 mt-4">
-                    <button id="btnPulang" class="btn btn-info flex-1" onclick="doAbsensi('pulang')"><i class="fas fa-sign-out-alt"></i> Absen Pulang</button>
-                  </div>
-                </div>
-              </div>
-              <div id="emptyPulang" class="text-center py-6 text-[var(--muted)]"><p class="text-sm">Pilih kelas lalu siswa untuk memulai absensi</p></div>
-            </div>
-          </div>
-
-          <!-- Tab Tidak Hadir -->
-          <div id="tab-tidak" class="tab-content">
-            <div class="max-w-lg mx-auto py-4 space-y-4">
-              <div>
-                <label class="label">Pilih Kelas</label>
-                <select id="tidakKelas" class="input" style="max-width:100%" onchange="loadSiswaByKelas('tidak')">
-                  <option value="">-- Pilih Kelas --</option>
-                </select>
-              </div>
-              <div>
-                <label class="label">Pilih Siswa</label>
-                <select id="tidakSiswa" class="input" style="max-width:100%">
-                  <option value="">-- Pilih Siswa --</option>
-                </select>
-              </div>
-              <div>
-                <label class="label">Keterangan</label>
-                <select id="tidakKeterangan" class="input" style="max-width:300px">
-                  <option value="">-- Pilih Keterangan --</option>
-                  <option value="Sakit">Sakit</option>
-                  <option value="Izin">Izin</option>
-                  <option value="Alpa">Alpa</option>
-                </select>
-              </div>
-              <button id="btnTidak" class="btn btn-danger w-full" onclick="doTidakHadir()"><i class="fas fa-user-xmark"></i> Rekam Ketidakhadiran</button>
-            </div>
-          </div>
+          <div id="statHadir" class="text-2xl font-bold text-emerald-400">0</div>
         </div>
-      </section>
-
-      <!-- ========== KONFIGURASI ========== -->
-      <section id="page-konfigurasi" class="page">
-        <div class="max-w-2xl space-y-4">
-          <div class="card">
-            <h3 class="font-display font-semibold text-base mb-1">Jam Default (Fallback)</h3>
-            <p class="text-sm text-[var(--muted)] mb-5">Digunakan jika kelas belum memiliki jadwal khusus.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><label class="label">Jam Masuk Default</label><div class="flex items-center gap-3"><input type="time" id="configJamMasuk" class="input" style="max-width:200px"><span class="text-sm text-[var(--muted)]">WIB</span></div></div>
-              <div><label class="label">Jam Pulang Default</label><div class="flex items-center gap-3"><input type="time" id="configJamPulang" class="input" style="max-width:200px"><span class="text-sm text-[var(--muted)]">WIB</span></div></div>
-            </div>
-            <button class="btn btn-primary mt-5" onclick="saveConfig()"><i class="fas fa-save"></i> Simpan Default</button>
+        <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs text-slate-400">Terlambat</span>
+            <div class="p-2 bg-amber-500/10 text-amber-400 rounded-lg"><i data-lucide="clock" class="w-4 h-4"></i></div>
           </div>
-          <div class="card p-0 overflow-hidden">
-            <div class="p-5 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div><h3 class="font-display font-semibold text-base mb-1">Jadwal Per Kelas</h3><p class="text-sm text-[var(--muted)]">Atur jam masuk & pulang spesifik per kelas.</p></div>
-              <button class="btn btn-primary" onclick="openModalJadwal()"><i class="fas fa-plus"></i> Tambah Jadwal</button>
-            </div>
-            <div class="overflow-x-auto"><table class="data-table"><thead><tr><th style="width:50px">No</th><th>Kelas</th><th>Jam Masuk</th><th>Jam Pulang</th><th style="width:120px">Aksi</th></tr></thead><tbody id="jadwalTableBody"><tr><td colspan="5"><div class="empty-state py-6"><i class="fas fa-calendar-alt block"></i><p class="text-sm">Belum ada jadwal kelas</p></div></td></tr></tbody></table></div>
-          </div>
-          <div class="card"><h3 class="font-display font-semibold text-base mb-1">Informasi Sistem</h3><div class="mt-3 p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)] text-sm space-y-1"><div class="flex justify-between"><span class="text-[var(--muted)]">Versi</span><span>2.0.0</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Format Kode QR</span><span>NIS Siswa</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Backend</span><span>Google Apps Script</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Frontend</span><span>GitHub Pages</span></div></div></div>
+          <div id="statTerlambat" class="text-2xl font-bold text-amber-400">0</div>
         </div>
-      </section>
-
-      <!-- ========== LAPORAN ========== -->
-      <section id="page-laporan" class="page">
-        <div class="card mb-4">
-          <div class="flex flex-col sm:flex-row gap-3 items-end">
-            <div><label class="label">Tanggal</label><input type="date" id="laporanTanggal" class="input" style="max-width:200px"></div>
-            <div><label class="label">Kelas</label><select id="laporanKelas" class="input" style="max-width:180px"><option value="Semua">Semua Kelas</option></select></div>
-            <button class="btn btn-primary" onclick="loadLaporan()"><i class="fas fa-search"></i> Tampilkan</button>
-            <button class="btn btn-secondary" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Ekspor Excel</button>
+        <div class="bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs text-slate-400">Belum Absen</span>
+            <div class="p-2 bg-rose-500/10 text-rose-400 rounded-lg"><i data-lucide="user-x" class="w-4 h-4"></i></div>
           </div>
-        </div>
-        <div class="card p-0 overflow-hidden"><div class="overflow-x-auto max-h-[60vh] overflow-y-auto">
-          <table class="data-table"><thead><tr><th style="width:50px">No</th><th>Nama Siswa</th><th>Kelas</th><th>Tanggal</th><th>Jam Masuk</th><th>Jam Pulang</th><th>Status</th></tr></thead>
-          <tbody id="tbodyLaporan"><tr><td colspan="7"><div class="empty-state"><i class="fas fa-file-alt block"></i><p class="text-sm">Pilih filter untuk menampilkan laporan</p></div></td></tr></tbody></table>
-        </div></div>
-        <div id="laporanSummary" class="mt-3 text-sm text-[var(--muted)] hidden"></div>
-      </section>
-    </div>
-  </main>
-
-  <!-- MODAL JADWAL -->
-  <div id="modalJadwal" class="modal-overlay" onclick="if(event.target===this)closeModal('modalJadwal')">
-    <div class="modal-content">
-      <div class="flex items-center justify-between mb-5"><h3 id="modalJadwalTitle" class="font-display font-bold text-lg">Tambah Jadwal Kelas</h3><button onclick="closeModal('modalJadwal')" class="text-[var(--muted)] hover:text-[var(--text)]"><i class="fas fa-times"></i></button></div>
-      <div class="space-y-4">
-        <div><label class="label">Nama Kelas</label><input type="text" id="inputJadwalKelas" class="input" placeholder="Contoh: 1A, 2B, 3C"></div>
-        <div class="grid grid-cols-2 gap-4">
-          <div><label class="label">Jam Masuk</label><input type="time" id="inputJadwalMasuk" class="input"></div>
-          <div><label class="label">Jam Pulang</label><input type="time" id="inputJadwalPulang" class="input"></div>
+          <div id="statBelumAbsen" class="text-2xl font-bold text-rose-400">0</div>
         </div>
       </div>
-      <div class="flex gap-3 mt-6"><button class="btn btn-secondary flex-1" onclick="closeModal('modalJadwal')">Batal</button><button id="btnSubmitJadwal" class="btn btn-primary flex-1" onclick="submitJadwal()"><i class="fas fa-save"></i> Simpan</button></div>
+
+      <!-- CHART & RECENT ACTIVITY -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/50 p-5 rounded-2xl">
+          <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center space-x-2">
+            <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+            <span>Tren Kehadiran (7 Hari Terakhir)</span>
+          </h3>
+          <div class="h-64 relative">
+            <canvas id="attendanceChart"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-700/50 p-5 rounded-2xl flex flex-col">
+          <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center space-x-2">
+            <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+            <span>Aktivitas Terbaru Hari Ini</span>
+          </h3>
+          <div id="recentActivityList" class="space-y-3 overflow-y-auto flex-1 max-h-64 pr-1 text-xs">
+            <div class="text-slate-500 text-center py-8">Belum ada aktivitas hari ini</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 2. SCANNER QR TAB ==================== -->
+    <div id="content-scanner" class="tab-content space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- CAMERA AREA -->
+        <div class="lg:col-span-7 bg-slate-800/60 border border-slate-700/50 p-6 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="camera" class="w-5 h-5 text-emerald-400"></i>
+              <h3 class="font-semibold text-slate-200">Kamera Scanner</h3>
+            </div>
+            
+            <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-700">
+              <button onclick="setScanMode('masuk')" id="modeMasukBtn" class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition">Masuk</button>
+              <button onclick="setScanMode('pulang')" id="modePulangBtn" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 transition">Pulang</button>
+            </div>
+          </div>
+
+          <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-700 min-h-[300px] flex items-center justify-center">
+            <div id="reader" class="w-full"></div>
+            <div id="scannerOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 text-slate-400 p-4 text-center">
+              <i data-lucide="video-off" class="w-12 h-12 mb-2 text-slate-600"></i>
+              <p class="text-sm">Kamera Belum Aktif</p>
+              <button onclick="startScanner()" class="mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-xl transition flex items-center space-x-2">
+                <i data-lucide="power" class="w-4 h-4"></i>
+                <span>Mulai Kamera</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <div class="flex items-center space-x-2">
+              <span id="cameraStatusIndicator" class="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span id="cameraStatusText">Offline</span>
+            </div>
+            <button onclick="stopScanner()" id="stopScanBtn" class="hidden text-rose-400 hover:underline">Matikan Kamera</button>
+          </div>
+        </div>
+
+        <!-- SCAN RESULT & MANUAL INPUT -->
+        <div class="lg:col-span-5 space-y-6">
+          <div id="scanResultCard" class="bg-slate-800/60 border border-slate-700/50 p-6 rounded-2xl text-center space-y-3">
+            <div id="scanIconBox" class="w-16 h-16 mx-auto rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400">
+              <i data-lucide="qr-code" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <h4 id="scanResultName" class="font-bold text-lg text-slate-100">Siap Pemindaian</h4>
+              <p id="scanResultSub" class="text-xs text-slate-400">Arahkan QR Code Kartu Pelajar ke Kamera</p>
+            </div>
+            <div id="scanResultStatusBadge" class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-slate-700 text-slate-300 hidden">
+              -
+            </div>
+          </div>
+
+          <div class="bg-slate-800/60 border border-slate-700/50 p-6 rounded-2xl space-y-4">
+            <h4 class="text-sm font-semibold text-slate-200 flex items-center space-x-2">
+              <i data-lucide="keyboard" class="w-4 h-4 text-emerald-400"></i>
+              <span>Input Manual via NIS</span>
+            </h4>
+            <div class="space-y-3">
+              <input type="text" id="manualNisInput" placeholder="Masukkan Nomor Induk Siswa (NIS)" 
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+              
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="submitManualAbsen('masuk')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-xl text-xs transition">
+                  Absen Masuk
+                </button>
+                <button onclick="submitManualAbsen('pulang')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 rounded-xl text-xs transition">
+                  Absen Pulang
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== 3. DATA SISWA TAB ==================== -->
+    <div id="content-siswa" class="tab-content space-y-6">
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-slate-800/60 p-4 rounded-2xl border border-slate-700/50">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <input type="text" id="searchSiswaInput" onkeyup="filterSiswaTable()" placeholder="Cari nama atau NIS..." 
+            class="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 w-full sm:w-64">
+          <select id="filterKelasSiswa" onchange="filterSiswaTable()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+            <option value="">Semua Kelas</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="openModalAddSiswa()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-1.5">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Tambah Siswa</span>
+          </button>
+          <label class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-1.5 cursor-pointer">
+            <i data-lucide="file-spread-sheet" class="w-4 h-4 text-emerald-400"></i>
+            <span>Impor Excel</span>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" onchange="importExcelSiswa(event)" class="hidden">
+          </label>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase font-semibold border-b border-slate-700/60">
+              <tr>
+                <th class="p-3.5">ID</th>
+                <th class="p-3.5">Nama Siswa</th>
+                <th class="p-3.5">Kelas</th>
+                <th class="p-3.5">NIS</th>
+                <th class="p-3.5">No HP Ortu (WA)</th>
+                <th class="p-3.5 text-center">QR Code</th>
+                <th class="p-3.5 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="siswaTableBody" class="divide-y divide-slate-700/40">
+              <tr>
+                <td colspan="7" class="p-8 text-center text-slate-500">Memuat data siswa...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 4. LAPORAN ABSENSI TAB ==================== -->
+    <div id="content-absensi" class="tab-content space-y-6">
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-slate-800/60 p-4 rounded-2xl border border-slate-700/50">
+        <div class="flex flex-wrap items-center gap-3">
+          <input type="date" id="filterTanggalAbsensi" onchange="loadAbsensiData()" 
+            class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+          <select id="filterKelasAbsensi" onchange="loadAbsensiData()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+            <option value="Semua">Semua Kelas</option>
+          </select>
+          <button onclick="loadAbsensiData()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 p-2 rounded-xl transition">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="openModalTidakHadir()" class="bg-amber-600 hover:bg-amber-500 text-white px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-1.5">
+            <i data-lucide="user-minus" class="w-4 h-4"></i>
+            <span>Catat Sakit/Izin/Alpa</span>
+          </button>
+          <button onclick="exportAbsensiExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Ekspor Excel</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase font-semibold border-b border-slate-700/60">
+              <tr>
+                <th class="p-3.5">Tanggal</th>
+                <th class="p-3.5">Nama Siswa</th>
+                <th class="p-3.5">Kelas</th>
+                <th class="p-3.5">Jam Masuk</th>
+                <th class="p-3.5">Jam Pulang</th>
+                <th class="p-3.5">Status</th>
+              </tr>
+            </thead>
+            <tbody id="absensiTableBody" class="divide-y divide-slate-700/40">
+              <tr>
+                <td colspan="6" class="p-8 text-center text-slate-500">Memuat data absensi...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 5. PENGATURAN TAB ==================== -->
+    <div id="content-pengaturan" class="tab-content space-y-6 max-w-4xl">
+      <div class="bg-slate-800/60 border border-slate-700/50 p-6 rounded-2xl space-y-6">
+        <h3 class="text-base font-semibold text-slate-100 flex items-center space-x-2 border-b border-slate-700/60 pb-3">
+          <i data-lucide="sliders" class="w-5 h-5 text-emerald-400"></i>
+          <span>Konfigurasi Jam Presensi & WA Gateway</span>
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Jam Masuk Default</label>
+            <input type="time" id="cfgJamMasuk" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Jam Pulang Default</label>
+            <input type="time" id="cfgJamPulang" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div class="border-t border-slate-700/60 pt-4 space-y-4">
+          <h4 class="text-sm font-semibold text-emerald-400 flex items-center space-x-2">
+            <i data-lucide="message-square" class="w-4 h-4"></i>
+            <span>Integrasi Fonnte WhatsApp Gateway</span>
+          </h4>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Fonnte API Token</label>
+            <input type="text" id="cfgFonnteToken" placeholder="Masukkan Token Fonnte..." 
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Notifikasi WhatsApp</label>
+            <select id="cfgWaAktif" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+              <option value="true">Aktif (Kirim Notifikasi Otomatis ke Ortu)</option>
+              <option value="false">Nonaktifkan Notifikasi WA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="saveKonfigurasi()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-medium transition flex items-center space-x-2">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Simpan Pengaturan</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: TAMBAH SISWA -->
+  <div id="modalAddSiswa" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-700/60 pb-3">
+        <h3 class="font-semibold text-slate-100">Tambah Data Siswa</h3>
+        <button onclick="closeModalAddSiswa()" class="text-slate-400 hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 mb-1">Nama Lengkap</label>
+          <input type="text" id="addNamaSiswa" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Kelas</label>
+          <input type="text" id="addKelasSiswa" placeholder="Contoh: 1A" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">NIS (Nomor Induk Siswa)</label>
+          <input type="text" id="addNisSiswa" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">No HP Orang Tua (WhatsApp)</label>
+          <input type="text" id="addNoHPSiswa" placeholder="081234567890" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-2">
+        <button onclick="closeModalAddSiswa()" class="px-4 py-2 bg-slate-700 text-slate-300 text-xs rounded-xl">Batal</button>
+        <button onclick="submitAddSiswa()" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-xl font-medium">Simpan Siswa</button>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL QR -->
-  <div id="modalQR" class="modal-overlay" onclick="if(event.target===this)closeModal('modalQR')">
-    <div class="modal-content text-center">
-      <div class="flex items-center justify-between mb-4"><h3 class="font-display font-bold text-lg">Kode QR Siswa</h3><button onclick="closeModal('modalQR')" class="text-[var(--muted)] hover:text-[var(--text)]"><i class="fas fa-times"></i></button></div>
-      <div id="qr-display" class="bg-white rounded-xl p-4 inline-block mb-4"></div>
-      <div id="qrStudentName" class="font-display font-bold text-lg"></div>
-      <div id="qrStudentDetail" class="text-sm text-[var(--muted)] mb-1"></div>
-      <div id="qrStudentNis" class="font-mono text-2xl font-bold text-[var(--accent)] mb-4"></div>
-      <button class="btn btn-primary" onclick="downloadQR()"><i class="fas fa-download"></i> Download QR</button>
+  <!-- MODAL: CETAK QR CODE -->
+  <div id="modalQrCode" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
+      <div id="qrPrintArea" class="bg-white p-6 rounded-2xl text-slate-900 space-y-3">
+        <p class="text-xs font-bold uppercase tracking-wider border-b pb-2">Kartu Presensi Siswa</p>
+        <div id="modalQrContainer" class="flex justify-center my-2"></div>
+        <h3 id="modalQrNama" class="font-bold text-base leading-tight">Nama Siswa</h3>
+        <p id="modalQrKelasNis" class="text-xs text-slate-600">Kelas - / NIS: -</p>
+      </div>
+      <div class="flex space-x-2">
+        <button onclick="window.print()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-2 rounded-xl font-medium transition">Cetak QR</button>
+        <button onclick="closeModalQr()" class="px-4 bg-slate-700 text-slate-300 text-xs py-2 rounded-xl">Tutup</button>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL KONFIRMASI -->
-  <div id="modalKonfirmasi" class="modal-overlay" onclick="if(event.target===this)closeModal('modalKonfirmasi')">
-    <div class="modal-content text-center">
-      <div class="w-14 h-14 rounded-full bg-[rgba(239,68,68,0.12)] flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-[var(--danger)] text-xl"></i></div>
-      <h3 id="konfirmasiTitle" class="font-display font-bold text-lg mb-2">Konfirmasi</h3>
-      <p id="konfirmasiMessage" class="text-sm text-[var(--muted)] mb-6"></p>
-      <div class="flex gap-3"><button class="btn btn-secondary flex-1" onclick="closeModal('modalKonfirmasi')">Batal</button><button id="btnKonfirmasiYa" class="btn btn-danger flex-1">Hapus</button></div>
+  <!-- MODAL: CATAT TIDAK HADIR -->
+  <div id="modalTidakHadir" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-700/60 pb-3">
+        <h3 class="font-semibold text-slate-100">Catat Ketidakhadiran</h3>
+        <button onclick="closeModalTidakHadir()" class="text-slate-400 hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 mb-1">Pilih Siswa</label>
+          <select id="thSiswaSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Keterangan</label>
+          <select id="thKeteranganSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+            <option value="Sakit">Sakit</option>
+            <option value="Izin">Izin</option>
+            <option value="Alpa">Alpa</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-2">
+        <button onclick="closeModalTidakHadir()" class="px-4 py-2 bg-slate-700 text-slate-300 text-xs rounded-xl">Batal</button>
+        <button onclick="submitTidakHadir()" class="px-4 py-2 bg-amber-600 text-white text-xs rounded-xl font-medium">Simpan Data</button>
+      </div>
     </div>
   </div>
 
+
+  <!-- JS LOGIC APPS -->
   <script>
-    // =============================================
-    // KONFIGURASI API
-    // =============================================
-    var API_URL = 'https://script.google.com/macros/s/AKfycbyGnjM5GAyGFXLx1Qhzmv5xyTnhFkiZhtFlfSw4kb5Sk6W1U9k2lufotb3mq1ySxhSL/exec';
+    // SEMATKAN LINK DEFAULT GAS
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyGnjM5GAyGFXLx1Qhzmv5xyTnhFkiZhtFlfSw4kb5Sk6W1U9k2lufotb3mq1ySxhSL/exec';
+    
+    let GAS_URL = localStorage.getItem('GAS_URL') || DEFAULT_GAS_URL;
+    let html5QrcodeScanner = null;
+    let scanCooldown = false;
+    let currentScanMode = 'masuk';
+    let globalSiswaList = [];
+    let attendanceChart = null;
 
-    // =============================================
-    // API WRAPPER
-    // =============================================
-    function apiGet(action, params) {
-      params = params || {};
-      var url = new URL(API_URL);
-      url.searchParams.set('action', action);
-      Object.keys(params).forEach(function(k) { url.searchParams.set(k, params[k]); });
-      return fetch(url.toString(), { method: 'GET', redirect: 'follow' })
-        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function(j) { if (!j.success) throw new Error((j.data && j.data.error) ? j.data.error : 'Error server'); return j.data; });
-    }
-
-    function apiPost(action, data) {
-      data = data || {};
-      var payload = { action: action };
-      Object.keys(data).forEach(function(key) { payload[key] = data[key]; });
-      return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload), redirect: 'follow' })
-        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function(j) { if (!j.success) throw new Error((j.data && j.data.error) ? j.data.error : (j.data && j.data.message) ? j.data.message : 'Error server'); return j.data; });
-    }
-
-    function checkApiConnection() {
-      var dot = document.getElementById('apiStatusDot'), txt = document.getElementById('apiStatusText');
-      dot.className = 'api-status checking'; txt.textContent = 'Menguji koneksi...';
-      apiGet('ping').then(function() { dot.className = 'api-status connected'; txt.textContent = 'Terhubung'; })
-        .catch(function(e) { dot.className = 'api-status disconnected'; txt.textContent = 'Gagal: ' + e.message; });
-    }
-
-    // =============================================
-    // SUARA
-    // =============================================
-    function playSuccessBeep() {
-      try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        var o1 = ctx.createOscillator(), g1 = ctx.createGain();
-        o1.connect(g1); g1.connect(ctx.destination); o1.frequency.value = 880; o1.type = 'sine'; g1.gain.value = 0.25;
-        o1.start(ctx.currentTime); o1.stop(ctx.currentTime + 0.12);
-        var o2 = ctx.createOscillator(), g2 = ctx.createGain();
-        o2.connect(g2); g2.connect(ctx.destination); o2.frequency.value = 1318; o2.type = 'sine'; g2.gain.value = 0.25;
-        o2.start(ctx.currentTime + 0.13); o2.stop(ctx.currentTime + 0.3);
-        setTimeout(function() { ctx.close(); }, 400);
-      } catch(e) {}
-    }
-
-    function playErrorBeep() {
-      try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        var o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination); o.frequency.value = 250; o.type = 'square'; g.gain.value = 0.15;
-        o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3);
-        setTimeout(function() { ctx.close(); }, 400);
-      } catch(e) {}
-    }
-
-    // =============================================
-    // UTILITAS
-    // =============================================
-    function showToast(msg, type) {
-      type = type || 'info';
-      var c = document.getElementById('toastContainer'), t = document.createElement('div');
-      t.className = 'toast toast-' + type;
-      var ic = type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle';
-      t.innerHTML = '<i class="fas fa-' + ic + '"></i><span>' + msg + '</span>';
-      c.appendChild(t);
-      setTimeout(function() { t.style.animation = 'toastOut .3s ease-in forwards'; setTimeout(function() { t.remove(); }, 300); }, 4000);
-    }
-
-    function openModal(id) { document.getElementById(id).classList.add('show'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); }
-    function formatTanggal(s) { if (!s) return '-'; try { return new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); } catch(e) { return s; } }
-    function escapeHtml(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
-    function updateClock() {
-      var n = new Date();
-      document.getElementById('currentDate').textContent = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-      document.getElementById('currentTime').textContent = n.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
-    setInterval(updateClock, 1000); updateClock();
-
-    // =============================================
-    // NAVIGASI
-    // =============================================
-    var currentPage = 'dashboard';
-    var pageTitles = { dashboard: 'Dashboard', siswa: 'Data Siswa', absensi: 'Absensi', konfigurasi: 'Konfigurasi', laporan: 'Laporan' };
-
-    function showPage(page) {
-      if (currentPage === 'absensi' && page !== 'absensi' && scannerRunning) stopScanner();
-      currentPage = page;
-      document.getElementById('pageTitle').textContent = pageTitles[page];
-      document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.toggle('active', el.getAttribute('data-page') === page); });
-      document.querySelectorAll('.page').forEach(function(el) { el.classList.toggle('active', el.id === 'page-' + page); });
-      if (window.innerWidth < 1024) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.add('hidden'); }
-      loadPageData(page);
-    }
-
-    function loadPageData(page) {
-      if (page === 'dashboard') loadDashboard();
-      else if (page === 'siswa') loadSiswa();
-      else if (page === 'absensi') { ensureSiswaLoaded().then(function() { populateAllKelasDropdowns(); switchAbsenTab(currentAbsenTab); }); }
-      else if (page === 'konfigurasi') { loadKonfigurasi(); loadJadwal(); }
-      else if (page === 'laporan') { loadKelasDropdown(); loadLaporan(); }
-    }
-
-    function refreshCurrentPage() { loadPageData(currentPage); showToast('Data berhasil di-refresh', 'success'); }
-
-    // =============================================
-    // PASTIKAN DATA SISWA SUDAH DIMUAT
-    // =============================================
-    var siswaLoadPromise = null;
-
-    function ensureSiswaLoaded() {
-      if (siswaLoadPromise) return siswaLoadPromise;
-      if (allSiswa.length > 0) {
-        siswaLoadPromise = Promise.resolve(allSiswa);
-        return siswaLoadPromise;
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      document.getElementById('gasUrlInput').value = GAS_URL;
+      
+      startClock();
+      document.getElementById('filterTanggalAbsensi').valueAsDate = new Date();
+      
+      if (GAS_URL) {
+        checkBackendStatus();
+        loadDashboardData();
+        loadSiswaData();
       }
-      siswaLoadPromise = apiGet('getSiswa').then(function(d) {
-        allSiswa = d;
-        return d;
-      }).catch(function(e) {
-        showToast('Gagal memuat data siswa: ' + e.message, 'error');
-        return [];
-      });
-      return siswaLoadPromise;
+    });
+
+    // ---------------- LOGIKA DASHBOARD & REALTIME CLOCK ----------------
+    function startClock() {
+      setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+        document.getElementById('liveDate').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      }, 1000);
     }
 
-    function invalidateSiswaCache() {
-      siswaLoadPromise = null;
-      allSiswa = [];
+    function saveGasUrl() {
+      const url = document.getElementById('gasUrlInput').value.trim();
+      if (!url) return alert('Silakan masukkan Apps Script Web App URL!');
+      localStorage.setItem('GAS_URL', url);
+      GAS_URL = url;
+      alert('URL Berhasil Disimpan!');
+      checkBackendStatus();
+      loadDashboardData();
+      loadSiswaData();
     }
 
-    // =============================================
-    // DASHBOARD
-    // =============================================
-    var chartInstance = null;
-    var cachedClasses = [];
-
-    function loadDashboard() {
-      apiGet('getDashboard').then(function(d) {
-        animateCount('statTotal', d.totalSiswa);
-        animateCount('statHadir', d.hadir);
-        animateCount('statTerlambat', d.terlambat);
-        animateCount('statBelum', d.belumAbsen);
-        animateCount('statPulang', d.sudahPulang);
-        if (d.classes) cachedClasses = d.classes;
-        renderChart(d.last7Days, d.last7Hadir, d.last7Terlambat);
-        var a = document.getElementById('recentActivity');
-        if (!d.recentActivity || d.recentActivity.length === 0) {
-          a.innerHTML = '<div class="empty-state py-8"><i class="fas fa-history block"></i><p class="text-sm">Belum ada aktivitas</p></div>';
-        } else {
-          a.innerHTML = d.recentActivity.map(function(r) {
-            var bc = r.status === 'Hadir' ? 'badge-hadir' : r.status === 'Terlambat' ? 'badge-terlambat' : r.status === 'Pulang' ? 'badge-pulang' : (r.status === 'Sakit' ? 'badge-sakit' : (r.status === 'Izin' ? 'badge-izin' : 'badge-alpa'));
-            return '<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-[rgba(16,185,129,0.04)] transition-colors"><div class="w-8 h-8 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">' + escapeHtml(r.nama.charAt(0)) + '</div><div class="flex-1 min-w-0"><div class="text-sm font-medium truncate">' + escapeHtml(r.nama) + '</div><div class="text-xs text-[var(--muted)]">' + escapeHtml(r.kelas) + ' &middot; ' + formatTanggal(r.tanggal) + '</div></div><span class="badge ' + bc + '">' + escapeHtml(r.status) + '</span></div>';
-          }).join('');
+    async function checkBackendStatus() {
+      const statusEl = document.getElementById('apiStatus');
+      try {
+        const res = await fetch(`${GAS_URL}?action=ping`);
+        const json = await res.json();
+        if (json.success) {
+          statusEl.className = "flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+          statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Backend Terhubung</span>`;
         }
-      }).catch(function(e) { showToast('Gagal memuat dashboard: ' + e.message, 'error'); });
+      } catch (err) {
+        statusEl.className = "flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span><span>Koneksi Gagal</span>`;
+      }
     }
 
-    function animateCount(id, target) {
-      var el = document.getElementById(id), cur = parseInt(el.textContent) || 0;
-      if (cur === target) return;
-      var step = target > cur ? 1 : -1, speed = Math.max(30, 300 / Math.abs(target - cur));
-      var iv = setInterval(function() { cur += step; el.textContent = cur; if (cur === target) clearInterval(iv); }, speed);
+    async function loadDashboardData() {
+      if (!GAS_URL) return;
+      try {
+        const res = await fetch(`${GAS_URL}?action=getDashboard`);
+        const json = await res.json();
+        if (json.success) {
+          const d = json.data;
+          document.getElementById('statTotalSiswa').innerText = d.totalSiswa || 0;
+          document.getElementById('statHadir').innerText = d.hadir || 0;
+          document.getElementById('statTerlambat').innerText = d.terlambat || 0;
+          document.getElementById('statBelumAbsen').innerText = d.belumAbsen || 0;
+
+          // Render Chart
+          renderChart(d.last7Days, d.last7Hadir, d.last7Terlambat);
+
+          // Populate Recent Activity
+          const listEl = document.getElementById('recentActivityList');
+          if (d.recentActivity && d.recentActivity.length > 0) {
+            listEl.innerHTML = d.recentActivity.map(a => `
+              <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/50 border border-slate-700/40">
+                <div>
+                  <p class="font-semibold text-slate-200">${a.nama} <span class="text-slate-400">(${a.kelas})</span></p>
+                  <p class="text-[10px] text-slate-500">${a.jamMasuk ? 'Masuk: '+a.jamMasuk : ''} ${a.jamPulang ? '| Pulang: '+a.jamPulang : ''}</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${getStatusBadgeClass(a.status)}">${a.status}</span>
+              </div>
+            `).join('');
+          }
+
+          // Populate Kelas Selects
+          if (d.classes) {
+            const selects = ['filterKelasSiswa', 'filterKelasAbsensi'];
+            selects.forEach(id => {
+              const el = document.getElementById(id);
+              const currentVal = el.value;
+              el.innerHTML = (id === 'filterKelasAbsensi' ? '<option value="Semua">Semua Kelas</option>' : '<option value="">Semua Kelas</option>') + 
+                d.classes.map(c => `<option value="${c}">${c}</option>`).join('');
+              el.value = currentVal;
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Gagal muat dashboard", e);
+      }
     }
 
-    function renderChart(labels, hData, tData) {
-      var ctx = document.getElementById('attendanceChart').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
-      chartInstance = new Chart(ctx, {
+    function renderChart(labels, dataHadir, dataTerlambat) {
+      const ctx = document.getElementById('attendanceChart').getContext('2d');
+      if (attendanceChart) attendanceChart.destroy();
+
+      attendanceChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels,
+          labels: labels || [],
           datasets: [
-            { label: 'Hadir', data: hData, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: '#10B981', borderWidth: 1, borderRadius: 6, borderSkipped: false },
-            { label: 'Terlambat', data: tData, backgroundColor: 'rgba(245,158,11,0.7)', borderColor: '#F59E0B', borderWidth: 1, borderRadius: 6, borderSkipped: false }
+            { label: 'Hadir', data: dataHadir || [], backgroundColor: '#10B981', borderRadius: 6 },
+            { label: 'Terlambat', data: dataTerlambat || [], backgroundColor: '#F59E0B', borderRadius: 6 }
           ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94A3B8', font: { family: 'DM Sans', size: 12 }, usePointStyle: true, pointStyle: 'rectRounded' } }, tooltip: { backgroundColor: '#1E293B', titleColor: '#F1F5F9', bodyColor: '#94A3B8', borderColor: '#334155', borderWidth: 1, cornerRadius: 8, padding: 12 } }, scales: { x: { grid: { color: 'rgba(51,65,85,0.3)' }, ticks: { color: '#94A3B8', font: { family: 'DM Sans', size: 11 } } }, y: { beginAtZero: true, grid: { color: 'rgba(51,65,85,0.3)' }, ticks: { color: '#94A3B8', font: { family: 'DM Sans', size: 11 }, stepSize: 1, callback: function(v) { return Number.isInteger(v) ? v : null; } } } } }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94A3B8', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#94A3B8', font: { size: 10 } }, grid: { display: false } },
+            y: { ticks: { color: '#94A3B8', font: { size: 10 } }, grid: { color: '#334155' } }
+          }
+        }
       });
     }
 
-    // =============================================
-    // DATA SISWA
-    // =============================================
-    var allSiswa = [];
-
-    function loadSiswa() {
-      invalidateSiswaCache();
-      apiGet('getSiswa').then(function(d) { allSiswa = d; siswaLoadPromise = Promise.resolve(d); renderSiswaTable(allSiswa); }).catch(function(e) { showToast('Gagal memuat: ' + e.message, 'error'); });
-    }
-
-    function renderSiswaTable(data) {
-      var tb = document.getElementById('tbodySiswa');
-      if (!data || data.length === 0) { tb.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-users block"></i><p class="text-sm">Belum ada data siswa</p></div></td></tr>'; return; }
-      tb.innerHTML = data.map(function(s, i) {
-        return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-xs font-bold flex-shrink-0">' + escapeHtml(s.nama.charAt(0)) + '</div><span class="font-medium">' + escapeHtml(s.nama) + '</span></div></td><td>' + escapeHtml(s.kelas) + '</td><td><code class="text-[var(--accent)] bg-[var(--accent-glow)] px-2 py-0.5 rounded text-xs font-mono">' + escapeHtml(s.nis) + '</code></td><td class="text-[var(--muted)] text-sm">' + formatTanggal(s.tanggalDaftar) + '</td><td>' + (s.nis ? '<button class="btn btn-secondary py-1 px-2 text-xs" onclick="showQR(\'' + escapeHtml(s.nis) + '\',\'' + escapeHtml(s.nama) + '\',\'' + escapeHtml(s.kelas) + '\')"><i class="fas fa-qrcode"></i></button>' : '<span class="text-xs text-[var(--muted)]">-</span>') + '</td></tr>';
-      }).join('');
-    }
-
-    function filterSiswaTable() {
-      var q = document.getElementById('searchSiswa').value.toLowerCase();
-      renderSiswaTable(allSiswa.filter(function(s) { return s.nama.toLowerCase().indexOf(q) !== -1 || s.nis.toLowerCase().indexOf(q) !== -1 || s.kelas.toLowerCase().indexOf(q) !== -1; }));
-    }
-
-    function handleImportExcel(event) {
-      var file = event.target.files[0]; if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          var d = new Uint8Array(e.target.result);
-          var wb = XLSX.read(d, { type: 'array' });
-          var ws = wb.Sheets[wb.SheetNames[0]];
-          var json = XLSX.utils.sheet_to_json(ws, { defval: '' });
-          if (json.length === 0) { showToast('File Excel kosong', 'error'); return; }
-          var f = json[0];
-          if (!(f.Nama||f.nama||f.NAMA) || !(f.Kelas||f.kelas||f.KELAS)) { showToast('Pastikan ada kolom "Nama" dan "Kelas"', 'error'); return; }
-          var imp = json.map(function(r) {
-            return {
-              nama: (r.Nama||r.nama||r.NAMA||'').toString().trim(),
-              kelas: (r.Kelas||r.kelas||r.KELAS||'').toString().trim(),
-              nis: (r.NIS||r.nis||r.Nis||'').toString().trim()
-            };
-          }).filter(function(r) { return r.nama !== ''; });
-          if (imp.length === 0) { showToast('Tidak ada data valid', 'error'); return; }
-          showToast('Mengimpor ' + imp.length + ' data...', 'info');
-          apiPost('importSiswa', { data: imp }).then(function(r) { showToast('Berhasil mengimpor ' + r.count + ' siswa', 'success'); invalidateSiswaCache(); loadSiswa(); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
-        } catch(err) { showToast('Gagal baca file: ' + err.message, 'error'); }
-      };
-      reader.readAsArrayBuffer(file);
-      event.target.value = '';
-    }
-
-    var currentQRInstance = null;
-    function showQR(nis, nama, kelas) {
-      document.getElementById('qrStudentName').textContent = nama;
-      document.getElementById('qrStudentDetail').textContent = 'Kelas: ' + kelas;
-      document.getElementById('qrStudentNis').textContent = nis;
-      var qd = document.getElementById('qr-display'); qd.innerHTML = '';
-      currentQRInstance = new QRCode(qd, { text: nis, width: 200, height: 200, colorDark: '#0F172A', colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.H });
-      openModal('modalQR');
-    }
-
-    function downloadQR() {
-      var nisVal = document.getElementById('qrStudentNis').textContent;
-      var c = document.querySelector('#qr-display canvas');
-      if (c) { var a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = 'QR-' + nisVal + '.png'; a.click(); }
-      else { var img = document.querySelector('#qr-display img'); if (img) { var a2 = document.createElement('a'); a2.href = img.src; a2.download = 'QR-' + nisVal + '.png'; a2.click(); } }
-      showToast('QR didownload', 'success');
-    }
-
-    // =============================================
-    // DROPDOWN KELAS
-    // =============================================
-    function getClassesFromCache() {
-      if (cachedClasses && cachedClasses.length > 0) return cachedClasses.slice();
-      if (allSiswa && allSiswa.length > 0) {
-        var map = {}, arr = [];
-        allSiswa.forEach(function(s) { if (s.kelas && !map[s.kelas]) { map[s.kelas] = true; arr.push(s.kelas); } });
-        arr.sort();
-        return arr;
-      }
-      return [];
-    }
-
-    function fillKelasSelect(selectEl, withSemua) {
-      var classes = getClassesFromCache();
-      var current = selectEl.value;
-      selectEl.innerHTML = withSemua ? '<option value="Semua">Semua Kelas</option>' : '<option value="">-- Pilih Kelas --</option>';
-      classes.forEach(function(k) {
-        selectEl.innerHTML += '<option value="' + escapeHtml(k) + '">' + escapeHtml(k) + '</option>';
+    // ---------------- TAB NAVIGATION ----------------
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => {
+        el.className = "nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800";
       });
-      selectEl.value = current;
+
+      document.getElementById(`content-${tabId}`).classList.add('active');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.className = "nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2 bg-emerald-600 text-white";
+
+      if (tabId === 'dashboard') loadDashboardData();
+      if (tabId === 'siswa') loadSiswaData();
+      if (tabId === 'absensi') loadAbsensiData();
+      if (tabId === 'pengaturan') loadKonfigurasiData();
+      if (tabId !== 'scanner' && html5QrcodeScanner) stopScanner();
     }
 
-    function populateAllKelasDropdowns() {
-      fillKelasSelect(document.getElementById('masukKelas'), false);
-      fillKelasSelect(document.getElementById('pulangKelas'), false);
-      fillKelasSelect(document.getElementById('tidakKelas'), false);
-    }
+    // ---------------- SCANNER LOGIC ----------------
+    function setScanMode(mode) {
+      currentScanMode = mode;
+      const mBtn = document.getElementById('modeMasukBtn');
+      const pBtn = document.getElementById('modePulangBtn');
 
-    function loadKelasDropdown() {
-      fillKelasSelect(document.getElementById('laporanKelas'), true);
-    }
-
-    // =============================================
-    // ABSENSI - TAB SWITCHING & SCANNER
-    // =============================================
-    var currentAbsenTab = 'masuk';
-    var scannerRunning = false;
-    var html5QrCode = null;
-    var selectedSiswaMasuk = null;
-    var selectedSiswaPulang = null;
-
-    var SCAN_COOLDOWN_MS = 5000;
-    var lastScannedCode = '';
-    var lastScanTime = 0;
-    var cooldownTimer = null;
-    var cooldownAnimFrame = null;
-
-    function isCooldownActive() {
-      return (Date.now() - lastScanTime) < SCAN_COOLDOWN_MS && lastScannedCode !== '';
-    }
-
-    function startCooldown() {
-      lastScanTime = Date.now();
-      var wrap = document.getElementById('cooldownWrap');
-      var bar = document.getElementById('cooldownBar');
-      var txt = document.getElementById('cooldownText');
-      wrap.classList.remove('hidden');
-      bar.style.width = '100%';
-      var start = Date.now();
-      if (cooldownAnimFrame) cancelAnimationFrame(cooldownAnimFrame);
-      if (cooldownTimer) clearTimeout(cooldownTimer);
-      function tick() {
-        var elapsed = Date.now() - start;
-        var pct = Math.max(0, 1 - elapsed / SCAN_COOLDOWN_MS) * 100;
-        bar.style.width = pct + '%';
-        txt.textContent = Math.ceil((SCAN_COOLDOWN_MS - elapsed) / 1000) + 's';
-        if (elapsed < SCAN_COOLDOWN_MS) { cooldownAnimFrame = requestAnimationFrame(tick); }
-        else { wrap.classList.add('hidden'); lastScannedCode = ''; }
+      if (mode === 'masuk') {
+        mBtn.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition";
+        pBtn.className = "px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 transition";
+      } else {
+        pBtn.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-blue-600 text-white transition";
+        mBtn.className = "px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 transition";
       }
-      cooldownAnimFrame = requestAnimationFrame(tick);
-    }
-
-    function switchAbsenTab(tab) {
-      currentAbsenTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-tab') === tab); });
-      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.toggle('active', c.id === 'tab-' + tab); });
-    }
-
-    function toggleScanner() {
-      if (scannerRunning) { stopScanner(); }
-      else { startScanner(); }
     }
 
     function startScanner() {
-      if (scannerRunning) return;
-      var btn = document.getElementById('btnToggleScan');
-      btn.innerHTML = '<i class="fas fa-stop"></i> Stop Scanner';
-      btn.classList.remove('btn-secondary'); btn.classList.add('btn-danger');
-      document.getElementById('scanResult').classList.add('hidden');
-      scannerRunning = true;
+      document.getElementById('scannerOverlay').classList.add('hidden');
+      document.getElementById('stopScanBtn').classList.remove('hidden');
+      
+      document.getElementById('cameraStatusIndicator').className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+      document.getElementById('cameraStatusText').innerText = "Kamera Aktif";
 
-      html5QrCode = new Html5Qrcode('qr-reader');
-      html5QrCode.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
         onScanSuccess,
-        function() {}
-      ).catch(function(err) {
-        showToast('Gagal mengakses kamera: ' + err, 'error');
-        resetScannerUI();
+        onScanFailure
+      ).catch(err => {
+        alert("Gagal mengakses kamera: " + err);
+        stopScanner();
       });
     }
 
     function stopScanner() {
-      if (!scannerRunning || !html5QrCode) return;
-      html5QrCode.stop().then(function() { resetScannerUI(); }).catch(function() { resetScannerUI(); });
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          html5QrcodeScanner = null;
+          document.getElementById('scannerOverlay').classList.remove('hidden');
+          document.getElementById('stopScanBtn').classList.add('hidden');
+          document.getElementById('cameraStatusIndicator').className = "w-2 h-2 rounded-full bg-rose-500";
+          document.getElementById('cameraStatusText').innerText = "Offline";
+        }).catch(err => console.error(err));
+      }
     }
 
-    function resetScannerUI() {
-      scannerRunning = false;
-      html5QrCode = null;
-      var btn = document.getElementById('btnToggleScan');
-      btn.innerHTML = '<i class="fas fa-qrcode"></i> Mulai Scanner';
-      btn.classList.remove('btn-danger'); btn.classList.add('btn-secondary');
+    function onScanSuccess(decodedText, decodedResult) {
+      if (scanCooldown) return;
+      scanCooldown = true;
+
+      processAbsensi(decodedText, currentScanMode);
+
+      setTimeout(() => { scanCooldown = false; }, 4000);
     }
 
-    function switchCamera() {
-      if (!scannerRunning || !html5QrCode) { showToast('Scanner belum aktif', 'error'); return; }
-      html5QrCode.stop().then(function() {
-        html5QrCode.start(
-          { facingMode: 'environment' === 'environment' ? 'user' : 'environment' },
-          { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
-          onScanSuccess,
-          function() {}
-        ).catch(function(err) { showToast('Gagal ganti kamera: ' + err, 'error'); });
-      });
+    function onScanFailure(error) {
+      // Ignored for continuous scanning
     }
 
-    function onScanSuccess(decodedText) {
-      if (isCooldownActive() && decodedText === lastScannedCode) return;
-      lastScannedCode = decodedText;
-      startCooldown();
+    async function processAbsensi(nis, tipe) {
+      if (!GAS_URL) return alert('Atur GAS Web App URL terlebih dahulu!');
 
-      // Flash effect
-      var reader = document.getElementById('qr-reader');
-      reader.classList.add('scan-flash');
-      setTimeout(function() { reader.classList.remove('scan-flash'); }, 400);
+      playBeepSound();
 
-      var tipe = currentAbsenTab === 'pulang' ? 'pulang' : 'masuk';
-      if (currentAbsenTab === 'tidak') {
-        showToast('Gunakan tab Masuk/Pulang untuk scan QR', 'info');
+      document.getElementById('scanResultName').innerText = "Memproses Absensi...";
+      document.getElementById('scanResultSub').innerText = `NIS: ${nis}`;
+      
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'prosesAbsensi', nis: nis, tipe: tipe })
+        });
+        const json = await res.json();
+
+        const badge = document.getElementById('scanResultStatusBadge');
+        badge.classList.remove('hidden');
+
+        if (json.success) {
+          document.getElementById('scanIconBox').className = "w-16 h-16 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center";
+          document.getElementById('scanResultName').innerText = "Presensi Berhasil!";
+          document.getElementById('scanResultSub').innerText = json.data.message;
+
+          badge.className = `inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(json.data.status || 'Hadir')}`;
+          badge.innerText = json.data.status || 'Berhasil';
+        } else {
+          document.getElementById('scanIconBox').className = "w-16 h-16 mx-auto rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center";
+          document.getElementById('scanResultName').innerText = "Presensi Gagal";
+          document.getElementById('scanResultSub').innerText = json.data.message || json.data.error;
+
+          badge.className = "inline-block px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+          badge.innerText = "Gagal";
+        }
+      } catch (err) {
+        alert("Gagal memproses absensi: " + err);
+      }
+    }
+
+    function submitManualAbsen(tipe) {
+      const nis = document.getElementById('manualNisInput').value.trim();
+      if (!nis) return alert('Masukkan NIS!');
+      processAbsensi(nis, tipe);
+      document.getElementById('manualNisInput').value = '';
+    }
+
+    function playBeepSound() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    }
+
+    // ---------------- DATA SISWA LOGIC ----------------
+    async function loadSiswaData() {
+      if (!GAS_URL) return;
+      try {
+        const res = await fetch(`${GAS_URL}?action=getSiswa`);
+        const json = await res.json();
+        if (json.success) {
+          globalSiswaList = json.data;
+          renderSiswaTable(globalSiswaList);
+        }
+      } catch (err) {
+        console.error("Gagal muat siswa", err);
+      }
+    }
+
+    function renderSiswaTable(data) {
+      const tbody = document.getElementById('siswaTableBody');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500">Data siswa kosong.</td></tr>`;
         return;
       }
 
-      apiPost('prosesAbsensi', { nis: decodedText, tipe: tipe })
-        .then(function(r) {
-          playSuccessBeep();
-          showScanResult(true, r.message, r.status);
-          showToast(r.message, 'success');
-        })
-        .catch(function(e) {
-          playErrorBeep();
-          showScanResult(false, e.message, '');
-          showToast(e.message, 'error');
-        });
+      tbody.innerHTML = data.map(s => `
+        <tr class="hover:bg-slate-800/50 transition">
+          <td class="p-3.5">${s.id}</td>
+          <td class="p-3.5 font-semibold text-slate-100">${s.nama}</td>
+          <td class="p-3.5">${s.kelas}</td>
+          <td class="p-3.5 font-mono text-emerald-400">${s.nis}</td>
+          <td class="p-3.5 text-slate-400">${s.noHP || '-'}</td>
+          <td class="p-3.5 text-center">
+            <button onclick="openModalQr('${s.nama}', '${s.kelas}', '${s.nis}')" class="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-emerald-400 transition">
+              <i data-lucide="qr-code" class="w-4 h-4"></i>
+            </button>
+          </td>
+          <td class="p-3.5 text-right">
+            <button onclick="deleteSiswa(${s.rowIndex})" class="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
     }
 
-    function showScanResult(success, message, status) {
-      var wrap = document.getElementById('scanResult');
-      var content = document.getElementById('scanResultContent');
-      wrap.classList.remove('hidden');
-      if (success) {
-        var bc = status === 'Terlambat' ? 'badge-terlambat' : 'badge-hadir';
-        content.className = 'rounded-lg p-4 border text-center border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.05)]';
-        content.innerHTML = '<i class="fas fa-check-circle text-3xl text-[var(--accent)] mb-2"></i><div class="font-semibold mb-1">' + escapeHtml(message) + '</div>' + (status ? '<span class="badge ' + bc + '">' + escapeHtml(status) + '</span>' : '');
-      } else {
-        content.className = 'rounded-lg p-4 border text-center border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.05)]';
-        content.innerHTML = '<i class="fas fa-times-circle text-3xl text-[var(--danger)] mb-2"></i><div class="font-semibold text-[var(--danger)]">' + escapeHtml(message) + '</div>';
-      }
-    }
+    function filterSiswaTable() {
+      const search = document.getElementById('searchSiswaInput').value.toLowerCase();
+      const kelas = document.getElementById('filterKelasSiswa').value;
 
-    // =============================================
-    // ABSENSI MANUAL
-    // =============================================
-    function onAbsenKelasChange(tipe) {
-      var kelasEl = document.getElementById(tipe + 'Kelas');
-      var siswaEl = document.getElementById(tipe + 'SiswaSelect');
-      var kelas = kelasEl.value;
-      siswaEl.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-      if (tipe === 'masuk') { selectedSiswaMasuk = null; document.getElementById('masukInfo').classList.add('hidden'); document.getElementById('emptyMasuk').classList.remove('hidden'); }
-      if (tipe === 'pulang') { selectedSiswaPulang = null; document.getElementById('pulangInfo').classList.add('hidden'); document.getElementById('emptyPulang').classList.remove('hidden'); }
-      if (!kelas) return;
-      var filtered = allSiswa.filter(function(s) { return s.kelas === kelas; });
-      filtered.forEach(function(s) {
-        var opt = document.createElement('option');
-        opt.value = s.nis;
-        opt.textContent = s.nama + (s.nis ? ' (' + s.nis + ')' : '');
-        siswaEl.appendChild(opt);
+      const filtered = globalSiswaList.filter(s => {
+        const matchSearch = s.nama.toLowerCase().includes(search) || s.nis.toLowerCase().includes(search);
+        const matchKelas = !kelas || s.kelas === kelas;
+        return matchSearch && matchKelas;
       });
+
+      renderSiswaTable(filtered);
     }
 
-    function onAbsenSiswaChange(tipe) {
-      var siswaEl = document.getElementById(tipe + 'SiswaSelect');
-      var nis = siswaEl.value;
-      if (tipe === 'masuk') {
-        if (!nis) { selectedSiswaMasuk = null; document.getElementById('masukInfo').classList.add('hidden'); document.getElementById('emptyMasuk').classList.remove('hidden'); return; }
-        selectedSiswaMasuk = allSiswa.find(function(s) { return s.nis === nis; });
-        if (selectedSiswaMasuk) {
-          document.getElementById('avatar').textContent = selectedSiswaMasuk.nama.charAt(0);
-          document.getElementById('nameMasuk').textContent = selectedSiswaMasuk.nama;
-          document.getElementById('classMasuk').textContent = selectedSiswaMasuk.kelas;
-          document.getElementById('nisMasuk').textContent = 'NIS: ' + selectedSiswaMasuk.nis;
-          document.getElementById('masukInfo').classList.remove('hidden');
-          document.getElementById('emptyMasuk').classList.add('hidden');
+    function openModalAddSiswa() { document.getElementById('modalAddSiswa').classList.remove('hidden'); }
+    function closeModalAddSiswa() { document.getElementById('modalAddSiswa').classList.add('hidden'); }
+
+    async function submitAddSiswa() {
+      const nama = document.getElementById('addNamaSiswa').value.trim();
+      const kelas = document.getElementById('addKelasSiswa').value.trim();
+      const nis = document.getElementById('addNisSiswa').value.trim();
+      const noHP = document.getElementById('addNoHPSiswa').value.trim();
+
+      if (!nama || !kelas || !nis) return alert('Harap isi semua kolom wajib!');
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'addSiswa', data: { nama, kelas, nis, noHP } })
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert('Siswa Berhasil Ditambahkan!');
+          closeModalAddSiswa();
+          loadSiswaData();
         }
-      } else if (tipe === 'pulang') {
-        if (!nis) { selectedSiswaPulang = null; document.getElementById('pulangInfo').classList.add('hidden'); document.getElementById('emptyPulang').classList.remove('hidden'); return; }
-        selectedSiswaPulang = allSiswa.find(function(s) { return s.nis === nis; });
-        if (selectedSiswaPulang) {
-          document.getElementById('avatarPulang').textContent = selectedSiswaPulang.nama.charAt(0);
-          document.getElementById('namePulang').textContent = selectedSiswaPulang.nama;
-          document.getElementById('classPulang').textContent = selectedSiswaPulang.kelas;
-          document.getElementById('nisPulang').textContent = 'NIS: ' + selectedSiswaPulang.nis;
-          document.getElementById('pulangInfo').classList.remove('hidden');
-          document.getElementById('emptyPulang').classList.add('hidden');
-        }
+      } catch (e) {
+        alert("Gagal menambahkan siswa: " + e);
       }
     }
 
-    function doAbsensi(tipe) {
-      var siswa = tipe === 'masuk' ? selectedSiswaMasuk : selectedSiswaPulang;
-      if (!siswa || !siswa.nis) { showToast('Pilih siswa terlebih dahulu', 'error'); return; }
-      var btn = document.getElementById(tipe === 'masuk' ? 'btnMasuk' : 'btnPulang');
-      btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Memproses...';
-      apiPost('prosesAbsensi', { nis: siswa.nis, tipe: tipe })
-        .then(function(r) {
-          playSuccessBeep();
-          showToast(r.message, 'success');
-          btn.disabled = false;
-          btn.innerHTML = tipe === 'masuk' ? '<i class="fas fa-sign-in-alt"></i> Absen Masuk' : '<i class="fas fa-sign-out-alt"></i> Absen Pulang';
-        })
-        .catch(function(e) {
-          playErrorBeep();
-          showToast(e.message, 'error');
-          btn.disabled = false;
-          btn.innerHTML = tipe === 'masuk' ? '<i class="fas fa-sign-in-alt"></i> Absen Masuk' : '<i class="fas fa-sign-out-alt"></i> Absen Pulang';
+    async function deleteSiswa(rowIndex) {
+      if (!confirm("Yakin ingin menghapus data siswa ini?")) return;
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'deleteSiswa', rowIndex: rowIndex })
         });
+        const json = await res.json();
+        if (json.success) {
+          loadSiswaData();
+        }
+      } catch (e) { alert("Gagal menghapus siswa: " + e); }
     }
 
-    function loadSiswaByKelas(tipe) {
-      var kelasEl = document.getElementById(tipe + 'Kelas');
-      var siswaEl = document.getElementById(tipe + 'Siswa');
-      var kelas = kelasEl.value;
-      siswaEl.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-      if (!kelas) return;
-      var filtered = allSiswa.filter(function(s) { return s.kelas === kelas; });
-      filtered.forEach(function(s) {
-        var opt = document.createElement('option');
-        opt.value = s.nis;
-        opt.textContent = s.nama + (s.nis ? ' (' + s.nis + ')' : '');
-        siswaEl.appendChild(opt);
+    function importExcelSiswa(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(evt) {
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const siswaData = [];
+        for (let i = 1; i < rows.length; i++) {
+          if (rows[i][0]) {
+            siswaData.push({
+              nama: rows[i][0],
+              kelas: String(rows[i][1] || ''),
+              nis: String(rows[i][2] || ''),
+              noHP: String(rows[i][3] || '')
+            });
+          }
+        }
+
+        if (siswaData.length === 0) return alert('Format Excel kosong/tidak valid');
+
+        try {
+          const res = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'importSiswa', data: siswaData })
+          });
+          const json = await res.json();
+          if (json.success) {
+            alert(`Berhasil mengimpor ${json.data.count} siswa!`);
+            loadSiswaData();
+          }
+        } catch (err) { alert("Gagal impor excel: " + err); }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function openModalQr(nama, kelas, nis) {
+      document.getElementById('modalQrNama').innerText = nama;
+      document.getElementById('modalQrKelasNis').innerText = `Kelas ${kelas} / NIS: ${nis}`;
+
+      const qrContainer = document.getElementById('modalQrContainer');
+      qrContainer.innerHTML = '';
+      new QRCode(qrContainer, {
+        text: String(nis),
+        width: 160,
+        height: 160
       });
+
+      document.getElementById('modalQrCode').classList.remove('hidden');
     }
+    function closeModalQr() { document.getElementById('modalQrCode').classList.add('hidden'); }
 
-    function doTidakHadir() {
-      var nis = document.getElementById('tidakSiswa').value;
-      var keterangan = document.getElementById('tidakKeterangan').value;
-      if (!nis) { showToast('Pilih siswa terlebih dahulu', 'error'); return; }
-      if (!keterangan) { showToast('Pilih keterangan', 'error'); return; }
-      var btn = document.getElementById('btnTidak');
-      btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Memproses...';
-      apiPost('prosesTidakHadir', { nis: nis, keterangan: keterangan })
-        .then(function(r) {
-          showToast(r.message, 'success');
-          btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-xmark"></i> Rekam Ketidakhadiran';
-          document.getElementById('tidakSiswa').value = '';
-          document.getElementById('tidakKeterangan').value = '';
-        })
-        .catch(function(e) {
-          showToast(e.message, 'error');
-          btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-xmark"></i> Rekam Ketidakhadiran';
-        });
-    }
+    // ---------------- LAPORAN ABSENSI LOGIC ----------------
+    async function loadAbsensiData() {
+      if (!GAS_URL) return;
+      const tgl = document.getElementById('filterTanggalAbsensi').value;
+      const kls = document.getElementById('filterKelasAbsensi').value;
 
-    // =============================================
-    // KONFIGURASI
-    // =============================================
-    function loadKonfigurasi() {
-      apiGet('getKonfigurasi').then(function(c) {
-        if (c.jam_masuk_default) document.getElementById('configJamMasuk').value = c.jam_masuk_default;
-        if (c.jam_pulang_default) document.getElementById('configJamPulang').value = c.jam_pulang_default;
-      }).catch(function(e) { showToast('Gagal muat konfigurasi: ' + e.message, 'error'); });
-    }
-
-    function saveConfig() {
-      var data = {
-        jam_masuk_default: document.getElementById('configJamMasuk').value,
-        jam_pulang_default: document.getElementById('configJamPulang').value
-      };
-      apiPost('updateKonfigurasi', { data: data }).then(function() { showToast('Konfigurasi default disimpan', 'success'); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
-    }
-
-    // =============================================
-    // JADWAL
-    // =============================================
-    var editJadwalRowIndex = null;
-
-    function loadJadwal() {
-      apiGet('getJadwal').then(function(data) {
-        var tb = document.getElementById('jadwalTableBody');
-        if (!data || data.length === 0) { tb.innerHTML = '<tr><td colspan="5"><div class="empty-state py-6"><i class="fas fa-calendar-alt block"></i><p class="text-sm">Belum ada jadwal kelas</p></div></td></tr>'; return; }
-        tb.innerHTML = data.map(function(j, i) {
-          return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td class="font-medium">' + escapeHtml(j.kelas) + '</td><td>' + escapeHtml(j.jamMasuk) + '</td><td>' + escapeHtml(j.jamPulang) + '</td><td><button class="btn btn-secondary py-1 px-2 text-xs mr-1" onclick="editJadwal(' + j.rowIndex + ',\'' + escapeHtml(j.kelas) + '\',\'' + escapeHtml(j.jamMasuk) + '\',\'' + escapeHtml(j.jamPulang) + '\')"><i class="fas fa-edit"></i></button><button class="btn btn-danger py-1 px-2 text-xs" onclick="hapusJadwal(' + j.rowIndex + ',\'' + escapeHtml(j.kelas) + '\')"><i class="fas fa-trash"></i></button></td></tr>';
-        }).join('');
-      }).catch(function(e) { showToast('Gagal muat jadwal: ' + e.message, 'error'); });
-    }
-
-    function openModalJadwal() {
-      editJadwalRowIndex = null;
-      document.getElementById('modalJadwalTitle').textContent = 'Tambah Jadwal Kelas';
-      document.getElementById('inputJadwalKelas').value = '';
-      document.getElementById('inputJadwalKelas').disabled = false;
-      document.getElementById('inputJadwalMasuk').value = '';
-      document.getElementById('inputJadwalPulang').value = '';
-      document.getElementById('btnSubmitJadwal').innerHTML = '<i class="fas fa-save"></i> Simpan';
-      openModal('modalJadwal');
-    }
-
-    function editJadwal(rowIndex, kelas, jamMasuk, jamPulang) {
-      editJadwalRowIndex = rowIndex;
-      document.getElementById('modalJadwalTitle').textContent = 'Edit Jadwal Kelas';
-      document.getElementById('inputJadwalKelas').value = kelas;
-      document.getElementById('inputJadwalKelas').disabled = true;
-      document.getElementById('inputJadwalMasuk').value = jamMasuk;
-      document.getElementById('inputJadwalPulang').value = jamPulang;
-      document.getElementById('btnSubmitJadwal').innerHTML = '<i class="fas fa-save"></i> Perbarui';
-      openModal('modalJadwal');
-    }
-
-    function submitJadwal() {
-      var kelas = document.getElementById('inputJadwalKelas').value.trim();
-      var jamMasuk = document.getElementById('inputJadwalMasuk').value;
-      var jamPulang = document.getElementById('inputJadwalPulang').value;
-      if (!kelas) { showToast('Nama kelas wajib diisi', 'error'); return; }
-      if (!jamMasuk || !jamPulang) { showToast('Jam masuk dan pulang wajib diisi', 'error'); return; }
-      var d = { kelas: kelas, jamMasuk: jamMasuk, jamPulang: jamPulang };
-      if (editJadwalRowIndex) {
-        apiPost('updateJadwal', { rowIndex: editJadwalRowIndex, data: d }).then(function(r) { showToast(r.message, 'success'); closeModal('modalJadwal'); loadJadwal(); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
-      } else {
-        apiPost('addJadwal', { data: d }).then(function(r) { showToast(r.message, 'success'); closeModal('modalJadwal'); loadJadwal(); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
-      }
-    }
-
-    function hapusJadwal(rowIndex, kelas) {
-      document.getElementById('konfirmasiTitle').textContent = 'Hapus Jadwal';
-      document.getElementById('konfirmasiMessage').textContent = 'Yakin ingin menghapus jadwal kelas "' + kelas + '"?';
-      document.getElementById('btnKonfirmasiYa').onclick = function() {
-        apiPost('deleteJadwal', { rowIndex: rowIndex }).then(function() { showToast('Jadwal dihapus', 'success'); closeModal('modalKonfirmasi'); loadJadwal(); }).catch(function(e) { showToast('Gagal: ' + e.message, 'error'); });
-      };
-      openModal('modalKonfirmasi');
-    }
-
-    // =============================================
-    // LAPORAN
-    // =============================================
-    function loadLaporan() {
-      var tanggal = document.getElementById('laporanTanggal').value;
-      var kelas = document.getElementById('laporanKelas').value;
-      if (!tanggal) {
-        var today = new Date();
-        tanggal = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-        document.getElementById('laporanTanggal').value = tanggal;
-      }
-      apiGet('getAbsensi', { tanggal: tanggal, kelas: kelas }).then(function(data) {
-        var tb = document.getElementById('tbodyLaporan');
-        var summary = document.getElementById('laporanSummary');
-        if (!data || data.length === 0) {
-          tb.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-file-alt block"></i><p class="text-sm">Tidak ada data absensi untuk tanggal ini</p></div></td></tr>';
-          summary.classList.add('hidden');
-          return;
+      try {
+        const res = await fetch(`${GAS_URL}?action=getAbsensi&tanggal=${tgl}&kelas=${kls}`);
+        const json = await res.json();
+        if (json.success) {
+          renderAbsensiTable(json.data);
         }
-        tb.innerHTML = data.map(function(r, i) {
-          var bc = r.status === 'Hadir' ? 'badge-hadir' : r.status === 'Terlambat' ? 'badge-terlambat' : (r.status === 'Sakit' ? 'badge-sakit' : (r.status === 'Izin' ? 'badge-izin' : 'badge-alpa'));
-          return '<tr><td class="text-[var(--muted)]">' + (i+1) + '</td><td><span class="font-medium">' + escapeHtml(r.nama) + '</span></td><td>' + escapeHtml(r.kelas) + '</td><td class="text-[var(--muted)]">' + formatTanggal(r.tanggal) + '</td><td>' + escapeHtml(r.jamMasuk || '-') + '</td><td>' + escapeHtml(r.jamPulang || '-') + '</td><td><span class="badge ' + bc + '">' + escapeHtml(r.status) + '</span></td></tr>';
-        }).join('');
-        var h = data.filter(function(r) { return r.status === 'Hadir'; }).length;
-        var t = data.filter(function(r) { return r.status === 'Terlambat'; }).length;
-        var s = data.filter(function(r) { return r.status === 'Sakit'; }).length;
-        var iz = data.filter(function(r) { return r.status === 'Izin'; }).length;
-        var a = data.filter(function(r) { return r.status === 'Alpa'; }).length;
-        summary.innerHTML = 'Total: <strong>' + data.length + '</strong> &mdash; Hadir: <strong class="text-[var(--accent)]">' + h + '</strong> &mdash; Terlambat: <strong class="text-[var(--warning)]">' + t + '</strong> &mdash; Sakit: <strong class="text-[var(--danger)]">' + s + '</strong> &mdash; Izin: <strong class="text-[var(--warning)]">' + iz + '</strong> &mdash; Alpa: <strong class="text-[var(--muted)]">' + a + '</strong>';
-        summary.classList.remove('hidden');
-      }).catch(function(e) { showToast('Gagal muat laporan: ' + e.message, 'error'); });
+      } catch (e) { console.error("Gagal muat absensi", e); }
     }
 
-    function exportExcel() {
-      var tanggal = document.getElementById('laporanTanggal').value;
-      var kelas = document.getElementById('laporanKelas').value;
-      if (!tanggal) { showToast('Pilih tanggal terlebih dahulu', 'error'); return; }
-      apiGet('getAbsensi', { tanggal: tanggal, kelas: kelas }).then(function(data) {
-        if (!data || data.length === 0) { showToast('Tidak ada data untuk diekspor', 'error'); return; }
-        var rows = [['No', 'Nama Siswa', 'Kelas', 'Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status']];
-        data.forEach(function(r, i) { rows.push([i+1, r.nama, r.kelas, r.tanggal, r.jamMasuk || '-', r.jamPulang || '-', r.status]); });
-        var ws = XLSX.utils.aoa_to_sheet(rows);
-        var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Absensi');
-        XLSX.writeFile(wb, 'Absensi_' + tanggal + (kelas !== 'Semua' ? '_' + kelas : '') + '.xlsx');
-        showToast('File Excel berhasil didownload', 'success');
-      }).catch(function(e) { showToast('Gagal ekspor: ' + e.message, 'error'); });
+    function renderAbsensiTable(data) {
+      const tbody = document.getElementById('absensiTableBody');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">Tidak ada catatan absensi pada tanggal ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(a => `
+        <tr class="hover:bg-slate-800/50 transition">
+          <td class="p-3.5 font-mono text-slate-400">${a.tanggal}</td>
+          <td class="p-3.5 font-semibold text-slate-100">${a.nama}</td>
+          <td class="p-3.5">${a.kelas}</td>
+          <td class="p-3.5 font-mono text-slate-300">${a.jamMasuk || '-'}</td>
+          <td class="p-3.5 font-mono text-slate-300">${a.jamPulang || '-'}</td>
+          <td class="p-3.5">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${getStatusBadgeClass(a.status)}">${a.status}</span>
+          </td>
+        </tr>
+      `).join('');
     }
 
-    // =============================================
-    // INIT
-    // =============================================
-    document.addEventListener('DOMContentLoaded', function() {
-      checkApiConnection();
-      loadDashboard();
-    });
+    function openModalTidakHadir() {
+      const select = document.getElementById('thSiswaSelect');
+      select.innerHTML = globalSiswaList.map(s => `<option value="${s.nis}">${s.nama} (${s.kelas}) - NIS: ${s.nis}</option>`).join('');
+      document.getElementById('modalTidakHadir').classList.remove('hidden');
+    }
+    function closeModalTidakHadir() { document.getElementById('modalTidakHadir').classList.add('hidden'); }
+
+    async function submitTidakHadir() {
+      const nis = document.getElementById('thSiswaSelect').value;
+      const keterangan = document.getElementById('thKeteranganSelect').value;
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'prosesTidakHadir', nis: nis, keterangan: keterangan })
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert("Berhasil dicatat!");
+          closeModalTidakHadir();
+          loadAbsensiData();
+        } else alert(json.data.message);
+      } catch (e) { alert("Gagal memproses data: " + e); }
+    }
+
+    function exportAbsensiExcel() {
+      const tbody = document.getElementById('absensiTableBody');
+      const table = tbody.closest('table');
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Laporan Absensi" });
+      XLSX.writeFile(wb, `Absensi_Siswa_${document.getElementById('filterTanggalAbsensi').value}.xlsx`);
+    }
+
+    // ---------------- PENGATURAN LOGIC ----------------
+    async function loadKonfigurasiData() {
+      if (!GAS_URL) return;
+      try {
+        const res = await fetch(`${GAS_URL}?action=getKonfigurasi`);
+        const json = await res.json();
+        if (json.success) {
+          const cfg = json.data;
+          document.getElementById('cfgJamMasuk').value = cfg.jam_masuk_default || '07:00';
+          document.getElementById('cfgJamPulang').value = cfg.jam_pulang_default || '14:00';
+          document.getElementById('cfgFonnteToken').value = cfg.fonnte_token || '';
+          document.getElementById('cfgWaAktif').value = cfg.wa_notif_aktif || 'true';
+        }
+      } catch (e) { console.error("Gagal muat konfigurasi", e); }
+    }
+
+    async function saveKonfigurasi() {
+      const jamMasuk = document.getElementById('cfgJamMasuk').value;
+      const jamPulang = document.getElementById('cfgJamPulang').value;
+      const token = document.getElementById('cfgFonnteToken').value.trim();
+      const waAktif = document.getElementById('cfgWaAktif').value;
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'updateKonfigurasi',
+            data: {
+              jam_masuk_default: jamMasuk,
+              jam_pulang_default: jamPulang,
+              fonnte_token: token,
+              wa_notif_aktif: waAktif
+            }
+          })
+        });
+        const json = await res.json();
+        if (json.success) alert('Pengaturan berhasil disimpan!');
+      } catch (e) { alert('Gagal menyimpan pengaturan: ' + e); }
+    }
+
+    // HELPER: BADGE STYLES
+    function getStatusBadgeClass(status) {
+      if (status === 'Hadir') return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+      if (status === 'Terlambat') return 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+      if (status === 'Sakit') return 'bg-blue-500/20 text-blue-400 border border-blue-500/30';
+      if (status === 'Izin') return 'bg-purple-500/20 text-purple-400 border border-purple-500/30';
+      if (status === 'Alpa') return 'bg-rose-500/20 text-rose-400 border border-rose-500/30';
+      return 'bg-slate-700 text-slate-300';
+    }
   </script>
 </body>
 </html>
