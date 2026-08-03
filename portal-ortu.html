@@ -6,7 +6,7 @@
   <title>Portal Orang Tua - Absensi Digital SDIT AL-IQRA</title>
   
   <!-- Tailwind CSS & FontAwesome -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -432,19 +432,31 @@
     }
 
     // Helper Generator QR Code
-    function generateQRCodeURL(text) {
-      return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(text)}`;
-    }
+   function generateQRCodeURL(text) {
+  return `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${encodeURIComponent(text)}`;
+}
 
     // Update Tampilan Kartu Pelajar
     function updateKartuPelajar(nama, nis, kelas) {
-      document.getElementById('cardNama').textContent = nama;
-      document.getElementById('cardNis').textContent = nis;
-      document.getElementById('cardKelas').textContent = kelas;
-      document.getElementById('cardQrCode').src = generateQRCodeURL(nis);
-      document.getElementById('cardFoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0284c7&color=fff&size=128`;
-    }
-
+  document.getElementById('cardNama').textContent = nama;
+  document.getElementById('cardNis').textContent = nis;
+  document.getElementById('cardKelas').textContent = kelas;
+  
+  // Set QR Code
+  const qrImg = document.getElementById('cardQrCode');
+  qrImg.src = generateQRCodeURL(nis);
+  qrImg.onerror = function() {
+    // Fallback jika API QR gagal dimuat
+    this.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24'><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='8' fill='%23666'>QR Err</text></svg>";
+  };
+  // Set Foto Avatar
+  const fotoImg = document.getElementById('cardFoto');
+  fotoImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=0284c7&color=fff&size=128`;
+  fotoImg.onerror = function() {
+    // Fallback jika avatar gagal dimuat
+    this.src = "https://via.placeholder.com/150?text=Foto";
+  };
+}
     // Cetak Kartu
     function cetakKartu() {
       window.print();
