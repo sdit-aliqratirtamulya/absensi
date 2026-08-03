@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cyber Attendance System</title>
   
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- HTML5-QRCode JS -->
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <!-- QRCode JS Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap');
@@ -58,11 +60,45 @@
       background: #06b6d4;
       border-radius: 3px;
     }
+
+    /* Ukuran Standar Kartu ID Card CR80 (85.6mm x 54mm) */
+    .id-card {
+      width: 320px;
+      height: 200px;
+      background: linear-gradient(135deg, #0b1329 0%, #1e293b 100%);
+    }
+
+    /* CSS Khusus Cetak Kartu */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+        background: white !important;
+        padding: 0 !important;
+      }
+      .card-container {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        color: #000 !important;
+      }
+    }
   </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR NAVIGATION -->
   <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-50">
     <div>
       <!-- Header Logos -->
@@ -77,7 +113,7 @@
         <p class="text-xs text-slate-400">SMK/SMA Karawang System</p>
       </div>
 
-      <!-- Navigation -->
+      <!-- Navigation Links -->
       <nav class="mt-4 space-y-1">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-active w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold hover:text-cyan-400 transition">
           <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i> Dashboard
@@ -94,7 +130,7 @@
       </nav>
     </div>
 
-    <!-- Status Server Footer -->
+    <!-- System Status Footer -->
     <div class="p-4 border-t border-slate-800/80 bg-slate-900/30">
       <div class="flex items-center gap-2">
         <span class="relative flex h-3 w-3">
@@ -148,9 +184,14 @@
       <section id="sec-siswa" class="hidden space-y-4">
         <div class="cyber-card p-4 rounded-xl flex justify-between items-center">
           <input type="text" id="search-siswa" onkeyup="filterSiswaTable()" placeholder="Cari NIS atau Nama Siswa..." class="bg-slate-900 border border-slate-700 text-sm rounded-lg px-4 py-2 w-72 focus:outline-none focus:border-cyan-500 text-white">
-          <button onclick="loadDataSiswa()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">
-            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Data
-          </button>
+          <div class="flex gap-2">
+            <button onclick="cetakSemuaKartu()" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-2">
+              <i class="fa-solid fa-print"></i> Cetak Semua Kartu
+            </button>
+            <button onclick="loadDataSiswa()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2 rounded-lg transition border border-slate-700">
+              <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
+            </button>
+          </div>
         </div>
 
         <div class="cyber-card rounded-xl overflow-hidden">
@@ -161,10 +202,11 @@
                 <th class="p-4">Nama Siswa</th>
                 <th class="p-4">Kelas</th>
                 <th class="p-4">No HP Orang Tua</th>
+                <th class="p-4 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody id="tb-siswa" class="divide-y divide-slate-800/50">
-              <tr><td colspan="4" class="text-center p-4 text-slate-500">Memuat data...</td></tr>
+              <tr><td colspan="5" class="text-center p-4 text-slate-500">Memuat data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -256,8 +298,41 @@
     </div>
   </main>
 
+  <!-- MODAL PREVIEW & CETAK KARTU PELAJAR -->
+  <div id="modal-card" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-cyan-500/30 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] flex flex-col justify-between shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="font-tech text-lg font-bold text-cyan-400">PREVIEW KARTU PELAJAR</h3>
+          <p class="text-xs text-slate-400">Siap untuk dicetak ke kertas PVC / HVS / Glossy</p>
+        </div>
+        <button onclick="closeCardModal()" class="text-slate-400 hover:text-white text-xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Print Area) -->
+      <div class="my-6 overflow-y-auto max-h-[60vh] p-4 bg-slate-950 rounded-xl border border-slate-800">
+        <div id="print-area" class="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
+          <!-- Kartu Pelajar akan di-generate otomatis di sini -->
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end gap-3 border-t border-slate-800 pt-4">
+        <button onclick="closeCardModal()" class="px-5 py-2.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Batal</button>
+        <button onclick="window.print()" class="px-5 py-2.5 rounded-lg bg-cyan-600 text-white text-xs font-bold hover:bg-cyan-500 flex items-center gap-2 shadow-lg shadow-cyan-950">
+          <i class="fa-solid fa-print"></i> CETAK KARTU
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <script>
-    // URL Deployment Google Apps Script Anda
+    // URL Deployment Google Apps Script (Ganti dengan URL milik Anda)
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbySwZBBu3LfBopdqMgKBjIza1yRzZtxrMHjGED42f47lQpA_Jj2adtWzZm9M_d4ij1jxQ/exec";
 
     let html5QrCode = null;
@@ -337,9 +412,14 @@
           <td class="p-4 font-semibold text-white">${r[1]}</td>
           <td class="p-4">${r[2]}</td>
           <td class="p-4 text-slate-400">${r[4]}</td>
+          <td class="p-4 text-center">
+            <button onclick="cetakKartuSiswa('${r[0]}', '${r[1]}', '${r[2]}')" class="bg-cyan-950 text-cyan-400 border border-cyan-800 hover:bg-cyan-900 px-3 py-1 rounded text-xs transition">
+              <i class="fa-solid fa-id-card mr-1"></i> Kartu
+            </button>
+          </td>
         </tr>`;
       });
-      document.getElementById('tb-siswa').innerHTML = html || '<tr><td colspan="4" class="text-center p-4">Kosong</td></tr>';
+      document.getElementById('tb-siswa').innerHTML = html || '<tr><td colspan="5" class="text-center p-4">Kosong</td></tr>';
     }
 
     function filterSiswaTable() {
@@ -454,6 +534,111 @@
             document.getElementById('tb-laporan').innerHTML = html || '<tr><td colspan="6" class="text-center p-4">Kosong</td></tr>';
           }
         });
+    }
+
+    // GENERATOR KARTU PELAJAR FUNCTIONS
+    function cetakKartuSiswa(nis, nama, kelas) {
+      const container = document.getElementById('print-area');
+      container.innerHTML = '';
+      
+      container.innerHTML = createCardHTML(nis, nama, kelas);
+      
+      new QRCode(document.getElementById(`qrcode-${nis}`), {
+        text: nis.toString(),
+        width: 65,
+        height: 65,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      document.getElementById('modal-card').classList.remove('hidden');
+    }
+
+    function cetakSemuaKartu() {
+      if (!globalDataSiswa.length) {
+        alert("Data siswa belum dimuat!");
+        return;
+      }
+
+      const container = document.getElementById('print-area');
+      container.innerHTML = '';
+
+      globalDataSiswa.forEach(s => {
+        container.innerHTML += createCardHTML(s[0], s[1], s[2]);
+      });
+
+      setTimeout(() => {
+        globalDataSiswa.forEach(s => {
+          new QRCode(document.getElementById(`qrcode-${s[0]}`), {
+            text: s[0].toString(),
+            width: 65,
+            height: 65,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        });
+      }, 100);
+
+      document.getElementById('modal-card').classList.remove('hidden');
+    }
+
+    function createCardHTML(nis, nama, kelas) {
+      return `
+      <div class="card-container id-card rounded-xl p-3 border border-cyan-500/40 relative flex flex-col justify-between text-white overflow-hidden shadow-xl">
+        
+        <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-cyan-500/10 rounded-full blur-xl"></div>
+        
+        <!-- Card Header -->
+        <div class="flex items-center justify-between border-b border-cyan-500/30 pb-2">
+          <div class="flex items-center gap-1.5">
+            <img src="logo-karawang.png" class="h-6 w-auto">
+            <img src="logo-disdik.png" class="h-6 w-auto">
+            <img src="logo-sekolah.png" class="h-6 w-auto">
+          </div>
+          <div class="text-right">
+            <h4 class="font-tech text-[9px] font-bold text-cyan-400 tracking-wider">KARTU PELAJAR</h4>
+            <p class="text-[7px] text-slate-300">SMK/SMA KARAWANG</p>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="flex items-center justify-between my-1 gap-2">
+          <div class="space-y-1">
+            <div>
+              <p class="text-[7px] text-slate-400 uppercase tracking-wider">Nama Lengkap</p>
+              <h5 class="text-xs font-bold text-white truncate max-w-[180px]">${nama}</h5>
+            </div>
+            <div class="flex gap-4">
+              <div>
+                <p class="text-[7px] text-slate-400 uppercase tracking-wider">NIS</p>
+                <p class="font-tech text-xs text-cyan-400 font-semibold">${nis}</p>
+              </div>
+              <div>
+                <p class="text-[7px] text-slate-400 uppercase tracking-wider">Kelas</p>
+                <p class="text-xs font-semibold text-slate-200">${kelas}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Code Container -->
+          <div class="bg-white p-1 rounded-lg border border-cyan-400 shadow-md">
+            <div id="qrcode-${nis}"></div>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="border-t border-slate-700/60 pt-1 flex justify-between items-center">
+          <p class="text-[6px] text-slate-400">Harap membawa kartu ini setiap presensi harian.</p>
+          <p class="font-tech text-[6px] text-cyan-400/80">OFFICIAL PRESENSI CARD</p>
+        </div>
+
+      </div>`;
+    }
+
+    function closeCardModal() {
+      document.getElementById('modal-card').classList.add('hidden');
     }
   </script>
 </body>
