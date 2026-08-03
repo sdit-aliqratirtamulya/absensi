@@ -1,428 +1,528 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Presensi QR Code</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      background-color: #f8fafc;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .sidebar {
-      min-height: 100vh;
-      background-color: #0f172a;
-      color: #fff;
-    }
-    .sidebar .nav-link {
-      color: #94a3b8;
-      padding: 12px 20px;
-      margin: 4px 0;
-      border-radius: 8px;
-    }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active {
-      color: #fff;
-      background-color: #1e293b;
-    }
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    .scanner-box {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px dashed #cbd5e1;
-    }
-  </style>
-</head>
-<body>
+/**
+ * @OnlyCurrentDoc
+ * @scriptscope https://www.googleapis.com/auth/script.external_request
+ */
 
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar Navigation -->
-    <div class="col-md-3 col-lg-2 sidebar p-3">
-      <h4 class="text-center my-3 fw-bold text-primary"><i class="fa-solid fa-qrcode me-2"></i>Presensi QR</h4>
-      <hr class="border-secondary">
-      <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-          <a href="#" class="nav-link active" onclick="switchTab('dashboard', this)"><i class="fa-solid fa-chart-pie me-2"></i>Dashboard</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('scan', this)"><i class="fa-solid fa-camera me-2"></i>Scan QR</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('siswa', this)"><i class="fa-solid fa-users me-2"></i>Data Siswa</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('laporan', this)"><i class="fa-solid fa-file-invoice me-2"></i>Laporan</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('pengaturan', this)"><i class="fa-solid fa-gear me-2"></i>Pengaturan</a>
-        </li>
-      </ul>
-    </div>
+// ==========================================
+// KONFIGURASI PRIVAT (SERVER-ONLY)
+// ==========================================
+const FONNTE_TOKEN_PRIVAT = "2FhYGdhuticUBt57BMX5";
 
-    <!-- Main Content Area -->
-    <div class="col-md-9 col-lg-10 p-4">
+const SHEET_NAMES = {
+  SISWA: "Data_Siswa",
+  ABSENSI: "Laporan_Absensi",
+  PENGATURAN: "Pengaturan"
+};
+
+// ==========================================
+// ROUTING HTTP REQUEST (GET & POST)
+// ==========================================
+function doGet(e) {
+  const action = e.parameter.action;
+  
+  if (action === "ping") {
+    return jsonResponse({ success: true, message: "Backend Online" });
+  }
+  
+  if (action === "getDashboard") {
+    return jsonResponse(getDashboardData());
+  }
+  
+  if (action === "getSiswa") {
+    return jsonResponse(getSiswaData());
+  }
+  
+  if (action === "getAbsensi") {
+    const tanggal = e.parameter.tanggal;
+    const kelas = e.parameter.kelas;
+    return jsonResponse(getAbsensiData(tanggal, kelas));
+  }
+  
+  if (action === "getKonfigurasi") {
+    return jsonResponse(getKonfigurasiData());
+  }
+
+  return jsonResponse({ success: false, error: "Aksi GET tidak valid" });
+}
+
+function doPost(e) {
+  try {
+    const request = JSON.parse(e.postData.contents);
+    const action = request.action;
+
+    if (action === "prosesAbsensi") {
+      return jsonResponse(prosesAbsensi(request.nis, request.tipe));
+    }
+    
+    if (action === "addSiswa") {
+      return jsonResponse(addSiswa(request.data));
+    }
+    
+    if (action === "deleteSiswa") {
+      return jsonResponse(deleteSiswa(request.rowIndex));
+    }
+    
+    if (action === "importSiswa") {
+      return jsonResponse(importSiswa(request.data));
+    }
+
+    if (action === "prosesTidakHadir") {
+      return jsonResponse(prosesTidakHadir(request.nis, request.keterangan));
+    }
+
+    if (action === "updateKonfigurasi") {
+      return jsonResponse(updateKonfigurasi(request.data));
+    }
+
+    return jsonResponse({ success: false, error: "Aksi POST tidak valid" });
+  } catch (err) {
+    return jsonResponse({ success: false, error: err.toString() });
+  }
+}
+
+// Helper Response JSON
+function jsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Helper Format Jam (HH:mm)
+function formatJamSingkat(jamStr) {
+  if (!jamStr || jamStr === "-") return "-";
+  return String(jamStr).substring(0, 5);
+}
+
+// ==========================================
+// LOGIKA DATABASE / SHEET INITIALIZATION
+// ==========================================
+function getSpreadsheet() {
+  return SpreadsheetApp.getActiveSpreadsheet();
+}
+
+function getOrCreateSheet(sheetName) {
+  const ss = getSpreadsheet();
+  let sheet = ss.getSheetByName(sheetName);
+  
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+    
+    if (sheetName === SHEET_NAMES.SISWA) {
+      sheet.appendRow(["ID", "Nama", "Kelas", "NIS", "NoHP"]);
+      sheet.getRange("A1:E1").setFontWeight("bold");
+    } else if (sheetName === SHEET_NAMES.ABSENSI) {
+      sheet.appendRow(["Tanggal", "NIS", "Nama", "Kelas", "Jam Masuk", "Jam Pulang", "Status"]);
+      sheet.getRange("A1:G1").setFontWeight("bold");
+    } else if (sheetName === SHEET_NAMES.PENGATURAN) {
+      sheet.appendRow(["Key", "Value"]);
+      sheet.getRange("A1:B1").setFontWeight("bold");
       
-      <!-- TAB 1: DASHBOARD -->
-      <div id="tab-dashboard" class="tab-content">
-        <h3 class="fw-bold mb-4">Dashboard Presensi</h3>
-        <div class="row g-3 mb-4">
-          <div class="col-md-3">
-            <div class="card p-3 bg-primary text-white">
-              <h6>Total Siswa</h6>
-              <h2 id="dash-total" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-success text-white">
-              <h6>Hadir Tepat Waktu</h6>
-              <h2 id="dash-hadir" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-warning text-dark">
-              <h6>Terlambat</h6>
-              <h2 id="dash-terlambat" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-danger text-white">
-              <h6>Belum Presensi</h6>
-              <h2 id="dash-belum" class="fw-bold">0</h2>
-            </div>
-          </div>
-        </div>
-      </div>
+      sheet.appendRow(["jam_masuk_default", "07:00"]);
+      sheet.appendRow(["jam_pulang_default", "14:00"]);
+      sheet.appendRow(["wa_notif_aktif", "true"]);
+    }
+  }
+  return sheet;
+}
 
-      <!-- TAB 2: SCAN QR CODE -->
-      <div id="tab-scan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Scan QR Code Presensi</h3>
-        <div class="card p-4 text-center">
-          <div class="mb-3">
-            <div class="btn-group" role="group">
-              <input type="radio" class="btn-check" name="tipeAbsen" id="absenMasuk" value="masuk" checked>
-              <label class="btn btn-outline-primary" for="absenMasuk"><i class="fa-solid fa-right-to-bracket me-2"></i>Absen Masuk</label>
-              
-              <input type="radio" class="btn-check" name="tipeAbsen" id="absenPulang" value="pulang">
-              <label class="btn btn-outline-primary" for="absenPulang"><i class="fa-solid fa-right-from-bracket me-2"></i>Absen Pulang</label>
-            </div>
-          </div>
-          <div class="scanner-box bg-light p-2 mb-3">
-            <div id="reader" style="width: 100%;"></div>
-          </div>
-          <div id="scan-result" class="alert alert-info d-none" role="alert">
-            Memproses QR Code...
-          </div>
-        </div>
-      </div>
+function initSheet() {
+  const ss = getSpreadsheet();
+  
+  let sheetSiswa = ss.getSheetByName(SHEET_NAMES.SISWA);
+  if (!sheetSiswa) sheetSiswa = ss.insertSheet(SHEET_NAMES.SISWA);
+  if (sheetSiswa.getLastRow() === 0) {
+    sheetSiswa.appendRow(["ID", "Nama", "Kelas", "NIS", "NoHP"]);
+    sheetSiswa.getRange("A1:E1").setFontWeight("bold").setBackground("#334155").setFontColor("#FFFFFF");
+  }
 
-      <!-- TAB 3: DATA SISWA -->
-      <div id="tab-siswa" class="tab-content d-none">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h3 class="fw-bold">Data Siswa</h3>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="fa-solid fa-plus me-2"></i>Tambah Siswa</button>
-        </div>
-        <div class="card p-3">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>NIS</th>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>No. HP WhatsApp</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="siswa-table-body">
-                <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+  let sheetAbsensi = ss.getSheetByName(SHEET_NAMES.ABSENSI);
+  if (!sheetAbsensi) sheetAbsensi = ss.insertSheet(SHEET_NAMES.ABSENSI);
+  if (sheetAbsensi.getLastRow() === 0) {
+    sheetAbsensi.appendRow(["Tanggal", "NIS", "Nama", "Kelas", "Jam Masuk", "Jam Pulang", "Status"]);
+    sheetAbsensi.getRange("A1:G1").setFontWeight("bold").setBackground("#334155").setFontColor("#FFFFFF");
+  }
 
-      <!-- TAB 4: LAPORAN -->
-      <div id="tab-laporan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Laporan Presensi</h3>
-        <div class="card p-3 mb-4">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label">Pilih Tanggal</label>
-              <input type="date" id="filter-tanggal" class="form-control">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Filter Kelas</label>
-              <select id="filter-kelas" class="form-select">
-                <option value="Semua">Semua Kelas</option>
-              </select>
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-              <button class="btn btn-primary w-100" onclick="loadLaporan()"><i class="fa-solid fa-filter me-2"></i>Terapkan Filter</button>
-            </div>
-          </div>
-        </div>
-        <div class="card p-3">
-          <div class="table-responsive">
-            <table class="table table-striped align-middle">
-              <thead>
-                <tr>
-                  <th>Tanggal</th>
-                  <th>NIS</th>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>Jam Masuk</th>
-                  <th>Jam Pulang</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="laporan-table-body">
-                <tr><td colspan="7" class="text-center">Silakan pilih filter laporan</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+  let sheetPengaturan = ss.getSheetByName(SHEET_NAMES.PENGATURAN);
+  if (!sheetPengaturan) sheetPengaturan = ss.insertSheet(SHEET_NAMES.PENGATURAN);
+  if (sheetPengaturan.getLastRow() === 0) {
+    sheetPengaturan.appendRow(["Key", "Value"]);
+    sheetPengaturan.getRange("A1:B1").setFontWeight("bold").setBackground("#334155").setFontColor("#FFFFFF");
+    
+    sheetPengaturan.appendRow(["jam_masuk_default", "07:00"]);
+    sheetPengaturan.appendRow(["jam_pulang_default", "14:00"]);
+    sheetPengaturan.appendRow(["wa_notif_aktif", "true"]);
+  }
 
-      <!-- TAB 5: PENGATURAN (INPUT TOKEN DITUTUP/DIHAPUS) -->
-      <div id="tab-pengaturan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Pengaturan Sistem</h3>
-        <div class="card p-4 col-md-8">
-          <form id="form-pengaturan" onsubmit="event.preventDefault(); saveKonfigurasi();">
-            <div class="mb-3">
-              <label class="form-label">Batas Jam Masuk (Default)</label>
-              <input type="time" id="jam_masuk_default" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Jam Pulang (Default)</label>
-              <input type="time" id="jam_pulang_default" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Notifikasi WhatsApp</label>
-              <select id="wa_notif_aktif" class="form-select">
-                <option value="true">Aktif (Kirim Notifikasi Otomatis)</option>
-                <option value="false">Nonaktifkan</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-2"></i>Simpan Pengaturan</button>
-          </form>
-        </div>
-      </div>
+  return "Inisialisasi Sheet Berhasil!";
+}
 
-    </div>
-  </div>
-</div>
+// ==========================================
+// LOGIKA KONFIGURASI & SETTINGS
+// ==========================================
+function getKonfigurasiMap() {
+  const sheet = getOrCreateSheet(SHEET_NAMES.PENGATURAN);
+  const data = sheet.getDataRange().getValues();
+  const config = {
+    jam_masuk_default: "07:00",
+    jam_pulang_default: "14:00",
+    wa_notif_aktif: "true"
+  };
 
-<!-- JS LIBRARIES -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0]) {
+      config[data[i][0]] = String(data[i][1]);
+    }
+  }
 
-<script>
-  // ==========================================
-  // KONFIGURASI KODE INDEX.HTML
-  // ==========================================
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx.../exec"; // Sesuaikan Web App URL Apps Script Anda
-  const FONNTE_TOKEN = "2FhYGdhuticUBt57BMX5"; // Token Fonnte disimpan di sini
+  return config;
+}
 
-  let html5QrcodeScanner = null;
+// Mengembalikan data pengaturan ke frontend (Token TIDAK disertakan demi keamanan)
+function getKonfigurasiData() {
+  const config = getKonfigurasiMap();
+  delete config.fonnte_token; // Memastikan token tidak ikut terkirim ke frontend
+  return { success: true, data: config };
+}
 
-  document.addEventListener("DOMContentLoaded", () => {
-    loadDashboard();
-    loadKonfigurasi();
+function updateKonfigurasi(cfgData) {
+  const sheet = getOrCreateSheet(SHEET_NAMES.PENGATURAN);
+  const data = sheet.getDataRange().getValues();
+  
+  // Mengabaikan pembaruan token dari frontend jika ada
+  delete cfgData.fonnte_token;
+
+  const keysToUpdate = Object.keys(cfgData);
+  
+  keysToUpdate.forEach(key => {
+    let found = false;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === key) {
+        sheet.getRange(i + 1, 2).setValue(cfgData[key]);
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      sheet.appendRow([key, cfgData[key]]);
+    }
   });
 
-  // Switcher Tab Navigasi
-  function switchTab(tabName, element) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('d-none'));
-    document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
-    
-    document.getElementById(`tab-${tabName}`).classList.remove('d-none');
-    if(element) element.classList.add('active');
+  return { success: true, message: "Pengaturan berhasil diperbarui" };
+}
 
-    if (tabName === 'scan') {
-      initScanner();
-    } else if (html5QrcodeScanner) {
-      html5QrcodeScanner.clear();
-    }
+// ==========================================
+// LOGIKA DATA SISWA
+// ==========================================
+function getSiswaData() {
+  const sheet = getOrCreateSheet(SHEET_NAMES.SISWA);
+  const data = sheet.getDataRange().getValues();
+  const siswaList = [];
 
-    if (tabName === 'dashboard') loadDashboard();
-    if (tabName === 'siswa') loadSiswa();
-    if (tabName === 'laporan') loadLaporan();
-  }
-
-  // ==========================================
-  // DASHBOARD
-  // ==========================================
-  function loadDashboard() {
-    fetch(`${WEB_APP_URL}?action=getDashboard`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          document.getElementById('dash-total').innerText = res.data.totalSiswa;
-          document.getElementById('dash-hadir').innerText = res.data.hadir;
-          document.getElementById('dash-terlambat').innerText = res.data.terlambat;
-          document.getElementById('dash-belum').innerText = res.data.belumAbsen;
-        }
-      })
-      .catch(err => console.error("Error Dashboard:", err));
-  }
-
-  // ==========================================
-  // SCANNER QR CODE
-  // ==========================================
-  function initScanner() {
-    if (!html5QrcodeScanner) {
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-      html5QrcodeScanner.render(onScanSuccess);
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][3]) {
+      siswaList.push({
+        rowIndex: i + 1,
+        id: data[i][0] || i,
+        nama: data[i][1],
+        kelas: String(data[i][2]),
+        nis: String(data[i][3]),
+        noHP: String(data[i][4] || '')
+      });
     }
   }
 
-  function onScanSuccess(decodedText) {
-    const tipe = document.querySelector('input[name="tipeAbsen"]:checked').value;
-    const resBox = document.getElementById('scan-result');
+  return { success: true, data: siswaList };
+}
+
+function addSiswa(siswa) {
+  const sheet = getOrCreateSheet(SHEET_NAMES.SISWA);
+  const lastRow = sheet.getLastRow();
+  const newId = lastRow > 1 ? lastRow : 1;
+
+  sheet.appendRow([newId, siswa.nama, siswa.kelas, siswa.nis, siswa.noHP]);
+  return { success: true, message: "Siswa berhasil ditambahkan" };
+}
+
+function deleteSiswa(rowIndex) {
+  const sheet = getOrCreateSheet(SHEET_NAMES.SISWA);
+  sheet.deleteRow(rowIndex);
+  return { success: true, message: "Siswa berhasil dihapus" };
+}
+
+function importSiswa(siswaArray) {
+  const sheet = getOrCreateSheet(SHEET_NAMES.SISWA);
+  let count = 0;
+
+  siswaArray.forEach((s) => {
+    if (s.nama && s.nis) {
+      sheet.appendRow([count + 1, s.nama, s.kelas, s.nis, s.noHP]);
+      count++;
+    }
+  });
+
+  return { success: true, data: { count: count } };
+}
+
+// ==========================================
+// LOGIKA PROSES PRESENSI / ABSENSI
+// ==========================================
+function prosesAbsensi(nis, tipe) {
+  const cfg = getKonfigurasiMap();
+  const sheetSiswa = getOrCreateSheet(SHEET_NAMES.SISWA);
+  const dataSiswa = sheetSiswa.getDataRange().getValues();
+
+  // 1. Cari Siswa
+  let siswa = null;
+  for (let i = 1; i < dataSiswa.length; i++) {
+    if (String(dataSiswa[i][3]).trim() === String(nis).trim()) {
+      siswa = {
+        nama: dataSiswa[i][1],
+        kelas: String(dataSiswa[i][2]),
+        nis: String(dataSiswa[i][3]),
+        noHP: String(dataSiswa[i][4] || '')
+      };
+      break;
+    }
+  }
+
+  if (!siswa) {
+    return { success: false, data: { message: "Siswa dengan NIS " + nis + " tidak ditemukan!" } };
+  }
+
+  // 2. Format Waktu Presensi
+  const now = new Date();
+  const tglString = Utilities.formatDate(now, "Asia/Jakarta", "yyyy-MM-dd");
+  const jamSekarangSingkat = Utilities.formatDate(now, "Asia/Jakarta", "HH:mm");
+
+  const sheetAbsensi = getOrCreateSheet(SHEET_NAMES.ABSENSI);
+  const dataAbsensi = sheetAbsensi.getDataRange().getValues();
+
+  let existingRow = -1;
+  let currentStatus = "Hadir";
+
+  const jamMasukDefault = formatJamSingkat(cfg.jam_masuk_default || "07:00");
+
+  if (tipe === "masuk") {
+    if (jamSekarangSingkat > jamMasukDefault) {
+      currentStatus = "Terlambat";
+    }
+  }
+
+  // Cari Record Hari Ini
+  for (let i = 1; i < dataAbsensi.length; i++) {
+    const rowTgl = dataAbsensi[i][0] instanceof Date ? 
+      Utilities.formatDate(dataAbsensi[i][0], "Asia/Jakarta", "yyyy-MM-dd") : String(dataAbsensi[i][0]);
+    const rowNis = String(dataAbsensi[i][1]).trim();
+
+    if (rowTgl === tglString && rowNis === siswa.nis) {
+      existingRow = i + 1;
+      break;
+    }
+  }
+
+  if (existingRow > -1) {
+    if (tipe === "masuk") {
+      sheetAbsensi.getRange(existingRow, 5).setValue(jamSekarangSingkat);
+      sheetAbsensi.getRange(existingRow, 7).setValue(currentStatus);
+    } else {
+      sheetAbsensi.getRange(existingRow, 6).setValue(jamSekarangSingkat);
+    }
+  } else {
+    const jamMasukVal = (tipe === "masuk") ? jamSekarangSingkat : "";
+    const jamPulangVal = (tipe === "pulang") ? jamSekarangSingkat : "";
     
-    resBox.classList.remove('d-none', 'alert-danger', 'alert-success');
-    resBox.classList.add('alert-info');
-    resBox.innerText = `Memproses NIS: ${decodedText}...`;
-
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'prosesAbsensi',
-        nis: decodedText,
-        tipe: tipe
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      resBox.classList.remove('alert-info');
-      if (res.success) {
-        resBox.classList.add('alert-success');
-        resBox.innerText = res.data.message;
-      } else {
-        resBox.classList.add('alert-danger');
-        resBox.innerText = res.data.message || res.error;
-      }
-    })
-    .catch(err => {
-      resBox.classList.remove('alert-info');
-      resBox.classList.add('alert-danger');
-      resBox.innerText = "Gagal memproses presensi.";
-    });
+    sheetAbsensi.appendRow([tglString, siswa.nis, siswa.nama, siswa.kelas, jamMasukVal, jamPulangVal, currentStatus]);
   }
 
-  // ==========================================
-  // DATA SISWA
-  // ==========================================
-  function loadSiswa() {
-    fetch(`${WEB_APP_URL}?action=getSiswa`)
-      .then(res => res.json())
-      .then(res => {
-        const tbody = document.getElementById('siswa-table-body');
-        if (res.success && res.data.length > 0) {
-          tbody.innerHTML = res.data.map(s => `
-            <tr>
-              <td>${s.nis}</td>
-              <td>${s.nama}</td>
-              <td>${s.kelas}</td>
-              <td>${s.noHP || '-'}</td>
-              <td>
-                <button class="btn btn-sm btn-danger" onclick="deleteSiswa(${s.rowIndex})"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-          `).join('');
-        } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada data siswa</td></tr>';
-        }
+  // 3. Kirim WA via Server (Token Menggunakan FONNTE_TOKEN_PRIVAT)
+  if (cfg.wa_notif_aktif === "true" && siswa.noHP) {
+    const pesanWA = `*PEMBERITAHUAN PRESENSI*\n\n` +
+      `Nama: *${siswa.nama}*\n` +
+      `Kelas: ${siswa.kelas}\n` +
+      `NIS: ${siswa.nis}\n` +
+      `Tipe: Presensi ${tipe.toUpperCase()}\n` +
+      `Waktu: *${jamSekarangSingkat} WIB*\n` +
+      `Status: *${currentStatus}*\n\n` +
+      `_Pesan otomatis Sistem Presensi QR Code._`;
+    
+    kirimFonnteWA(siswa.noHP, pesanWA);
+  }
+
+  return {
+    success: true,
+    data: {
+      message: `Presensi ${tipe} berhasil dicatat pukul ${jamSekarangSingkat} WIB (${siswa.nama})`,
+      status: currentStatus
+    }
+  };
+}
+
+function prosesTidakHadir(nis, keterangan) {
+  const sheetSiswa = getOrCreateSheet(SHEET_NAMES.SISWA);
+  const dataSiswa = sheetSiswa.getDataRange().getValues();
+
+  let siswa = null;
+  for (let i = 1; i < dataSiswa.length; i++) {
+    if (String(dataSiswa[i][3]).trim() === String(nis).trim()) {
+      siswa = {
+        nama: dataSiswa[i][1],
+        kelas: String(dataSiswa[i][2]),
+        nis: String(dataSiswa[i][3]),
+        noHP: String(dataSiswa[i][4] || '')
+      };
+      break;
+    }
+  }
+
+  if (!siswa) return { success: false, data: { message: "Siswa tidak ditemukan" } };
+
+  const now = new Date();
+  const tglString = Utilities.formatDate(now, "Asia/Jakarta", "yyyy-MM-dd");
+
+  const sheetAbsensi = getOrCreateSheet(SHEET_NAMES.ABSENSI);
+  sheetAbsensi.appendRow([tglString, siswa.nis, siswa.nama, siswa.kelas, "-", "-", keterangan]);
+
+  const cfg = getKonfigurasiMap();
+  if (cfg.wa_notif_aktif === "true" && siswa.noHP) {
+    const pesanWA = `*PEMBERITAHUAN KETIDAKHADIRAN*\n\n` +
+      `Nama: *${siswa.nama}*\n` +
+      `Kelas: ${siswa.kelas}\n` +
+      `Tanggal: ${tglString}\n` +
+      `Keterangan: *${keterangan}*\n\n` +
+      `_Pesan otomatis Sistem Presensi._`;
+    kirimFonnteWA(siswa.noHP, pesanWA);
+  }
+
+  return { success: true, message: "Ketidakhadiran dicatat" };
+}
+
+// ==========================================
+// LOGIKA DASHBOARD & LAPORAN
+// ==========================================
+function getDashboardData() {
+  const sheetSiswa = getOrCreateSheet(SHEET_NAMES.SISWA);
+  const sheetAbsensi = getOrCreateSheet(SHEET_NAMES.ABSENSI);
+
+  const dataSiswa = sheetSiswa.getDataRange().getValues();
+  const dataAbsensi = sheetAbsensi.getDataRange().getValues();
+
+  const totalSiswa = Math.max(0, dataSiswa.length - 1);
+
+  const classes = [];
+  for (let i = 1; i < dataSiswa.length; i++) {
+    const k = String(dataSiswa[i][2]).trim();
+    if (k && !classes.includes(k)) classes.push(k);
+  }
+
+  const todayStr = Utilities.formatDate(new Date(), "Asia/Jakarta", "yyyy-MM-dd");
+  let hadir = 0;
+  let terlambat = 0;
+  const recentActivity = [];
+
+  for (let i = 1; i < dataAbsensi.length; i++) {
+    const rowTgl = dataAbsensi[i][0] instanceof Date ? 
+      Utilities.formatDate(dataAbsensi[i][0], "Asia/Jakarta", "yyyy-MM-dd") : String(dataAbsensi[i][0]);
+
+    if (rowTgl === todayStr) {
+      const st = dataAbsensi[i][6];
+      if (st === "Hadir") hadir++;
+      if (st === "Terlambat") terlambat++;
+
+      recentActivity.unshift({
+        nama: dataAbsensi[i][2],
+        kelas: dataAbsensi[i][3],
+        jamMasuk: dataAbsensi[i][4],
+        jamPulang: dataAbsensi[i][5],
+        status: st
       });
+    }
   }
 
-  // ==========================================
-  // LAPORAN
-  // ==========================================
-  function loadLaporan() {
-    const tgl = document.getElementById('filter-tanggal').value;
-    const kls = document.getElementById('filter-kelas').value;
+  const belumAbsen = Math.max(0, totalSiswa - (hadir + terlambat));
 
-    fetch(`${WEB_APP_URL}?action=getAbsensi&tanggal=${tgl}&kelas=${kls}`)
-      .then(res => res.json())
-      .then(res => {
-        const tbody = document.getElementById('laporan-table-body');
-        if (res.success && res.data.length > 0) {
-          tbody.innerHTML = res.data.map(a => `
-            <tr>
-              <td>${a.tanggal}</td>
-              <td>${a.nis}</td>
-              <td>${a.nama}</td>
-              <td>${a.kelas}</td>
-              <td>${a.jamMasuk || '-'}</td>
-              <td>${a.jamPulang || '-'}</td>
-              <td><span class="badge ${a.status === 'Hadir' ? 'bg-success' : 'bg-warning'}">${a.status}</span></td>
-            </tr>
-          `).join('');
-        } else {
-          tbody.innerHTML = '<tr><td colspan="7" class="text-center">Tidak ada data laporan</td></tr>';
-        }
+  return {
+    success: true,
+    data: {
+      totalSiswa,
+      hadir,
+      terlambat,
+      belumAbsen,
+      classes,
+      recentActivity: recentActivity.slice(0, 10),
+      last7Days: [todayStr],
+      last7Hadir: [hadir],
+      last7Terlambat: [terlambat]
+    }
+  };
+}
+
+function getAbsensiData(tanggal, kelas) {
+  const sheet = getOrCreateSheet(SHEET_NAMES.ABSENSI);
+  const data = sheet.getDataRange().getValues();
+  const result = [];
+
+  for (let i = 1; i < data.length; i++) {
+    const rowTgl = data[i][0] instanceof Date ? 
+      Utilities.formatDate(data[i][0], "Asia/Jakarta", "yyyy-MM-dd") : String(data[i][0]);
+    const rowKelas = String(data[i][3]);
+
+    const matchTgl = !tanggal || rowTgl === tanggal;
+    const matchKelas = !kelas || kelas === "Semua" || rowKelas === kelas;
+
+    if (matchTgl && matchKelas) {
+      result.push({
+        tanggal: rowTgl,
+        nis: data[i][1],
+        nama: data[i][2],
+        kelas: rowKelas,
+        jamMasuk: data[i][4],
+        jamPulang: data[i][5],
+        status: data[i][6]
       });
+    }
   }
 
-  // ==========================================
-  // PENGATURAN (TOKEN DISISIPKAN SECARA LOKAL)
-  // ==========================================
-  function loadKonfigurasi() {
-    fetch(`${WEB_APP_URL}?action=getKonfigurasi`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.success && res.data) {
-          if (document.getElementById('jam_masuk_default')) {
-            document.getElementById('jam_masuk_default').value = res.data.jam_masuk_default || "07:00";
-          }
-          if (document.getElementById('jam_pulang_default')) {
-            document.getElementById('jam_pulang_default').value = res.data.jam_pulang_default || "14:00";
-          }
-          if (document.getElementById('wa_notif_aktif')) {
-            document.getElementById('wa_notif_aktif').value = res.data.wa_notif_aktif || "true";
-          }
-        }
-      })
-      .catch(err => console.error("Gagal memuat konfigurasi:", err));
+  return { success: true, data: result };
+}
+
+// ==========================================
+// INTEGRASI API FONNTE PRIVAT (SERVER-ONLY)
+// ==========================================
+function kirimFonnteWA(target, message) {
+  if (!target || !FONNTE_TOKEN_PRIVAT) {
+    Logger.log("Gagal: Nomor HP target atau Token kosong");
+    return;
   }
 
-  function saveKonfigurasi() {
-    const cfgData = {
-      jam_masuk_default: document.getElementById('jam_masuk_default').value,
-      jam_pulang_default: document.getElementById('jam_pulang_default').value,
-      wa_notif_aktif: document.getElementById('wa_notif_aktif').value,
-      fonnte_token: FONNTE_TOKEN // Token diambil langsung dari skrip index.html
-    };
+  let cleanTarget = String(target).replace(/[^0-9]/g, '');
 
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'updateKonfigurasi',
-        data: cfgData
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        alert("Pengaturan berhasil disimpan!");
-      } else {
-        alert("Gagal menyimpan pengaturan.");
-      }
-    })
-    .catch(err => alert("Error saat menyimpan pengaturan."));
+  const url = "https://api.fonnte.com/send";
+  const payload = {
+    target: cleanTarget,
+    message: message
+  };
+
+  const options = {
+    method: "post",
+    headers: {
+      "Authorization": FONNTE_TOKEN_PRIVAT
+    },
+    payload: payload,
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const result = response.getContentText();
+    Logger.log("Respon Fonnte: " + result);
+    return result;
+  } catch (e) {
+    Logger.log("Error API Fonnte: " + e.toString());
   }
-</script>
-</body>
-</html>
+}
+
+// ==========================================
+// FUNGSI PENGUJIAN / OTORISASI
+// ==========================================
+function mintaOtorisasi() {
+  kirimFonnteWA("081234567890", "Tes Otorisasi Server Fonnte");
+}
