@@ -194,7 +194,7 @@
         </div>
       </div>
 
-      <!-- TAB 5: PENGATURAN -->
+      <!-- TAB 5: PENGATURAN (INPUT TOKEN DITUTUP/DIHAPUS) -->
       <div id="tab-pengaturan" class="tab-content d-none">
         <h3 class="fw-bold mb-4">Pengaturan Sistem</h3>
         <div class="card p-4 col-md-8">
@@ -229,11 +229,10 @@
 
 <script>
   // ==========================================
-  // KONFIGURASI FRONTEND & TOKEN PRIVAT
+  // KONFIGURASI KODE INDEX.HTML
   // ==========================================
-  // Ganti URL di bawah dengan Web App URL hasil Deploy Google Apps Script Anda
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_AHRWiVvyOzsyxskqxqbQPws51oc7GVuZiKUGR5HTc-kVMCgz-g4_jdttEKX99BHAyw/exec"; 
-  const FONNTE_TOKEN = "2FhYGdhuticUBt57BMX5"; // Token Fonnte disimpan di skrip frontend
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx.../exec"; // Sesuaikan Web App URL Apps Script Anda
+  const FONNTE_TOKEN = "2FhYGdhuticUBt57BMX5"; // Token Fonnte disimpan di sini
 
   let html5QrcodeScanner = null;
 
@@ -378,7 +377,7 @@
   }
 
   // ==========================================
-  // PENGATURAN (TOKEN DIKIRIM OTOMATIS)
+  // PENGATURAN (TOKEN DISISIPKAN SECARA LOKAL)
   // ==========================================
   function loadKonfigurasi() {
     fetch(`${WEB_APP_URL}?action=getKonfigurasi`)
@@ -404,7 +403,7 @@
       jam_masuk_default: document.getElementById('jam_masuk_default').value,
       jam_pulang_default: document.getElementById('jam_pulang_default').value,
       wa_notif_aktif: document.getElementById('wa_notif_aktif').value,
-      fonnte_token: FONNTE_TOKEN // Menyisipkan token Fonnte dari skrip index.html
+      fonnte_token: FONNTE_TOKEN // Token diambil langsung dari skrip index.html
     };
 
     fetch(WEB_APP_URL, {
