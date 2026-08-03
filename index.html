@@ -1,429 +1,460 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Presensi QR Code</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      background-color: #f8fafc;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .sidebar {
-      min-height: 100vh;
-      background-color: #0f172a;
-      color: #fff;
-    }
-    .sidebar .nav-link {
-      color: #94a3b8;
-      padding: 12px 20px;
-      margin: 4px 0;
-      border-radius: 8px;
-    }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active {
-      color: #fff;
-      background-color: #1e293b;
-    }
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    .scanner-box {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px dashed #cbd5e1;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Attendance System</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- HTML5-QRCode JS -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap');
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #080c14;
+      color: #e2e8f0;
+    }
+
+    .font-tech {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .cyber-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+    }
+
+    .cyber-card:hover {
+      border-color: rgba(6, 182, 212, 0.5);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+    }
+
+    .neon-text-cyan {
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+    }
+
+    .sidebar-active {
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.2) 0%, rgba(0,0,0,0) 100%);
+      border-left: 4px solid #06b6d4;
+      color: #06b6d4;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080c14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #06b6d4;
+      border-radius: 3px;
+    }
+  </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden">
 
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar Navigation -->
-    <div class="col-md-3 col-lg-2 sidebar p-3">
-      <h4 class="text-center my-3 fw-bold text-primary"><i class="fa-solid fa-qrcode me-2"></i>Presensi QR</h4>
-      <hr class="border-secondary">
-      <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-          <a href="#" class="nav-link active" onclick="switchTab('dashboard', this)"><i class="fa-solid fa-chart-pie me-2"></i>Dashboard</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('scan', this)"><i class="fa-solid fa-camera me-2"></i>Scan QR</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('siswa', this)"><i class="fa-solid fa-users me-2"></i>Data Siswa</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('laporan', this)"><i class="fa-solid fa-file-invoice me-2"></i>Laporan</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('pengaturan', this)"><i class="fa-solid fa-gear me-2"></i>Pengaturan</a>
-        </li>
-      </ul>
-    </div>
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-50">
+    <div>
+      <!-- Header Logos -->
+      <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-center gap-3">
+        <img src="logo-karawang.png" alt="Karawang" class="h-10 w-auto object-contain hover:scale-110 transition">
+        <img src="logo-disdik.png" alt="Disdik" class="h-10 w-auto object-contain hover:scale-110 transition">
+        <img src="logo-sekolah.png" alt="Sekolah" class="h-10 w-auto object-contain hover:scale-110 transition">
+      </div>
 
-    <!-- Main Content Area -->
-    <div class="col-md-9 col-lg-10 p-4">
-      
-      <!-- TAB 1: DASHBOARD -->
-      <div id="tab-dashboard" class="tab-content">
-        <h3 class="fw-bold mb-4">Dashboard Presensi</h3>
-        <div class="row g-3 mb-4">
-          <div class="col-md-3">
-            <div class="card p-3 bg-primary text-white">
-              <h6>Total Siswa</h6>
-              <h2 id="dash-total" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-success text-white">
-              <h6>Hadir Tepat Waktu</h6>
-              <h2 id="dash-hadir" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-warning text-dark">
-              <h6>Terlambat</h6>
-              <h2 id="dash-terlambat" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-danger text-white">
-              <h6>Belum Presensi</h6>
-              <h2 id="dash-belum" class="fw-bold">0</h2>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="p-4 text-center">
+        <h1 class="font-tech text-lg font-bold text-cyan-400 neon-text-cyan tracking-wider">CYBER ABSENSI</h1>
+        <p class="text-xs text-slate-400">SMK/SMA Karawang System</p>
+      </div>
 
-      <!-- TAB 2: SCAN QR CODE -->
-      <div id="tab-scan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Scan QR Code Presensi</h3>
-        <div class="card p-4 text-center">
-          <div class="mb-3">
-            <div class="btn-group" role="group">
-              <input type="radio" class="btn-check" name="tipeAbsen" id="absenMasuk" value="masuk" checked>
-              <label class="btn btn-outline-primary" for="absenMasuk"><i class="fa-solid fa-right-to-bracket me-2"></i>Absen Masuk</label>
-              
-              <input type="radio" class="btn-check" name="tipeAbsen" id="absenPulang" value="pulang">
-              <label class="btn btn-outline-primary" for="absenPulang"><i class="fa-solid fa-right-from-bracket me-2"></i>Absen Pulang</label>
-            </div>
-          </div>
-          <div class="scanner-box bg-light p-2 mb-3">
-            <div id="reader" style="width: 100%;"></div>
-          </div>
-          <div id="scan-result" class="alert alert-info d-none" role="alert">
-            Memproses QR Code...
-          </div>
-        </div>
-      </div>
+      <!-- Navigation -->
+      <nav class="mt-4 space-y-1">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-active w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold hover:text-cyan-400 transition">
+          <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i> Dashboard
+        </button>
+        <button onclick="switchTab('siswa')" id="nav-siswa" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
+          <i class="fa-solid fa-users w-5 text-center text-lg"></i> Data Siswa
+        </button>
+        <button onclick="switchTab('absensi')" id="nav-absensi" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
+          <i class="fa-solid fa-qrcode w-5 text-center text-lg"></i> Absensi
+        </button>
+        <button onclick="switchTab('laporan')" id="nav-laporan" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
+          <i class="fa-solid fa-file-invoice w-5 text-center text-lg"></i> Laporan
+        </button>
+      </nav>
+    </div>
 
-      <!-- TAB 3: DATA SISWA -->
-      <div id="tab-siswa" class="tab-content d-none">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h3 class="fw-bold">Data Siswa</h3>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="fa-solid fa-plus me-2"></i>Tambah Siswa</button>
-        </div>
-        <div class="card p-3">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>NIS</th>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>No. HP WhatsApp</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="siswa-table-body">
-                <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    <!-- Status Server Footer -->
+    <div class="p-4 border-t border-slate-800/80 bg-slate-900/30">
+      <div class="flex items-center gap-2">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+        </span>
+        <span class="text-xs font-tech text-slate-400">SYSTEM ONLINE</span>
+      </div>
+    </div>
+  </aside>
 
-      <!-- TAB 4: LAPORAN -->
-      <div id="tab-laporan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Laporan Presensi</h3>
-        <div class="card p-3 mb-4">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label">Pilih Tanggal</label>
-              <input type="date" id="filter-tanggal" class="form-control">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Filter Kelas</label>
-              <select id="filter-kelas" class="form-select">
-                <option value="Semua">Semua Kelas</option>
-              </select>
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-              <button class="btn btn-primary w-100" onclick="loadLaporan()"><i class="fa-solid fa-filter me-2"></i>Terapkan Filter</button>
-            </div>
-          </div>
-        </div>
-        <div class="card p-3">
-          <div class="table-responsive">
-            <table class="table table-striped align-middle">
-              <thead>
-                <tr>
-                  <th>Tanggal</th>
-                  <th>NIS</th>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>Jam Masuk</th>
-                  <th>Jam Pulang</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="laporan-table-body">
-                <tr><td colspan="7" class="text-center">Silakan pilih filter laporan</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-1 flex flex-col overflow-y-auto relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
 
-      <!-- TAB 5: PENGATURAN -->
-      <div id="tab-pengaturan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Pengaturan Sistem</h3>
-        <div class="card p-4 col-md-8">
-          <form id="form-pengaturan" onsubmit="event.preventDefault(); saveKonfigurasi();">
-            <div class="mb-3">
-              <label class="form-label">Batas Jam Masuk (Default)</label>
-              <input type="time" id="jam_masuk_default" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Jam Pulang (Default)</label>
-              <input type="time" id="jam_pulang_default" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Notifikasi WhatsApp</label>
-              <select id="wa_notif_aktif" class="form-select">
-                <option value="true">Aktif (Kirim Notifikasi Otomatis)</option>
-                <option value="false">Nonaktifkan</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-2"></i>Simpan Pengaturan</button>
-          </form>
-        </div>
-      </div>
+    <!-- TOP HEADER -->
+    <header class="p-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40 backdrop-blur sticky top-0 z-40">
+      <div>
+        <h2 id="page-title" class="font-tech text-xl font-bold text-white tracking-wide">DASHBOARD OVERVIEW</h2>
+        <p class="text-xs text-slate-400">Sistem Presensi Digital Otomatis WhatsApp</p>
+      </div>
+      <div id="clock" class="font-tech text-sm text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-3 py-1.5 rounded">
+        00:00:00 WIB
+      </div>
+    </header>
 
-    </div>
-  </div>
-</div>
+    <div class="p-6 space-y-6">
 
-<!-- JS LIBRARIES -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
+      <!-- SECTION: DASHBOARD -->
+      <section id="sec-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="cyber-card p-5 rounded-xl border-l-4 border-l-cyan-500">
+            <p class="text-xs text-slate-400 font-semibold uppercase">Total Siswa</p>
+            <h3 id="dash-total" class="text-3xl font-tech font-bold text-cyan-400 mt-1">0</h3>
+          </div>
+          <div class="cyber-card p-5 rounded-xl border-l-4 border-l-emerald-500">
+            <p class="text-xs text-slate-400 font-semibold uppercase">Hadir Hari Ini</p>
+            <h3 id="dash-hadir" class="text-3xl font-tech font-bold text-emerald-400 mt-1">0</h3>
+          </div>
+          <div class="cyber-card p-5 rounded-xl border-l-4 border-l-amber-500">
+            <p class="text-xs text-slate-400 font-semibold uppercase">Izin / Sakit</p>
+            <h3 id="dash-izinsakit" class="text-3xl font-tech font-bold text-amber-400 mt-1">0</h3>
+          </div>
+          <div class="cyber-card p-5 rounded-xl border-l-4 border-l-rose-500">
+            <p class="text-xs text-slate-400 font-semibold uppercase">Alpha</p>
+            <h3 id="dash-alpha" class="text-3xl font-tech font-bold text-rose-400 mt-1">0</h3>
+          </div>
+        </div>
+      </section>
 
-<script>
-  // ==========================================
-  // KONFIGURASI FRONTEND & TOKEN PRIVAT
-  // ==========================================
-  // Ganti URL di bawah dengan Web App URL hasil Deploy Google Apps Script Anda
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx.../exec"; 
-  const FONNTE_TOKEN = "2FhYGdhuticUBt57BMX5"; // Token Fonnte disimpan di skrip frontend
+      <!-- SECTION: DATA SISWA -->
+      <section id="sec-siswa" class="hidden space-y-4">
+        <div class="cyber-card p-4 rounded-xl flex justify-between items-center">
+          <input type="text" id="search-siswa" onkeyup="filterSiswaTable()" placeholder="Cari NIS atau Nama Siswa..." class="bg-slate-900 border border-slate-700 text-sm rounded-lg px-4 py-2 w-72 focus:outline-none focus:border-cyan-500 text-white">
+          <button onclick="loadDataSiswa()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">
+            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Data
+          </button>
+        </div>
 
-  let html5QrcodeScanner = null;
+        <div class="cyber-card rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-900/80 text-cyan-400 font-tech uppercase text-xs border-b border-slate-800">
+              <tr>
+                <th class="p-4">NIS</th>
+                <th class="p-4">Nama Siswa</th>
+                <th class="p-4">Kelas</th>
+                <th class="p-4">No HP Orang Tua</th>
+              </tr>
+            </thead>
+            <tbody id="tb-siswa" class="divide-y divide-slate-800/50">
+              <tr><td colspan="4" class="text-center p-4 text-slate-500">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-  document.addEventListener("DOMContentLoaded", () => {
-    loadDashboard();
-    loadKonfigurasi();
-  });
+      <!-- SECTION: ABSENSI -->
+      <section id="sec-absensi" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-  // Switcher Tab Navigasi
-  function switchTab(tabName, element) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('d-none'));
-    document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
-    
-    document.getElementById(`tab-${tabName}`).classList.remove('d-none');
-    if(element) element.classList.add('active');
+          <!-- QR SCANNER -->
+          <div class="cyber-card p-5 rounded-xl space-y-4">
+            <div class="flex justify-between items-center">
+              <h3 class="font-tech text-cyan-400 font-bold">SCANNER QR CODE</h3>
+              <button onclick="switchCamera()" class="bg-slate-800 hover:bg-slate-700 text-xs text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition flex items-center gap-2">
+                <i class="fa-solid fa-camera-rotate"></i> Switch Kamera
+              </button>
+            </div>
+            
+            <div id="reader" class="bg-black rounded-lg overflow-hidden border border-slate-800 relative min-h-[250px]"></div>
+            <p class="text-xs text-slate-400 text-center">Arahkan Kartu QR Siswa ke area kamera.</p>
+          </div>
 
-    if (tabName === 'scan') {
-      initScanner();
-    } else if (html5QrcodeScanner) {
-      html5QrcodeScanner.clear();
-    }
+          <!-- MANUAL ABSENSI -->
+          <div class="cyber-card p-5 rounded-xl space-y-4">
+            <h3 class="font-tech text-cyan-400 font-bold">ABSENSI MANUAL</h3>
+            
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs text-slate-400">Filter Kelas</label>
+                <select id="select-kelas" onchange="filterManualSiswaOptions()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 text-sm mt-1 focus:border-cyan-500">
+                  <option value="">-- Pilih Kelas --</option>
+                </select>
+              </div>
 
-    if (tabName === 'dashboard') loadDashboard();
-    if (tabName === 'siswa') loadSiswa();
-    if (tabName === 'laporan') loadLaporan();
-  }
+              <div>
+                <label class="text-xs text-slate-400">Pilih Siswa</label>
+                <select id="select-siswa" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 text-sm mt-1 focus:border-cyan-500">
+                  <option value="">-- Pilih Siswa --</option>
+                </select>
+              </div>
 
-  // ==========================================
-  // DASHBOARD
-  // ==========================================
-  function loadDashboard() {
-    fetch(`${WEB_APP_URL}?action=getDashboard`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          document.getElementById('dash-total').innerText = res.data.totalSiswa;
-          document.getElementById('dash-hadir').innerText = res.data.hadir;
-          document.getElementById('dash-terlambat').innerText = res.data.terlambat;
-          document.getElementById('dash-belum').innerText = res.data.belumAbsen;
-        }
-      })
-      .catch(err => console.error("Error Dashboard:", err));
-  }
+              <div>
+                <label class="text-xs text-slate-400">Status Kehadiran</label>
+                <select id="select-status" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 text-sm mt-1 focus:border-cyan-500">
+                  <option value="Hadir">Hadir</option>
+                  <option value="Sakit">Sakit</option>
+                  <option value="Izin">Izin</option>
+                  <option value="Alpha">Alpha</option>
+                </select>
+              </div>
 
-  // ==========================================
-  // SCANNER QR CODE
-  // ==========================================
-  function initScanner() {
-    if (!html5QrcodeScanner) {
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-      html5QrcodeScanner.render(onScanSuccess);
-    }
-  }
+              <button onclick="submitAbsenManual()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-tech font-bold py-3 rounded-lg shadow-lg shadow-cyan-950 transition">
+                SUBMIT PRESENSI
+              </button>
+            </div>
+          </div>
 
-  function onScanSuccess(decodedText) {
-    const tipe = document.querySelector('input[name="tipeAbsen"]:checked').value;
-    const resBox = document.getElementById('scan-result');
-    
-    resBox.classList.remove('d-none', 'alert-danger', 'alert-success');
-    resBox.classList.add('alert-info');
-    resBox.innerText = `Memproses NIS: ${decodedText}...`;
+        </div>
+      </section>
 
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'prosesAbsensi',
-        nis: decodedText,
-        tipe: tipe
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      resBox.classList.remove('alert-info');
-      if (res.success) {
-        resBox.classList.add('alert-success');
-        resBox.innerText = res.data.message;
-      } else {
-        resBox.classList.add('alert-danger');
-        resBox.innerText = res.data.message || res.error;
-      }
-    })
-    .catch(err => {
-      resBox.classList.remove('alert-info');
-      resBox.classList.add('alert-danger');
-      resBox.innerText = "Gagal memproses presensi.";
-    });
-  }
+      <!-- SECTION: LAPORAN -->
+      <section id="sec-laporan" class="hidden space-y-4">
+        <div class="cyber-card p-4 rounded-xl flex justify-between items-center">
+          <h3 class="font-tech text-cyan-400 font-bold">LOG PRESENSI SISWA</h3>
+          <button onclick="loadDataLaporan()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">
+            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Laporan
+          </button>
+        </div>
 
-  // ==========================================
-  // DATA SISWA
-  // ==========================================
-  function loadSiswa() {
-    fetch(`${WEB_APP_URL}?action=getSiswa`)
-      .then(res => res.json())
-      .then(res => {
-        const tbody = document.getElementById('siswa-table-body');
-        if (res.success && res.data.length > 0) {
-          tbody.innerHTML = res.data.map(s => `
-            <tr>
-              <td>${s.nis}</td>
-              <td>${s.nama}</td>
-              <td>${s.kelas}</td>
-              <td>${s.noHP || '-'}</td>
-              <td>
-                <button class="btn btn-sm btn-danger" onclick="deleteSiswa(${s.rowIndex})"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-          `).join('');
-        } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada data siswa</td></tr>';
-        }
-      });
-  }
+        <div class="cyber-card rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-900/80 text-cyan-400 font-tech uppercase text-xs border-b border-slate-800">
+              <tr>
+                <th class="p-4">Waktu</th>
+                <th class="p-4">Tanggal</th>
+                <th class="p-4">NIS</th>
+                <th class="p-4">Nama Siswa</th>
+                <th class="p-4">Kelas</th>
+                <th class="p-4">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tb-laporan" class="divide-y divide-slate-800/50">
+              <tr><td colspan="6" class="text-center p-4 text-slate-500">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-  // ==========================================
-  // LAPORAN
-  // ==========================================
-  function loadLaporan() {
-    const tgl = document.getElementById('filter-tanggal').value;
-    const kls = document.getElementById('filter-kelas').value;
+    </div>
+  </main>
 
-    fetch(`${WEB_APP_URL}?action=getAbsensi&tanggal=${tgl}&kelas=${kls}`)
-      .then(res => res.json())
-      .then(res => {
-        const tbody = document.getElementById('laporan-table-body');
-        if (res.success && res.data.length > 0) {
-          tbody.innerHTML = res.data.map(a => `
-            <tr>
-              <td>${a.tanggal}</td>
-              <td>${a.nis}</td>
-              <td>${a.nama}</td>
-              <td>${a.kelas}</td>
-              <td>${a.jamMasuk || '-'}</td>
-              <td>${a.jamPulang || '-'}</td>
-              <td><span class="badge ${a.status === 'Hadir' ? 'bg-success' : 'bg-warning'}">${a.status}</span></td>
-            </tr>
-          `).join('');
-        } else {
-          tbody.innerHTML = '<tr><td colspan="7" class="text-center">Tidak ada data laporan</td></tr>';
-        }
-      });
-  }
+  <script>
+    // URL Deployment Google Apps Script Anda
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbySwZBBu3LfBopdqMgKBjIza1yRzZtxrMHjGED42f47lQpA_Jj2adtWzZm9M_d4ij1jxQ/exec";
 
-  // ==========================================
-  // PENGATURAN (TOKEN DIKIRIM OTOMATIS)
-  // ==========================================
-  function loadKonfigurasi() {
-    fetch(`${WEB_APP_URL}?action=getKonfigurasi`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.success && res.data) {
-          if (document.getElementById('jam_masuk_default')) {
-            document.getElementById('jam_masuk_default').value = res.data.jam_masuk_default || "07:00";
-          }
-          if (document.getElementById('jam_pulang_default')) {
-            document.getElementById('jam_pulang_default').value = res.data.jam_pulang_default || "14:00";
-          }
-          if (document.getElementById('wa_notif_aktif')) {
-            document.getElementById('wa_notif_aktif').value = res.data.wa_notif_aktif || "true";
-          }
-        }
-      })
-      .catch(err => console.error("Gagal memuat konfigurasi:", err));
-  }
+    let html5QrCode = null;
+    let currentCameraFacingMode = "environment"; // Kamera belakang default
+    let globalDataSiswa = [];
 
-  function saveKonfigurasi() {
-    const cfgData = {
-      jam_masuk_default: document.getElementById('jam_masuk_default').value,
-      jam_pulang_default: document.getElementById('jam_pulang_default').value,
-      wa_notif_aktif: document.getElementById('wa_notif_aktif').value,
-      fonnte_token: FONNTE_TOKEN // Menyisipkan token Fonnte dari skrip index.html
-    };
+    // Init Application
+    window.onload = function() {
+      startClock();
+      loadDashboardData();
+      loadDataSiswa();
+    };
 
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'updateKonfigurasi',
-        data: cfgData
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        alert("Pengaturan berhasil disimpan!");
-      } else {
-        alert("Gagal menyimpan pengaturan.");
-      }
-    })
-    .catch(err => alert("Error saat menyimpan pengaturan."));
-  }
-</script>
+    function startClock() {
+      setInterval(() => {
+        const d = new Date();
+        document.getElementById("clock").innerText = d.toLocaleTimeString('id-ID') + " WIB";
+      }, 1000);
+    }
+
+    // Switch Navigation Tab
+    function switchTab(tab) {
+      const tabs = ['dashboard', 'siswa', 'absensi', 'laporan'];
+      tabs.forEach(t => {
+        document.getElementById(`sec-${t}`).classList.add('hidden');
+        document.getElementById(`nav-${t}`).classList.remove('sidebar-active');
+        document.getElementById(`nav-${t}`).classList.add('text-slate-400');
+      });
+
+      document.getElementById(`sec-${tab}`).classList.remove('hidden');
+      document.getElementById(`nav-${tab}`).classList.add('sidebar-active');
+      document.getElementById(`nav-${tab}`).classList.remove('text-slate-400');
+      document.getElementById(`page-title`).innerText = tab.toUpperCase() + " OVERVIEW";
+
+      if (tab === 'absensi') {
+        initQRScanner();
+      } else {
+        stopQRScanner();
+      }
+
+      if (tab === 'laporan') loadDataLaporan();
+      if (tab === 'dashboard') loadDashboardData();
+    }
+
+    // Load Data Dashboard
+    function loadDashboardData() {
+      fetch(`${GAS_API_URL}?action=getDashboard`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            document.getElementById('dash-total').innerText = res.summary.totalSiswa;
+            document.getElementById('dash-hadir').innerText = res.summary.hadir;
+            document.getElementById('dash-izinsakit').innerText = res.summary.sakit + res.summary.izin;
+            document.getElementById('dash-alpha').innerText = res.summary.alpha;
+          }
+        });
+    }
+
+    // Load Data Siswa
+    function loadDataSiswa() {
+      fetch(`${GAS_API_URL}?action=getSiswa`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            globalDataSiswa = res.data;
+            renderSiswaTable(res.data);
+            populateKelasDropdown(res.data);
+          }
+        });
+    }
+
+    function renderSiswaTable(data) {
+      let html = '';
+      data.forEach(r => {
+        html += `<tr class="hover:bg-slate-900/50">
+          <td class="p-4 font-tech text-cyan-400">${r[0]}</td>
+          <td class="p-4 font-semibold text-white">${r[1]}</td>
+          <td class="p-4">${r[2]}</td>
+          <td class="p-4 text-slate-400">${r[4]}</td>
+        </tr>`;
+      });
+      document.getElementById('tb-siswa').innerHTML = html || '<tr><td colspan="4" class="text-center p-4">Kosong</td></tr>';
+    }
+
+    function filterSiswaTable() {
+      const keyword = document.getElementById('search-siswa').value.toLowerCase();
+      const filtered = globalDataSiswa.filter(s => 
+        s[0].toString().toLowerCase().includes(keyword) || 
+        s[1].toLowerCase().includes(keyword)
+      );
+      renderSiswaTable(filtered);
+    }
+
+    function populateKelasDropdown(data) {
+      const selectKelas = document.getElementById('select-kelas');
+      const kelasSet = [...new Set(data.map(item => item[2]))];
+      
+      selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      kelasSet.forEach(k => {
+        if(k) selectKelas.innerHTML += `<option value="${k}">${k}</option>`;
+      });
+    }
+
+    function filterManualSiswaOptions() {
+      const selectedKelas = document.getElementById('select-kelas').value;
+      const selectSiswa = document.getElementById('select-siswa');
+      
+      selectSiswa.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+      const filtered = globalDataSiswa.filter(s => s[2] === selectedKelas);
+      
+      filtered.forEach(s => {
+        selectSiswa.innerHTML += `<option value="${s[0]}">${s[1]} (${s[0]})</option>`;
+      });
+    }
+
+    // Submit Absensi (QR Code & Manual)
+    function submitAbsen(nis, status = "Hadir") {
+      fetch(GAS_API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "submitAbsen", nis: nis, status: status })
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert(res.message);
+        if (res.status === 'success') loadDashboardData();
+      });
+    }
+
+    function submitAbsenManual() {
+      const nis = document.getElementById('select-siswa').value;
+      const status = document.getElementById('select-status').value;
+      
+      if (!nis) {
+        alert("Pilih siswa terlebih dahulu!");
+        return;
+      }
+      submitAbsen(nis, status);
+    }
+
+    // QR Code Scanner Module
+    function initQRScanner() {
+      if (html5QrCode) stopQRScanner();
+
+      html5QrCode = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+      html5QrCode.start(
+        { facingMode: currentCameraFacingMode }, 
+        config, 
+        onScanSuccess
+      ).catch(err => {
+        console.error("Kamera error: ", err);
+      });
+    }
+
+    function stopQRScanner() {
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+        });
+      }
+    }
+
+    function switchCamera() {
+      currentCameraFacingMode = (currentCameraFacingMode === "environment") ? "user" : "environment";
+      initQRScanner();
+    }
+
+    function onScanSuccess(decodedText) {
+      stopQRScanner();
+      submitAbsen(decodedText, "Hadir");
+      setTimeout(() => initQRScanner(), 3000);
+    }
+
+    // Laporan
+    function loadDataLaporan() {
+      fetch(`${GAS_API_URL}?action=getLaporan`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            let html = '';
+            res.data.reverse().forEach(r => {
+              const dateFormatted = new Date(r[1]).toLocaleDateString('id-ID');
+              const timeFormatted = new Date(r[0]).toLocaleTimeString('id-ID');
+              html += `<tr class="hover:bg-slate-900/50">
+                <td class="p-4 text-cyan-400 font-tech">${timeFormatted}</td>
+                <td class="p-4">${dateFormatted}</td>
+                <td class="p-4 font-tech">${r[2]}</td>
+                <td class="p-4 font-semibold text-white">${r[3]}</td>
+                <td class="p-4">${r[4]}</td>
+                <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${r[5] === 'Hadir' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">${r[5]}</span></td>
+              </tr>`;
+            });
+            document.getElementById('tb-laporan').innerHTML = html || '<tr><td colspan="6" class="text-center p-4">Kosong</td></tr>';
+          }
+        });
+    }
+  </script>
 </body>
 </html>
