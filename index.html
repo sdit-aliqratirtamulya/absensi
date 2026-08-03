@@ -333,7 +333,7 @@
 
   <script>
     // URL Deployment Google Apps Script (Ganti dengan URL milik Anda)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbySwZBBu3LfBopdqMgKBjIza1yRzZtxrMHjGED42f47lQpA_Jj2adtWzZm9M_d4ij1jxQ/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwWZvzD6E57vNzDjCyNikEma3ufhvo1VK3Rsg9qlhZOVYxn4R1WFmR6w0uDn9ic9OafKQ/exec";
 
     let html5QrCode = null;
     let currentCameraFacingMode = "environment"; // Kamera belakang default
@@ -513,28 +513,43 @@
     }
 
     // Laporan
-    function loadDataLaporan() {
-      fetch(`${GAS_API_URL}?action=getLaporan`)
-        .then(res => res.json())
-        .then(res => {
-          if (res.status === 'success') {
-            let html = '';
-            res.data.reverse().forEach(r => {
-              const dateFormatted = new Date(r[1]).toLocaleDateString('id-ID');
-              const timeFormatted = new Date(r[0]).toLocaleTimeString('id-ID');
-              html += `<tr class="hover:bg-slate-900/50">
-                <td class="p-4 text-cyan-400 font-tech">${timeFormatted}</td>
-                <td class="p-4">${dateFormatted}</td>
-                <td class="p-4 font-tech">${r[2]}</td>
-                <td class="p-4 font-semibold text-white">${r[3]}</td>
-                <td class="p-4">${r[4]}</td>
-                <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${r[5] === 'Hadir' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">${r[5]}</span></td>
-              </tr>`;
-            });
-            document.getElementById('tb-laporan').innerHTML = html || '<tr><td colspan="6" class="text-center p-4">Kosong</td></tr>';
-          }
+   // Laporan
+function loadDataLaporan() {
+  fetch(`${GAS_API_URL}?action=getLaporan`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === 'success') {
+        let html = '';
+        // Membalik urutan agar data presensi terbaru muncul di paling atas
+        res.data.reverse().forEach(r => {
+          const waktuFormatted = r[0] || '-';
+          const tanggalFormatted = r[1] ? new Date(r[1]).toLocaleDateString('id-ID') : '-';
+          
+          html += `<tr class="hover:bg-slate-900/50">
+            <td class="p-4 text-cyan-400 font-tech">${waktuFormatted}</td>
+            <td class="p-4">${tanggalFormatted}</td>
+            <td class="p-4 font-tech">${r[2]}</td>
+            <td class="p-4 font-semibold text-white">${r[3]}</td>
+            <td class="p-4">${r[4]}</td>
+            <td class="p-4">
+              <span class="px-2 py-1 rounded text-xs font-bold ${
+                r[5] === 'Hadir' 
+                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' 
+                  : 'bg-amber-950 text-amber-400 border border-amber-800'
+              }">
+                ${r[5]}
+              </span>
+            </td>
+          </tr>`;
         });
-    }
+        document.getElementById('tb-laporan').innerHTML = html || '<tr><td colspan="6" class="text-center p-4">Belum ada data presensi</td></tr>';
+      }
+    })
+    .catch(err => {
+      console.error("Gagal memuat laporan:", err);
+      document.getElementById('tb-laporan').innerHTML = '<tr><td colspan="6" class="text-center p-4 text-rose-500">Gagal memuat data laporan</td></tr>';
+    });
+}
 
     // GENERATOR KARTU PELAJAR FUNCTIONS
     function cetakKartuSiswa(nis, nama, kelas) {
