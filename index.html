@@ -1,729 +1,429 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Presensi QR Code</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      background-color: #f8fafc;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .sidebar {
-      min-height: 100vh;
-      background-color: #0f172a;
-      color: #fff;
-    }
-    .sidebar .nav-link {
-      color: #94a3b8;
-      padding: 12px 20px;
-      margin: 4px 0;
-      border-radius: 8px;
-    }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active {
-      color: #fff;
-      background-color: #1e293b;
-    }
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    .scanner-box {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px dashed #cbd5e1;
-    }
-    /* Style Kartu QR untuk Diunduh/Dicetak */
-    .id-card {
-      width: 320px;
-      border: 2px solid #0f172a;
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-      background: #fff;
-      margin: 0 auto;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Presensi QR Code</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #0f172a;
+      color: #fff;
+    }
+    .sidebar .nav-link {
+      color: #94a3b8;
+      padding: 12px 20px;
+      margin: 4px 0;
+      border-radius: 8px;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+      color: #fff;
+      background-color: #1e293b;
+    }
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .scanner-box {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px dashed #cbd5e1;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar Navigation -->
-    <div class="col-md-3 col-lg-2 sidebar p-3">
-      <h4 class="text-center my-3 fw-bold text-primary"><i class="fa-solid fa-qrcode me-2"></i>Presensi QR</h4>
-      <hr class="border-secondary">
-      <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-          <a href="#" class="nav-link active" onclick="switchTab('dashboard', this)"><i class="fa-solid fa-chart-pie me-2"></i>Dashboard</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('scan', this)"><i class="fa-solid fa-camera me-2"></i>Scan QR</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('siswa', this)"><i class="fa-solid fa-users me-2"></i>Data Siswa</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('laporan', this)"><i class="fa-solid fa-file-invoice me-2"></i>Laporan</a>
-        </li>
-        <li>
-          <a href="#" class="nav-link" onclick="switchTab('pengaturan', this)"><i class="fa-solid fa-gear me-2"></i>Pengaturan</a>
-        </li>
-      </ul>
-    </div>
+  <div class="row">
+    <!-- Sidebar Navigation -->
+    <div class="col-md-3 col-lg-2 sidebar p-3">
+      <h4 class="text-center my-3 fw-bold text-primary"><i class="fa-solid fa-qrcode me-2"></i>Presensi QR</h4>
+      <hr class="border-secondary">
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+          <a href="#" class="nav-link active" onclick="switchTab('dashboard', this)"><i class="fa-solid fa-chart-pie me-2"></i>Dashboard</a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" onclick="switchTab('scan', this)"><i class="fa-solid fa-camera me-2"></i>Scan QR</a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" onclick="switchTab('siswa', this)"><i class="fa-solid fa-users me-2"></i>Data Siswa</a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" onclick="switchTab('laporan', this)"><i class="fa-solid fa-file-invoice me-2"></i>Laporan</a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" onclick="switchTab('pengaturan', this)"><i class="fa-solid fa-gear me-2"></i>Pengaturan</a>
+        </li>
+      </ul>
+    </div>
 
-    <!-- Main Content Area -->
-    <div class="col-md-9 col-lg-10 p-4">
-      
-      <!-- TAB 1: DASHBOARD -->
-      <div id="tab-dashboard" class="tab-content">
-        <h3 class="fw-bold mb-4">Dashboard Presensi</h3>
-        <div class="row g-3 mb-4">
-          <div class="col-md-3">
-            <div class="card p-3 bg-primary text-white">
-              <h6>Total Siswa</h6>
-              <h2 id="dash-total" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-success text-white">
-              <h6>Hadir Tepat Waktu</h6>
-              <h2 id="dash-hadir" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-warning text-dark">
-              <h6>Terlambat</h6>
-              <h2 id="dash-terlambat" class="fw-bold">0</h2>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card p-3 bg-danger text-white">
-              <h6>Belum Presensi</h6>
-              <h2 id="dash-belum" class="fw-bold">0</h2>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Main Content Area -->
+    <div class="col-md-9 col-lg-10 p-4">
+      
+      <!-- TAB 1: DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content">
+        <h3 class="fw-bold mb-4">Dashboard Presensi</h3>
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="card p-3 bg-primary text-white">
+              <h6>Total Siswa</h6>
+              <h2 id="dash-total" class="fw-bold">0</h2>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-3 bg-success text-white">
+              <h6>Hadir Tepat Waktu</h6>
+              <h2 id="dash-hadir" class="fw-bold">0</h2>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-3 bg-warning text-dark">
+              <h6>Terlambat</h6>
+              <h2 id="dash-terlambat" class="fw-bold">0</h2>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-3 bg-danger text-white">
+              <h6>Belum Presensi</h6>
+              <h2 id="dash-belum" class="fw-bold">0</h2>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- TAB 2: SCAN QR CODE -->
-      <div id="tab-scan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Scan QR Code Presensi</h3>
-        <div class="card p-4 text-center">
-          <div class="row mb-3 justify-content-center">
-            <div class="col-md-6 mb-2">
-              <div class="btn-group w-100" role="group">
-                <input type="radio" class="btn-check" name="tipeAbsen" id="absenMasuk" value="masuk" checked>
-                <label class="btn btn-outline-primary" for="absenMasuk"><i class="fa-solid fa-right-to-bracket me-2"></i>Absen Masuk</label>
-                
-                <input type="radio" class="btn-check" name="tipeAbsen" id="absenPulang" value="pulang">
-                <label class="btn btn-outline-primary" for="absenPulang"><i class="fa-solid fa-right-from-bracket me-2"></i>Absen Pulang</label>
-              </div>
-            </div>
-            <!-- Pemilih Kamera (Kamera Depan / Belakang) -->
-            <div class="col-md-4 mb-2">
-              <select id="camera-select" class="form-select" onchange="changeCamera(this.value)">
-                <option value="">Memuat Kamera...</option>
-              </select>
-            </div>
-          </div>
+      <!-- TAB 2: SCAN QR CODE -->
+      <div id="tab-scan" class="tab-content d-none">
+        <h3 class="fw-bold mb-4">Scan QR Code Presensi</h3>
+        <div class="card p-4 text-center">
+          <div class="mb-3">
+            <div class="btn-group" role="group">
+              <input type="radio" class="btn-check" name="tipeAbsen" id="absenMasuk" value="masuk" checked>
+              <label class="btn btn-outline-primary" for="absenMasuk"><i class="fa-solid fa-right-to-bracket me-2"></i>Absen Masuk</label>
+              
+              <input type="radio" class="btn-check" name="tipeAbsen" id="absenPulang" value="pulang">
+              <label class="btn btn-outline-primary" for="absenPulang"><i class="fa-solid fa-right-from-bracket me-2"></i>Absen Pulang</label>
+            </div>
+          </div>
+          <div class="scanner-box bg-light p-2 mb-3">
+            <div id="reader" style="width: 100%;"></div>
+          </div>
+          <div id="scan-result" class="alert alert-info d-none" role="alert">
+            Memproses QR Code...
+          </div>
+        </div>
+      </div>
 
-          <div class="scanner-box bg-light p-2 mb-3">
-            <div id="reader" style="width: 100%;"></div>
-          </div>
-          <div id="scan-result" class="alert alert-info d-none" role="alert">
-            Memproses QR Code...
-          </div>
-        </div>
-      </div>
+      <!-- TAB 3: DATA SISWA -->
+      <div id="tab-siswa" class="tab-content d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold">Data Siswa</h3>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="fa-solid fa-plus me-2"></i>Tambah Siswa</button>
+        </div>
+        <div class="card p-3">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>NIS</th>
+                  <th>Nama</th>
+                  <th>Kelas</th>
+                  <th>No. HP WhatsApp</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="siswa-table-body">
+                <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-      <!-- TAB 3: DATA SISWA -->
-      <div id="tab-siswa" class="tab-content d-none">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h3 class="fw-bold">Data Siswa</h3>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="fa-solid fa-plus me-2"></i>Tambah Siswa</button>
-        </div>
-        <div class="card p-3">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>NIS</th>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>No. HP WhatsApp</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="siswa-table-body">
-                <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <!-- TAB 4: LAPORAN -->
+      <div id="tab-laporan" class="tab-content d-none">
+        <h3 class="fw-bold mb-4">Laporan Presensi</h3>
+        <div class="card p-3 mb-4">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Pilih Tanggal</label>
+              <input type="date" id="filter-tanggal" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Filter Kelas</label>
+              <select id="filter-kelas" class="form-select">
+                <option value="Semua">Semua Kelas</option>
+              </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button class="btn btn-primary w-100" onclick="loadLaporan()"><i class="fa-solid fa-filter me-2"></i>Terapkan Filter</button>
+            </div>
+          </div>
+        </div>
+        <div class="card p-3">
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>NIS</th>
+                  <th>Nama</th>
+                  <th>Kelas</th>
+                  <th>Jam Masuk</th>
+                  <th>Jam Pulang</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="laporan-table-body">
+                <tr><td colspan="7" class="text-center">Silakan pilih filter laporan</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-      <!-- TAB 4: LAPORAN -->
-      <div id="tab-laporan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Laporan Presensi</h3>
-        <div class="card p-3 mb-4">
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label">Pilih Tanggal</label>
-              <input type="date" id="filter-tanggal" class="form-control">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Filter Kelas</label>
-              <select id="filter-kelas" class="form-select">
-                <option value="Semua">Semua Kelas</option>
-              </select>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-              <button class="btn btn-primary w-100" onclick="loadLaporan()"><i class="fa-solid fa-filter me-2"></i>Terapkan Filter</button>
-            </div>
-            <!-- Tombol Export CSV / Excel -->
-            <div class="col-md-3 d-flex align-items-end">
-              <button class="btn btn-success w-100" onclick="exportLaporanCSV()"><i class="fa-solid fa-file-excel me-2"></i>Export CSV</button>
-            </div>
-          </div>
-        </div>
-        <div class="card p-3">
-          <div class="table-responsive">
-            <table class="table table-striped align-middle" id="laporan-table">
-              <thead>
-                <tr>
-                  <th>Tanggal</th>
-                  <th>NIS</th>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>Jam Masuk</th>
-                  <th>Jam Pulang</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="laporan-table-body">
-                <tr><td colspan="8" class="text-center">Silakan pilih filter laporan</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <!-- TAB 5: PENGATURAN -->
+      <div id="tab-pengaturan" class="tab-content d-none">
+        <h3 class="fw-bold mb-4">Pengaturan Sistem</h3>
+        <div class="card p-4 col-md-8">
+          <form id="form-pengaturan" onsubmit="event.preventDefault(); saveKonfigurasi();">
+            <div class="mb-3">
+              <label class="form-label">Batas Jam Masuk (Default)</label>
+              <input type="time" id="jam_masuk_default" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Jam Pulang (Default)</label>
+              <input type="time" id="jam_pulang_default" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Notifikasi WhatsApp</label>
+              <select id="wa_notif_aktif" class="form-select">
+                <option value="true">Aktif (Kirim Notifikasi Otomatis)</option>
+                <option value="false">Nonaktifkan</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-2"></i>Simpan Pengaturan</button>
+          </form>
+        </div>
+      </div>
 
-      <!-- TAB 5: PENGATURAN -->
-      <div id="tab-pengaturan" class="tab-content d-none">
-        <h3 class="fw-bold mb-4">Pengaturan Sistem</h3>
-        <div class="card p-4 col-md-8">
-          <form id="form-pengaturan" onsubmit="event.preventDefault(); saveKonfigurasi();">
-            <div class="mb-3">
-              <label class="form-label">Batas Jam Masuk (Default)</label>
-              <input type="time" id="jam_masuk_default" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Jam Pulang (Default)</label>
-              <input type="time" id="jam_pulang_default" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Notifikasi WhatsApp</label>
-              <select id="wa_notif_aktif" class="form-select">
-                <option value="true">Aktif (Kirim Notifikasi Otomatis)</option>
-                <option value="false">Nonaktifkan</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Fonnte API Token (Keamanan Backend)</label>
-              <input type="password" id="fonnte_token" class="form-control" placeholder="Masukkan Token Fonnte">
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-2"></i>Simpan Pengaturan</button>
-          </form>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: TAMBAH SISWA -->
-<div class="modal fade" id="modalSiswa" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold">Tambah Data Siswa</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form onsubmit="event.preventDefault(); saveSiswa();">
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">NIS</label>
-            <input type="text" id="add-nis" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Nama Lengkap</label>
-            <input type="text" id="add-nama" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Kelas</label>
-            <input type="text" id="add-kelas" class="form-control" placeholder="misal: X RPL 1" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">No. HP WhatsApp (Orang Tua/Siswa)</label>
-            <input type="tel" id="add-nohp" class="form-control" placeholder="08123456789">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary">Simpan Siswa</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: QR CODE & KARTU SISWA -->
-<div class="modal fade" id="modalQR" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold">Kartu QR Presensi</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <div id="print-area">
-          <div class="id-card">
-            <h5 class="fw-bold mb-1">KARTU PRESENSI</h5>
-            <small class="text-muted d-block mb-3">Sistem Presensi Otomatis</small>
-            <div id="qrcode-container" class="d-flex justify-content-center mb-3"></div>
-            <h6 id="qr-modal-nama" class="fw-bold mb-0">-</h6>
-            <p id="qr-modal-nis" class="text-muted mb-0">NIS: -</p>
-            <small id="qr-modal-kelas" class="badge bg-secondary">-</small>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button class="btn btn-outline-primary" onclick="cetakKartu()"><i class="fa-solid fa-print me-2"></i>Cetak Kartu</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: BUKTI / SLIP PRESENSI -->
-<div class="modal fade" id="modalSlip" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold">Bukti Presensi Siswa</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="slip-print-area" class="border p-4 rounded bg-light">
-          <h5 class="text-center fw-bold mb-3">STRIP BUKTI PRESENSI</h5>
-          <hr>
-          <p><strong>Tanggal:</strong> <span id="slip-tanggal">-</span></p>
-          <p><strong>NIS:</strong> <span id="slip-nis">-</span></p>
-          <p><strong>Nama:</strong> <span id="slip-nama">-</span></p>
-          <p><strong>Kelas:</strong> <span id="slip-kelas">-</span></p>
-          <p><strong>Jam Masuk:</strong> <span id="slip-masuk">-</span></p>
-          <p><strong>Jam Pulang:</strong> <span id="slip-pulang">-</span></p>
-          <p><strong>Status:</strong> <span id="slip-status" class="badge bg-success">-</span></p>
-        </div>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button class="btn btn-outline-primary" onclick="cetakSlip()"><i class="fa-solid fa-print me-2"></i>Cetak Slip</button>
-      </div>
-    </div>
-  </div>
+    </div>
+  </div>
 </div>
 
 <!-- JS LIBRARIES -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script>
-  // ==========================================
-  // KONFIGURASI FRONTEND
-  // ==========================================
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx.../exec"; 
+  // ==========================================
+  // KONFIGURASI FRONTEND & TOKEN PRIVAT
+  // ==========================================
+  // Ganti URL di bawah dengan Web App URL hasil Deploy Google Apps Script Anda
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx.../exec"; 
+  const FONNTE_TOKEN = "2FhYGdhuticUBt57BMX5"; // Token Fonnte disimpan di skrip frontend
 
-  let html5QrcodeScanner = null;
-  let currentCameraId = null;
-  let currentReportData = [];
+  let html5QrcodeScanner = null;
 
-  // Audio Efek Suara Beep saat Scan Berhasil
-  const beepSound = new Audio("https://actions.google.com/sounds/v1/badges/beep_short.ogg");
+  document.addEventListener("DOMContentLoaded", () => {
+    loadDashboard();
+    loadKonfigurasi();
+  });
 
-  document.addEventListener("DOMContentLoaded", () => {
-    loadDashboard();
-    loadKonfigurasi();
-  });
+  // Switcher Tab Navigasi
+  function switchTab(tabName, element) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('d-none'));
+    document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(`tab-${tabName}`).classList.remove('d-none');
+    if(element) element.classList.add('active');
 
-  // Switcher Tab Navigasi
-  function switchTab(tabName, element) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('d-none'));
-    document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
-    
-    document.getElementById(`tab-${tabName}`).classList.remove('d-none');
-    if(element) element.classList.add('active');
+    if (tabName === 'scan') {
+      initScanner();
+    } else if (html5QrcodeScanner) {
+      html5QrcodeScanner.clear();
+    }
 
-    if (tabName === 'scan') {
-      initScanner();
-    } else if (html5QrcodeScanner) {
-      stopScanner();
-    }
+    if (tabName === 'dashboard') loadDashboard();
+    if (tabName === 'siswa') loadSiswa();
+    if (tabName === 'laporan') loadLaporan();
+  }
 
-    if (tabName === 'dashboard') loadDashboard();
-    if (tabName === 'siswa') loadSiswa();
-    if (tabName === 'laporan') loadLaporan();
-  }
+  // ==========================================
+  // DASHBOARD
+  // ==========================================
+  function loadDashboard() {
+    fetch(`${WEB_APP_URL}?action=getDashboard`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          document.getElementById('dash-total').innerText = res.data.totalSiswa;
+          document.getElementById('dash-hadir').innerText = res.data.hadir;
+          document.getElementById('dash-terlambat').innerText = res.data.terlambat;
+          document.getElementById('dash-belum').innerText = res.data.belumAbsen;
+        }
+      })
+      .catch(err => console.error("Error Dashboard:", err));
+  }
 
-  // ==========================================
-  // DASHBOARD
-  // ==========================================
-  function loadDashboard() {
-    fetch(`${WEB_APP_URL}?action=getDashboard`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          document.getElementById('dash-total').innerText = res.data.totalSiswa;
-          document.getElementById('dash-hadir').innerText = res.data.hadir;
-          document.getElementById('dash-terlambat').innerText = res.data.terlambat;
-          document.getElementById('dash-belum').innerText = res.data.belumAbsen;
-        }
-      })
-      .catch(err => console.error("Error Dashboard:", err));
-  }
+  // ==========================================
+  // SCANNER QR CODE
+  // ==========================================
+  function initScanner() {
+    if (!html5QrcodeScanner) {
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+      html5QrcodeScanner.render(onScanSuccess);
+    }
+  }
 
-  // ==========================================
-  // SCANNER QR CODE (EFEK BEEP & PEMILIH KAMERA)
-  // ==========================================
-  function initScanner() {
-    Html5Qrcode.getCameras().then(devices => {
-      const select = document.getElementById('camera-select');
-      select.innerHTML = '';
-      if (devices && devices.length > 0) {
-        devices.forEach((device, index) => {
-          const opt = document.createElement('option');
-          opt.value = device.id;
-          opt.text = device.label || `Kamera ${index + 1}`;
-          select.appendChild(opt);
-        });
-        currentCameraId = devices[0].id;
-        startScanner(currentCameraId);
-      } else {
-        select.innerHTML = '<option value="">Kamera Tidak Ditemukan</option>';
-      }
-    }).catch(err => {
-      console.error("Gagal mendapatkan kamera:", err);
-    });
-  }
+  function onScanSuccess(decodedText) {
+    const tipe = document.querySelector('input[name="tipeAbsen"]:checked').value;
+    const resBox = document.getElementById('scan-result');
+    
+    resBox.classList.remove('d-none', 'alert-danger', 'alert-success');
+    resBox.classList.add('alert-info');
+    resBox.innerText = `Memproses NIS: ${decodedText}...`;
 
-  function startScanner(cameraId) {
-    if (html5QrcodeScanner) {
-      stopScanner().then(() => runCamera(cameraId));
-    } else {
-      runCamera(cameraId);
-    }
-  }
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'prosesAbsensi',
+        nis: decodedText,
+        tipe: tipe
+      })
+    })
+    .then(res => res.json())
+    .then(res => {
+      resBox.classList.remove('alert-info');
+      if (res.success) {
+        resBox.classList.add('alert-success');
+        resBox.innerText = res.data.message;
+      } else {
+        resBox.classList.add('alert-danger');
+        resBox.innerText = res.data.message || res.error;
+      }
+    })
+    .catch(err => {
+      resBox.classList.remove('alert-info');
+      resBox.classList.add('alert-danger');
+      resBox.innerText = "Gagal memproses presensi.";
+    });
+  }
 
-  function runCamera(cameraId) {
-    html5QrcodeScanner = new Html5Qrcode("reader");
-    html5QrcodeScanner.start(
-      cameraId,
-      { fps: 10, qrbox: 250 },
-      onScanSuccess
-    );
-  }
+  // ==========================================
+  // DATA SISWA
+  // ==========================================
+  function loadSiswa() {
+    fetch(`${WEB_APP_URL}?action=getSiswa`)
+      .then(res => res.json())
+      .then(res => {
+        const tbody = document.getElementById('siswa-table-body');
+        if (res.success && res.data.length > 0) {
+          tbody.innerHTML = res.data.map(s => `
+            <tr>
+              <td>${s.nis}</td>
+              <td>${s.nama}</td>
+              <td>${s.kelas}</td>
+              <td>${s.noHP || '-'}</td>
+              <td>
+                <button class="btn btn-sm btn-danger" onclick="deleteSiswa(${s.rowIndex})"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada data siswa</td></tr>';
+        }
+      });
+  }
 
-  function changeCamera(cameraId) {
-    if (cameraId) {
-      currentCameraId = cameraId;
-      startScanner(cameraId);
-    }
-  }
+  // ==========================================
+  // LAPORAN
+  // ==========================================
+  function loadLaporan() {
+    const tgl = document.getElementById('filter-tanggal').value;
+    const kls = document.getElementById('filter-kelas').value;
 
-  function stopScanner() {
-    if (html5QrcodeScanner) {
-      return html5QrcodeScanner.stop().then(() => {
-        html5QrcodeScanner = null;
-      }).catch(err => console.error(err));
-    }
-    return Promise.resolve();
-  }
+    fetch(`${WEB_APP_URL}?action=getAbsensi&tanggal=${tgl}&kelas=${kls}`)
+      .then(res => res.json())
+      .then(res => {
+        const tbody = document.getElementById('laporan-table-body');
+        if (res.success && res.data.length > 0) {
+          tbody.innerHTML = res.data.map(a => `
+            <tr>
+              <td>${a.tanggal}</td>
+              <td>${a.nis}</td>
+              <td>${a.nama}</td>
+              <td>${a.kelas}</td>
+              <td>${a.jamMasuk || '-'}</td>
+              <td>${a.jamPulang || '-'}</td>
+              <td><span class="badge ${a.status === 'Hadir' ? 'bg-success' : 'bg-warning'}">${a.status}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center">Tidak ada data laporan</td></tr>';
+        }
+      });
+  }
 
-  function onScanSuccess(decodedText) {
-    // Putar Suara Beep
-    beepSound.play();
+  // ==========================================
+  // PENGATURAN (TOKEN DIKIRIM OTOMATIS)
+  // ==========================================
+  function loadKonfigurasi() {
+    fetch(`${WEB_APP_URL}?action=getKonfigurasi`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success && res.data) {
+          if (document.getElementById('jam_masuk_default')) {
+            document.getElementById('jam_masuk_default').value = res.data.jam_masuk_default || "07:00";
+          }
+          if (document.getElementById('jam_pulang_default')) {
+            document.getElementById('jam_pulang_default').value = res.data.jam_pulang_default || "14:00";
+          }
+          if (document.getElementById('wa_notif_aktif')) {
+            document.getElementById('wa_notif_aktif').value = res.data.wa_notif_aktif || "true";
+          }
+        }
+      })
+      .catch(err => console.error("Gagal memuat konfigurasi:", err));
+  }
 
-    const tipe = document.querySelector('input[name="tipeAbsen"]:checked').value;
-    const resBox = document.getElementById('scan-result');
-    
-    resBox.classList.remove('d-none', 'alert-danger', 'alert-success');
-    resBox.classList.add('alert-info');
-    resBox.innerText = `Memproses NIS: ${decodedText}...`;
+  function saveKonfigurasi() {
+    const cfgData = {
+      jam_masuk_default: document.getElementById('jam_masuk_default').value,
+      jam_pulang_default: document.getElementById('jam_pulang_default').value,
+      wa_notif_aktif: document.getElementById('wa_notif_aktif').value,
+      fonnte_token: FONNTE_TOKEN // Menyisipkan token Fonnte dari skrip index.html
+    };
 
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'prosesAbsensi',
-        nis: decodedText,
-        tipe: tipe
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      resBox.classList.remove('alert-info');
-      if (res.success) {
-        resBox.classList.add('alert-success');
-        resBox.innerText = res.data.message;
-      } else {
-        resBox.classList.add('alert-danger');
-        resBox.innerText = res.data.message || res.error;
-      }
-    })
-    .catch(err => {
-      resBox.classList.remove('alert-info');
-      resBox.classList.add('alert-danger');
-      resBox.innerText = "Gagal memproses presensi.";
-    });
-  }
-
-  // ==========================================
-  // DATA SISWA & PEMBUAT QR CODE
-  // ==========================================
-  function loadSiswa() {
-    fetch(`${WEB_APP_URL}?action=getSiswa`)
-      .then(res => res.json())
-      .then(res => {
-        const tbody = document.getElementById('siswa-table-body');
-        if (res.success && res.data.length > 0) {
-          tbody.innerHTML = res.data.map(s => `
-            <tr>
-              <td>${s.nis}</td>
-              <td>${s.nama}</td>
-              <td>${s.kelas}</td>
-              <td>${s.noHP || '-'}</td>
-              <td>
-                <button class="btn btn-sm btn-info text-white me-1" onclick="showQRCode('${s.nis}', '${s.nama}', '${s.kelas}')"><i class="fa-solid fa-qrcode"></i> Kartu QR</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteSiswa(${s.rowIndex})"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-          `).join('');
-        } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada data siswa</td></tr>';
-        }
-      });
-  }
-
-  function saveSiswa() {
-    const data = {
-      nis: document.getElementById('add-nis').value,
-      nama: document.getElementById('add-nama').value,
-      kelas: document.getElementById('add-kelas').value,
-      noHP: document.getElementById('add-nohp').value
-    };
-
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'addSiswa',
-        data: data
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        alert("Siswa berhasil ditambahkan!");
-        bootstrap.Modal.getInstance(document.getElementById('modalSiswa')).hide();
-        loadSiswa();
-      } else {
-        alert("Gagal menambahkan siswa.");
-      }
-    });
-  }
-
-  function deleteSiswa(rowIndex) {
-    if (confirm("Apakah Anda yakin ingin menghapus data siswa ini?")) {
-      fetch(WEB_APP_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'deleteSiswa',
-          rowIndex: rowIndex
-        })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          loadSiswa();
-        }
-      });
-    }
-  }
-
-  function showQRCode(nis, nama, kelas) {
-    document.getElementById('qr-modal-nama').innerText = nama;
-    document.getElementById('qr-modal-nis').innerText = `NIS: ${nis}`;
-    document.getElementById('qr-modal-kelas').innerText = kelas;
-
-    const qrContainer = document.getElementById('qrcode-container');
-    qrContainer.innerHTML = '';
-    
-    // Generasi QR Code Client-side
-    new QRCode(qrContainer, {
-      text: nis,
-      width: 150,
-      height: 150
-    });
-
-    const modal = new bootstrap.Modal(document.getElementById('modalQR'));
-    modal.show();
-  }
-
-  function cetakKartu() {
-    const printContents = document.getElementById('print-area').innerHTML;
-    const originalContents = document.body.innerHTML;
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
-  }
-
-  // ==========================================
-  // LAPORAN, EXPORT CSV & CETAK SLIP
-  // ==========================================
-  function loadLaporan() {
-    const tgl = document.getElementById('filter-tanggal').value;
-    const kls = document.getElementById('filter-kelas').value;
-
-    fetch(`${WEB_APP_URL}?action=getAbsensi&tanggal=${tgl}&kelas=${kls}`)
-      .then(res => res.json())
-      .then(res => {
-        const tbody = document.getElementById('laporan-table-body');
-        if (res.success && res.data.length > 0) {
-          currentReportData = res.data;
-          tbody.innerHTML = res.data.map((a, idx) => `
-            <tr>
-              <td>${a.tanggal}</td>
-              <td>${a.nis}</td>
-              <td>${a.nama}</td>
-              <td>${a.kelas}</td>
-              <td>${a.jamMasuk || '-'}</td>
-              <td>${a.jamPulang || '-'}</td>
-              <td><span class="badge ${a.status === 'Hadir' ? 'bg-success' : 'bg-warning'}">${a.status}</span></td>
-              <td>
-                <button class="btn btn-sm btn-outline-secondary" onclick="openSlipModal(${idx})"><i class="fa-solid fa-print"></i> Slip</button>
-              </td>
-            </tr>
-          `).join('');
-        } else {
-          currentReportData = [];
-          tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada data laporan</td></tr>';
-        }
-      });
-  }
-
-  function exportLaporanCSV() {
-    if (currentReportData.length === 0) {
-      alert("Tidak ada data untuk diexport!");
-      return;
-    }
-
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Tanggal,NIS,Nama,Kelas,Jam Masuk,Jam Pulang,Status\n";
-
-    currentReportData.forEach(row => {
-      csvContent += `"${row.tanggal}","${row.nis}","${row.nama}","${row.kelas}","${row.jamMasuk || '-'}","${row.jamPulang || '-'}","${row.status}"\n`;
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Laporan_Presensi_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  function openSlipModal(index) {
-    const data = currentReportData[index];
-    if (!data) return;
-
-    document.getElementById('slip-tanggal').innerText = data.tanggal;
-    document.getElementById('slip-nis').innerText = data.nis;
-    document.getElementById('slip-nama').innerText = data.nama;
-    document.getElementById('slip-kelas').innerText = data.kelas;
-    document.getElementById('slip-masuk').innerText = data.jamMasuk || '-';
-    document.getElementById('slip-pulang').innerText = data.jamPulang || '-';
-    document.getElementById('slip-status').innerText = data.status;
-
-    const modal = new bootstrap.Modal(document.getElementById('modalSlip'));
-    modal.show();
-  }
-
-  function cetakSlip() {
-    const printContents = document.getElementById('slip-print-area').innerHTML;
-    const originalContents = document.body.innerHTML;
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
-  }
-
-  // ==========================================
-  // PENGATURAN
-  // ==========================================
-  function loadKonfigurasi() {
-    fetch(`${WEB_APP_URL}?action=getKonfigurasi`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.success && res.data) {
-          if (document.getElementById('jam_masuk_default')) {
-            document.getElementById('jam_masuk_default').value = res.data.jam_masuk_default || "07:00";
-          }
-          if (document.getElementById('jam_pulang_default')) {
-            document.getElementById('jam_pulang_default').value = res.data.jam_pulang_default || "14:00";
-          }
-          if (document.getElementById('wa_notif_aktif')) {
-            document.getElementById('wa_notif_aktif').value = res.data.wa_notif_aktif || "true";
-          }
-          if (document.getElementById('fonnte_token')) {
-            document.getElementById('fonnte_token').value = res.data.fonnte_token || "";
-          }
-        }
-      });
-  }
-
-  function saveKonfigurasi() {
-    const cfgData = {
-      jam_masuk_default: document.getElementById('jam_masuk_default').value,
-      jam_pulang_default: document.getElementById('jam_pulang_default').value,
-      wa_notif_aktif: document.getElementById('wa_notif_aktif').value,
-      fonnte_token: document.getElementById('fonnte_token').value
-    };
-
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'updateKonfigurasi',
-        data: cfgData
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        alert("Pengaturan berhasil disimpan!");
-      } else {
-        alert("Gagal menyimpan pengaturan.");
-      }
-    });
-  }
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'updateKonfigurasi',
+        data: cfgData
+      })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        alert("Pengaturan berhasil disimpan!");
+      } else {
+        alert("Gagal menyimpan pengaturan.");
+      }
+    })
+    .catch(err => alert("Error saat menyimpan pengaturan."));
+  }
 </script>
 </body>
 </html>
