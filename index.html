@@ -378,18 +378,23 @@
     }
 
     // Load Data Dashboard
-    function loadDashboardData() {
-      fetch(`${GAS_API_URL}?action=getDashboard`)
-        .then(res => res.json())
-        .then(res => {
-          if (res.status === 'success') {
-            document.getElementById('dash-total').innerText = res.summary.totalSiswa;
-            document.getElementById('dash-hadir').innerText = res.summary.hadir;
-            document.getElementById('dash-izinsakit').innerText = res.summary.sakit + res.summary.izin;
-            document.getElementById('dash-alpha').innerText = res.summary.alpha;
-          }
-        });
-    }
+    function loadDashboard() {
+  fetch(`${GAS_API_URL}?action=getDashboard`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === 'success') {
+        const s = res.summary;
+        document.getElementById('dash-total').innerText = s.totalSiswa || 0;
+        document.getElementById('dash-hadir').innerText = s.hadir || 0;
+        document.getElementById('dash-sakit').innerText = s.sakit || 0;
+        document.getElementById('dash-izin').innerText  = s.izin || 0;
+        document.getElementById('dash-alpha').innerText = s.alpha || 0;
+      }
+    })
+    .catch(err => {
+      console.error("Gagal memuat dashboard:", err);
+    });
+}
 
     // Load Data Siswa
     function loadDataSiswa() {
