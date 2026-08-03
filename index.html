@@ -195,20 +195,23 @@
         </div>
 
         <div class="cyber-card rounded-xl overflow-hidden">
-          <table class="w-full text-left text-sm text-slate-300">
-            <thead class="bg-slate-900/80 text-cyan-400 font-tech uppercase text-xs border-b border-slate-800">
-              <tr>
-                <th class="p-4">NIS</th>
-                <th class="p-4">Nama Siswa</th>
-                <th class="p-4">Kelas</th>
-                <th class="p-4">No HP Orang Tua</th>
-                <th class="p-4 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="tb-siswa" class="divide-y divide-slate-800/50">
-              <tr><td colspan="5" class="text-center p-4 text-slate-500">Memuat data...</td></tr>
-            </tbody>
-          </table>
+          <table class="w-full text-left border-collapse text-sm">
+  <thead>
+    <tr class="bg-slate-900 text-cyan-400">
+      <th class="p-4">NIS</th>
+      <th class="p-4">Nama Siswa</th>
+      <th class="p-4">Kelas</th>
+      <th class="p-4">L/P</th>
+      <th class="p-4">No. HP Orang Tua</th>
+    </tr>
+  </thead>
+  <!-- ID ini harus persis sama dengan yang dipanggil di JS -->
+  <tbody id="tb-siswa">
+    <tr>
+      <td colspan="5" class="text-center p-4 text-slate-500">Memuat data...</td>
+    </tr>
+  </tbody>
+</table>
         </div>
       </section>
 
@@ -397,17 +400,38 @@
 }
 
     // Load Data Siswa
-    function loadDataSiswa() {
-      fetch(`${GAS_API_URL}?action=getSiswa`)
-        .then(res => res.json())
-        .then(res => {
-          if (res.status === 'success') {
-            globalDataSiswa = res.data;
-            renderSiswaTable(res.data);
-            populateKelasDropdown(res.data);
-          }
+    // Fungsi untuk memuat Data Siswa dari Google Sheets
+function loadDataSiswa() {
+  const tbSiswa = document.getElementById('tb-siswa');
+  if (!tbSiswa) return;
+
+  tbSiswa.innerHTML = '<tr><td colspan="5" class="text-center p-4">Memuat data siswa...</td></tr>';
+
+  fetch(`${GAS_API_URL}?action=getSiswa`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === 'success' && res.data.length > 0) {
+        let html = '';
+        res.data.forEach(r => {
+          // r[0]: NIS, r[1]: Nama, r[2]: Kelas, r[3]: JK, r[4]: No HP Ortu
+          html += `<tr class="border-b border-slate-800 hover:bg-slate-900/50">
+            <td class="p-4 font-tech text-cyan-400">${r[0]}</td>
+            <td class="p-4 font-semibold text-white">${r[1]}</td>
+            <td class="p-4 font-tech">${r[2]}</td>
+            <td class="p-4">${r[3] === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
+            <td class="p-4 text-slate-300">${r[4] || '-'}</td>
+          </tr>`;
         });
-    }
+        tbSiswa.innerHTML = html;
+      } else {
+        tbSiswa.innerHTML = '<tr><td colspan="5" class="text-center p-4">Belum ada data siswa.</td></tr>';
+      }
+    })
+    .catch(err => {
+      console.error("Gagal memuat siswa:", err);
+      tbSiswa.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-rose-500">Gagal mengambil data dari server. Batasan CORS atau URL invalid.</td></tr>';
+    });
+}
 
     function renderSiswaTable(data) {
       let html = '';
