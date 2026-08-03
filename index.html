@@ -343,11 +343,12 @@
     let globalDataSiswa = [];
 
     // Init Application
-    window.onload = function() {
-      startClock();
-      loadDashboardData();
-      loadDataSiswa();
-    };
+    // MENJADI INI:
+window.onload = function() {
+  loadDashboard(); // <- Sesuaikan dengan nama fungsi yang ada
+  loadDataSiswa();
+  loadDataLaporan();
+};
 
     function startClock() {
       setInterval(() => {
