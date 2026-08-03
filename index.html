@@ -110,7 +110,7 @@
 
       <div class="p-4 text-center">
         <h1 class="font-tech text-lg font-bold text-cyan-400 neon-text-cyan tracking-wider">CYBER ABSENSI</h1>
-        <p class="text-xs text-slate-400">SMK/SMA Karawang System</p>
+        <p class="text-xs text-slate-400">TEAM CYBER SDIT AL-IQRA</p>
       </div>
 
       <!-- Navigation Links -->
@@ -149,7 +149,7 @@
     <header class="p-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40 backdrop-blur sticky top-0 z-40">
       <div>
         <h2 id="page-title" class="font-tech text-xl font-bold text-white tracking-wide">DASHBOARD OVERVIEW</h2>
-        <p class="text-xs text-slate-400">Sistem Presensi Digital Otomatis WhatsApp</p>
+        <p class="text-xs text-slate-400">Sistem Absensi Digital SDIT AL-IQRA</p>
       </div>
       <div id="clock" class="font-tech text-sm text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-3 py-1.5 rounded">
         00:00:00 WIB
@@ -158,7 +158,7 @@
 
     <div class="p-6 space-y-6">
 
-      <!-- SECTION: DASHBOARD (STATISTIK LENGKAP DIPERBAIKI) -->
+      <!-- SECTION: DASHBOARD -->
       <section id="sec-dashboard" class="space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div class="cyber-card p-5 rounded-xl border-l-4 border-l-cyan-500">
@@ -399,11 +399,11 @@
             const elIzin  = document.getElementById('dash-izin');
             const elAlpha = document.getElementById('dash-alpha');
 
-            if (elTotal) elTotal.innerText = s.totalSiswa || 0;
-            if (elHadir) elHadir.innerText = s.hadir || 0;
-            if (elSakit) elSakit.innerText = s.sakit || 0;
-            if (elIzin)  elIzin.innerText  = s.izin || 0;
-            if (elAlpha) elAlpha.innerText = s.alpha || 0;
+            if (elTotal) elTotal.innerText = s.totalSiswa ?? 0;
+            if (elHadir) elHadir.innerText = s.hadir ?? 0;
+            if (elSakit) elSakit.innerText = s.sakit ?? 0;
+            if (elIzin)  elIzin.innerText  = s.izin ?? 0;
+            if (elAlpha) elAlpha.innerText = s.alpha ?? 0;
           }
         })
         .catch(err => {
@@ -422,7 +422,7 @@
         .then(res => res.json())
         .then(res => {
           if (res.status === 'success' && res.data.length > 0) {
-            globalDataSiswa = res.data; // DILENGKAPI: Simpan data global untuk pencarian & cetak
+            globalDataSiswa = res.data;
             renderSiswaTable(globalDataSiswa);
             populateKelasDropdown(globalDataSiswa);
           } else {
@@ -494,7 +494,9 @@
       .then(res => res.json())
       .then(res => {
         alert(res.message);
-        if (res.status === 'success') loadDashboard();
+        if (res.status === 'success') {
+          loadDashboard(); // Otomatis refresh kartu statistik
+        }
       });
     }
 
