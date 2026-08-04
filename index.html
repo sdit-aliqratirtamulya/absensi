@@ -188,22 +188,38 @@
         </div>
       </section>
 
-      <!-- SECTION: ABSENSI -->
-      <section id="sec-absensi" class="hidden space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+     <!-- SECTION: ABSENSI -->
+<section id="sec-absensi" class="hidden space-y-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          <!-- QR SCANNER -->
-          <div class="cyber-card p-5 rounded-xl space-y-4">
-            <div class="flex justify-between items-center">
-              <h3 class="font-tech text-cyan-400 font-bold">SCANNER QR CODE</h3>
-              <button onclick="switchCamera()" class="bg-slate-800 hover:bg-slate-700 text-xs text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition flex items-center gap-2">
-                <i class="fa-solid fa-camera-rotate"></i> Switch Kamera
-              </button>
-            </div>
-            
-            <div id="reader" class="bg-black rounded-lg overflow-hidden border border-slate-800 relative min-h-[250px]"></div>
-            <p class="text-xs text-slate-400 text-center">Arahkan Kartu QR Siswa ke area kamera.</p>
-          </div>
+    <!-- QR SCANNER -->
+    <div class="cyber-card p-5 rounded-xl space-y-4">
+      <div class="flex flex-wrap justify-between items-center gap-2">
+        <h3 class="font-tech text-cyan-400 font-bold">SCANNER QR CODE</h3>
+        
+        <!-- Group Tombol Kontrol Kamera -->
+        <div class="flex items-center gap-2">
+          <!-- Tombol Switch Kamera -->
+          <button onclick="switchCamera()" class="bg-slate-800 hover:bg-slate-700 text-xs text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-camera-rotate"></i>
+            <span>Switch</span>
+          </button>
+          
+          <!-- Tombol On/Off Kamera -->
+          <button id="btn-toggle-cam" onclick="toggleCamera()" class="bg-rose-950 hover:bg-rose-900 text-xs text-rose-400 border border-rose-800 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-video-slash" id="icon-toggle-cam"></i>
+            <span id="text-toggle-cam">Matikan Kamera</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Area Viewfinder Kamera -->
+      <div id="reader" class="bg-black rounded-lg overflow-hidden border border-slate-800 relative min-h-[250px] flex items-center justify-center"></div>
+      <p class="text-xs text-slate-400 text-center">Arahkan Kartu QR Siswa ke area kamera.</p>
+    </div>
+
+    <!-- MANUAL ABSENSI -->
+    ...
 
           <!-- MANUAL ABSENSI -->
           <div class="cyber-card p-5 rounded-xl space-y-4">
