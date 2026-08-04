@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cyber Attendance System</title>
+  <title>Cyber Attendance System - SDIT AL-IQRA TIRTAMULYA</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- HTML5-QRCode JS -->
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <!-- QRCode Generator JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap');
@@ -32,31 +34,46 @@
       box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
     }
 
-    .cyber-card:hover {
-      border-color: rgba(6, 182, 212, 0.5);
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
-    }
-
-    .neon-text-cyan {
-      text-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
-    }
-
     .sidebar-active {
       background: linear-gradient(90deg, rgba(6, 182, 212, 0.2) 0%, rgba(0,0,0,0) 100%);
       border-left: 4px solid #06b6d4;
       color: #06b6d4;
     }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
+    /* KARTU PELAJAR POTRAIT PRINT STYLE */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     }
-    ::-webkit-scrollbar-track {
-      background: #080c14;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #06b6d4;
-      border-radius: 3px;
+
+    /* Ukuran Standar Kartu Potrait CR80 */
+    .id-card-potrait {
+      width: 53.9mm;
+      height: 85.6mm;
+      background: #0f172a;
+      border: 2px solid #06b6d4;
+      border-radius: 8px;
+      padding: 8px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
     }
   </style>
 </head>
@@ -66,19 +83,19 @@
   <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-50">
     <div>
       <!-- Header Logos -->
-      <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-center gap-3">
-        <img src="logo-karawang.png" alt="Karawang" class="h-10 w-auto object-contain hover:scale-110 transition">
-        <img src="logo-disdik.png" alt="Disdik" class="h-10 w-auto object-contain hover:scale-110 transition">
-        <img src="logo-sekolah.png" alt="Sekolah" class="h-10 w-auto object-contain hover:scale-110 transition">
+      <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-center gap-2">
+        <img src="logo-karawang.png" alt="Karawang" class="h-8 w-auto object-contain">
+        <img src="logo-disdik.png" alt="Disdik" class="h-8 w-auto object-contain">
+        <img src="logo-sekolah.jpg" alt="Sekolah" class="h-8 w-auto object-contain">
       </div>
 
       <div class="p-4 text-center">
-        <h1 class="font-tech text-lg font-bold text-cyan-400 neon-text-cyan tracking-wider">CYBER ABSENSI</h1>
-        <p class="text-xs text-slate-400">SMK/SMA Karawang System</p>
+        <h1 class="font-tech text-base font-bold text-cyan-400">SDIT AL-IQRA</h1>
+        <p class="text-[10px] text-slate-400">Cyber Attendance System</p>
       </div>
 
       <!-- Navigation -->
-      <nav class="mt-4 space-y-1">
+      <nav class="mt-2 space-y-1">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-active w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold hover:text-cyan-400 transition">
           <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i> Dashboard
         </button>
@@ -113,7 +130,7 @@
     <header class="p-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40 backdrop-blur sticky top-0 z-40">
       <div>
         <h2 id="page-title" class="font-tech text-xl font-bold text-white tracking-wide">DASHBOARD OVERVIEW</h2>
-        <p class="text-xs text-slate-400">Sistem Presensi Digital Otomatis WhatsApp</p>
+        <p class="text-xs text-slate-400">Sistem Presensi SDIT Al-Iqra Tirtamulya</p>
       </div>
       <div id="clock" class="font-tech text-sm text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-3 py-1.5 rounded">
         00:00:00 WIB
@@ -160,11 +177,12 @@
                 <th class="p-4">NIS</th>
                 <th class="p-4">Nama Siswa</th>
                 <th class="p-4">Kelas</th>
-                <th class="p-4">No HP Orang Tua</th>
+                <th class="p-4">Jenis Kelamin</th>
+                <th class="p-4">Aksi / Kartu</th>
               </tr>
             </thead>
             <tbody id="tb-siswa" class="divide-y divide-slate-800/50">
-              <tr><td colspan="4" class="text-center p-4 text-slate-500">Memuat data...</td></tr>
+              <tr><td colspan="5" class="text-center p-4 text-slate-500">Memuat data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -256,15 +274,78 @@
     </div>
   </main>
 
+  <!-- MODAL CETAK KARTU SISWA -->
+  <div id="modal-card" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="cyber-card p-6 rounded-2xl max-w-sm w-full border border-cyan-500/30 space-y-4 text-center relative">
+      <button onclick="closeCardModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="font-tech text-cyan-400 font-bold text-sm">PRATINJAU KARTU PELAJAR</h3>
+
+      <!-- CONTAINER AREA KARTU POTRAIT -->
+      <div class="flex justify-center">
+        <div id="print-area">
+          <div class="id-card-potrait">
+            <!-- Header Logos & Title -->
+            <div class="text-center space-y-1">
+              <div class="flex justify-center items-center gap-1.5 border-b border-cyan-500/30 pb-1">
+                <img src="logo-karawang.png" class="h-4 w-auto">
+                <img src="logo-disdik.png" class="h-4 w-auto">
+                <img src="logo-sekolah.jpg" class="h-4 w-auto">
+              </div>
+              <p class="font-tech text-[7px] text-cyan-400 tracking-tighter">KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA</p>
+            </div>
+
+            <!-- Foto Siswa -->
+            <div class="flex justify-center my-1">
+              <div class="w-16 h-20 border border-cyan-400 rounded bg-slate-900 flex items-center justify-center overflow-hidden">
+                <img id="card-photo" src="" class="w-full h-full object-cover hidden">
+                <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-2xl"></i>
+              </div>
+            </div>
+
+            <!-- Detail Data Siswa -->
+            <div class="text-center space-y-0.5 text-[9px]">
+              <p class="text-cyan-400 font-semibold uppercase leading-tight" id="card-name">-</p>
+              <p class="text-slate-300 font-tech">NIS: <span id="card-nis">-</span></p>
+              <p class="text-slate-400" id="card-jk">-</p>
+            </div>
+
+            <!-- QR Code Murni -->
+            <div class="flex flex-col items-center mt-1">
+              <div id="card-qrcode" class="bg-white p-1 rounded border border-cyan-400"></div>
+              <p class="text-[6px] font-tech text-cyan-400 mt-1">SCAN UNTUK ABSENSI</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Upload Foto & Button Cetak -->
+      <div class="space-y-2 pt-2 border-t border-slate-800">
+        <input type="file" id="input-foto" accept="image/*" onchange="previewUploadedPhoto(event)" class="text-xs text-slate-400 w-full file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-slate-800 file:text-cyan-400 hover:file:bg-slate-700">
+        
+        <div class="flex gap-2">
+          <button onclick="savePhotoToSystem()" class="flex-1 bg-cyan-800 hover:bg-cyan-700 text-white font-semibold text-xs py-2 rounded-lg transition">
+            Simpan Foto
+          </button>
+          <button onclick="window.print()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-tech font-bold text-xs py-2 rounded-lg transition">
+            <i class="fa-solid fa-print"></i> Cetak Kartu
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script>
-    // URL Deployment Google Apps Script Anda
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxPDJzBTk8IDjIH6DnR00CVTkNmY3x5SmNmelyB0ZOpq6g8Lrn5HhKIOgvC3KzjAu7o/exec";
 
     let html5QrCode = null;
-    let currentCameraFacingMode = "environment"; // Kamera belakang default
+    let currentCameraFacingMode = "environment";
     let globalDataSiswa = [];
+    let selectedStudentForCard = null;
 
-    // Init Application
     window.onload = function() {
       startClock();
       loadDashboardData();
@@ -278,7 +359,6 @@
       }, 1000);
     }
 
-    // Switch Navigation Tab
     function switchTab(tab) {
       const tabs = ['dashboard', 'siswa', 'absensi', 'laporan'];
       tabs.forEach(t => {
@@ -292,17 +372,13 @@
       document.getElementById(`nav-${tab}`).classList.remove('text-slate-400');
       document.getElementById(`page-title`).innerText = tab.toUpperCase() + " OVERVIEW";
 
-      if (tab === 'absensi') {
-        initQRScanner();
-      } else {
-        stopQRScanner();
-      }
+      if (tab === 'absensi') initQRScanner();
+      else stopQRScanner();
 
       if (tab === 'laporan') loadDataLaporan();
       if (tab === 'dashboard') loadDashboardData();
     }
 
-    // Load Data Dashboard
     function loadDashboardData() {
       fetch(`${GAS_API_URL}?action=getDashboard`)
         .then(res => res.json())
@@ -316,7 +392,6 @@
         });
     }
 
-    // Load Data Siswa
     function loadDataSiswa() {
       fetch(`${GAS_API_URL}?action=getSiswa`)
         .then(res => res.json())
@@ -331,15 +406,21 @@
 
     function renderSiswaTable(data) {
       let html = '';
-      data.forEach(r => {
+      data.forEach((r, idx) => {
+        const jk = r[3] || 'L/P';
         html += `<tr class="hover:bg-slate-900/50">
           <td class="p-4 font-tech text-cyan-400">${r[0]}</td>
           <td class="p-4 font-semibold text-white">${r[1]}</td>
           <td class="p-4">${r[2]}</td>
-          <td class="p-4 text-slate-400">${r[4]}</td>
+          <td class="p-4 text-slate-400">${jk}</td>
+          <td class="p-4">
+            <button onclick="openCardModal(${idx})" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-400 border border-cyan-800 text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-address-card"></i> Kartu Pelajar
+            </button>
+          </td>
         </tr>`;
       });
-      document.getElementById('tb-siswa').innerHTML = html || '<tr><td colspan="4" class="text-center p-4">Kosong</td></tr>';
+      document.getElementById('tb-siswa').innerHTML = html || '<tr><td colspan="5" class="text-center p-4">Kosong</td></tr>';
     }
 
     function filterSiswaTable() {
@@ -373,7 +454,85 @@
       });
     }
 
-    // Submit Absensi (QR Code & Manual)
+    // MODAL & GENERATE KARTU PELAJAR
+    function openCardModal(idx) {
+      selectedStudentForCard = globalDataSiswa[idx];
+      const nis = selectedStudentForCard[0];
+      const nama = selectedStudentForCard[1];
+      const jk = selectedStudentForCard[3] || 'Laki-Laki';
+      const fotoUrl = selectedStudentForCard[5] || '';
+
+      document.getElementById('card-name').innerText = nama;
+      document.getElementById('card-nis').innerText = nis;
+      document.getElementById('card-jk').innerText = jk;
+
+      const imgEl = document.getElementById('card-photo');
+      const placeholderEl = document.getElementById('card-photo-placeholder');
+
+      if (fotoUrl) {
+        imgEl.src = fotoUrl;
+        imgEl.classList.remove('hidden');
+        placeholderEl.classList.add('hidden');
+      } else {
+        imgEl.classList.add('hidden');
+        placeholderEl.classList.remove('hidden');
+      }
+
+      // Generate QR Code Murni (Ukuran 65x65 px)
+      document.getElementById('card-qrcode').innerHTML = '';
+      new QRCode(document.getElementById('card-qrcode'), {
+        text: nis.toString(),
+        width: 65,
+        height: 65,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+
+      document.getElementById('modal-card').classList.remove('hidden');
+    }
+
+    function closeCardModal() {
+      document.getElementById('modal-card').classList.add('hidden');
+    }
+
+    function previewUploadedPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgEl = document.getElementById('card-photo');
+          imgEl.src = e.target.result;
+          imgEl.classList.remove('hidden');
+          document.getElementById('card-photo-placeholder').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function savePhotoToSystem() {
+      const imgEl = document.getElementById('card-photo');
+      if (imgEl.classList.contains('hidden') || !imgEl.src) {
+        alert("Pilih file foto terlebih dahulu!");
+        return;
+      }
+
+      fetch(GAS_API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "updateFotoSiswa",
+          nis: selectedStudentForCard[0],
+          fotoData: imgEl.src
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert(res.message);
+        if (res.status === 'success') loadDataSiswa();
+      });
+    }
+
+    // Submit Absensi
     function submitAbsen(nis, status = "Hadir") {
       fetch(GAS_API_URL, {
         method: "POST",
@@ -389,7 +548,6 @@
     function submitAbsenManual() {
       const nis = document.getElementById('select-siswa').value;
       const status = document.getElementById('select-status').value;
-      
       if (!nis) {
         alert("Pilih siswa terlebih dahulu!");
         return;
@@ -397,10 +555,9 @@
       submitAbsen(nis, status);
     }
 
-    // QR Code Scanner Module
+    // Scanner QR Code
     function initQRScanner() {
       if (html5QrCode) stopQRScanner();
-
       html5QrCode = new Html5Qrcode("reader");
       const config = { fps: 10, qrbox: { width: 220, height: 220 } };
 
@@ -408,16 +565,12 @@
         { facingMode: currentCameraFacingMode }, 
         config, 
         onScanSuccess
-      ).catch(err => {
-        console.error("Kamera error: ", err);
-      });
+      ).catch(err => console.error(err));
     }
 
     function stopQRScanner() {
       if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => {
-          html5QrCode.clear();
-        });
+        html5QrCode.stop().then(() => html5QrCode.clear());
       }
     }
 
@@ -432,7 +585,6 @@
       setTimeout(() => initQRScanner(), 3000);
     }
 
-    // Laporan
     function loadDataLaporan() {
       fetch(`${GAS_API_URL}?action=getLaporan`)
         .then(res => res.json())
