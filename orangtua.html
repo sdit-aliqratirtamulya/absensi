@@ -33,131 +33,151 @@
     }
 
     /* KARTU PELAJAR EXACT MATCH DESIGN WITH FIXED BORDER */
-    .id-card-potrait-exact {
-      width: 53.9mm !important;
-      height: 85.6mm !important;
-      position: relative !important;
-      background-image: url('bg-kartu-potrait.png') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      border: 2px solid #06b6d4 !important;
-      outline: 1px solid #080c14 !important;
-      border-radius: 10px !important;
-      box-sizing: border-box !important;
-      overflow: hidden !important;
-      font-family: 'Rajdhani', sans-serif !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
+/* DESIGN KARTU PELAJAR MODERN & ELEGAN (CR80 STANDARD) */
+.id-card-potrait-exact {
+  width: 53.9mm !important;
+  height: 85.6mm !important;
+  position: relative !important;
+  background: linear-gradient(135deg, #0b1329 0%, #030712 60%, #0284c7 100%) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.5) !important;
+  border-radius: 12px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  color: #ffffff !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
 
-    .card-header-logos {
-      position: absolute;
-      top: 8px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-    }
+/* Ornamen Background Grid & Subtle Glow */
+.id-card-potrait-exact::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(14, 165, 233, 0.15), transparent 70%);
+  pointer-events: none;
+}
 
-    .card-header-logos img {
-      height: 24px !important;
-      width: auto;
-      object-fit: contain;
-    }
+/* Header Container */
+.card-header-logos {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
 
-    .card-title-box {
-      position: absolute;
-      top: 36px;
-      left: 10px;
-      right: 10px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid #06b6d4;
-      border-radius: 4px;
-      color: #38bdf8;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 7.5px !important;
-      font-weight: 800 !important;
-      text-align: center;
-      padding: 3px 0;
-      letter-spacing: 0.5px;
-    }
+.card-header-logos img {
+  height: 22px !important;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
 
-    .card-photo-box {
-      position: absolute;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 20mm;
-      height: 25mm;
-      border: 2px solid #38bdf8;
-      border-radius: 6px;
-      background-color: #1e293b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
+/* Judul Kartu Minimalis Modern */
+.card-title-box {
+  position: absolute;
+  top: 35px;
+  left: 8px;
+  right: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 6px;
+  color: #38bdf8;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 7px !important;
+  font-weight: 800 !important;
+  text-align: center;
+  padding: 2.5px 0;
+  letter-spacing: 0.8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
 
-    .card-info-box {
-      position: absolute;
-      top: 120px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      color: #38bdf8;
-    }
+/* Foto Siswa Frame Glow */
+.card-photo-box {
+  position: absolute;
+  top: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22mm;
+  height: 27mm;
+  border: 2px solid #38bdf8;
+  border-radius: 8px;
+  background-color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
 
-    .card-info-box .info-group {
-      margin-bottom: 3px;
-    }
+/* Informasi Siswa Clean & Bold */
+.card-info-box {
+  position: absolute;
+  top: 124px;
+  left: 6px;
+  right: 6px;
+  text-align: center;
+}
 
-    .card-info-box .label {
-      display: block;
-      font-size: 8px !important;
-      color: #38bdf8;
-      font-weight: 800 !important;
-      letter-spacing: 0.5px;
-    }
+.card-info-box .info-group {
+  margin-bottom: 2px;
+}
 
-    .card-info-box .value {
-      display: block;
-      font-size: 10px !important;
-      color: #ffffff;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 800 !important;
-      text-transform: uppercase;
-    }
+.card-info-box .label {
+  display: block;
+  font-size: 7.5px !important;
+  color: #94a3b8;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+}
 
-    .card-qr-box {
-      position: absolute;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 3px;
-      background: #ffffff;
-      border: 2px solid #38bdf8;
-      border-radius: 6px;
-    }
+.card-info-box .value {
+  display: block;
+  font-size: 9.5px !important;
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
 
-    .qr-container canvas, .qr-container img {
-      width: 23mm !important;
-      height: 23mm !important;
-    }
+/* Modern Rounded QR Box */
+.card-qr-box {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px;
+  background: #ffffff;
+  border: 1.5px solid #0284c7;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
 
-    .card-footer-text {
-      position: absolute;
-      bottom: 7px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 7.5px !important;
-      font-weight: 800 !important;
-      color: #38bdf8;
-      letter-spacing: 1px;
-    }
+.qr-container canvas, .qr-container img {
+  width: 21mm !important;
+  height: 21mm !important;
+}
+
+/* Footer Tagline */
+.card-footer-text {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 7px !important;
+  font-weight: 800 !important;
+  color: #38bdf8;
+  letter-spacing: 1.2px;
+}
 
     /* PRINT MEDIA OVERRIDE */
     @media print {
@@ -279,52 +299,58 @@
 
       <h3 class="font-tech text-cyan-400 font-bold text-sm">PRATINJAU KARTU PELAJAR</h3>
 
-      <!-- CONTAINER PRINT AREA KARTU POTRAIT -->
-      <div class="flex justify-center">
-        <div id="print-area">
-          <div class="id-card-potrait-exact">
-            
-            <div class="card-header-logos">
-              <img src="logo-karawang.png">
-              <img src="logo-disdik.png">
-              <img src="logo-sekolah.png">
-            </div>
+<!-- CONTAINER PRINT AREA KARTU POTRAIT MODERN -->
+<div class="flex justify-center">
+  <div id="print-area">
+    <div class="id-card-potrait-exact">
+      
+      <!-- Logo Instansi Header -->
+      <div class="card-header-logos">
+        <img src="logo-karawang.png" alt="Karawang">
+        <img src="logo-disdik.png" alt="Disdik">
+        <img src="logo-sekolah.png" alt="Sekolah">
+      </div>
 
-            <div class="card-title-box">
-              KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA
-            </div>
+      <!-- Header Title -->
+      <div class="card-title-box">
+        SDIT AL-IQRA TIRTAMULYA
+      </div>
 
-            <div class="card-photo-box">
-              <img id="card-photo" src="" class="w-full h-full object-cover hidden">
-              <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-3xl"></i>
-            </div>
+      <!-- Foto Siswa -->
+      <div class="card-photo-box">
+        <img id="card-photo" src="" class="w-full h-full object-cover hidden">
+        <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-500 text-3xl"></i>
+      </div>
 
-            <div class="card-info-box">
-              <div class="info-group">
-                <span class="label">NAMA:</span>
-                <span class="value" id="card-name">-</span>
-              </div>
-              <div class="info-group">
-                <span class="label">NIS:</span>
-                <span class="value" id="card-nis">-</span>
-              </div>
-              <div class="info-group">
-                <span class="label">JENIS KELAMIN:</span>
-                <span class="value" id="card-jk">-</span>
-              </div>
-            </div>
-
-            <div class="card-qr-box">
-              <div id="card-qrcode" class="qr-container"></div>
-            </div>
-
-            <div class="card-footer-text">
-              SCAN UNTUK ABSENSI
-            </div>
-
-          </div>
+      <!-- Data Diri Siswa -->
+      <div class="card-info-box">
+        <div class="info-group">
+          <span class="label">NAMA SISWA</span>
+          <span class="value" id="card-name">-</span>
+        </div>
+        <div class="info-group">
+          <span class="label">NIS</span>
+          <span class="value" id="card-nis">-</span>
+        </div>
+        <div class="info-group">
+          <span class="label">JENIS KELAMIN</span>
+          <span class="value" id="card-jk">-</span>
         </div>
       </div>
+
+      <!-- Area QR Code -->
+      <div class="card-qr-box">
+        <div id="card-qrcode" class="qr-container"></div>
+      </div>
+
+      <!-- Footer text -->
+      <div class="card-footer-text">
+        KARTU PRESENSI DIGITAL
+      </div>
+
+    </div>
+  </div>
+</div>
 
       <!-- FORM UPLOAD FOTO & TOMBOL CETAK -->
       <div class="space-y-3 pt-2 border-t border-slate-800 text-left">
