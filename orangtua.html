@@ -51,22 +51,130 @@
       }
     }
 
-    /* Standar Kartu Potrait CR80 */
-    .id-card-potrait {
-      width: 53.9mm;
-      height: 85.6mm;
-      background: #0f172a;
-      border: 2px solid #06b6d4;
-      border-radius: 8px;
-      padding: 8px;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
+/* KARTU PELAJAR EXACT MATCH DESIGN */
+.id-card-potrait-exact {
+  width: 53.9mm !important;
+  height: 85.6mm !important;
+  position: relative !important;
+  background-image: url('bg-kartu-potrait.png') !important; /* Menggunakan Background Hasil Desain */
+  background-size: cover !important;
+  background-position: center !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Header Logo Placement */
+.card-header-logos {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Title Box Placement */
+.card-title-box {
+  position: absolute;
+  top: 36px;
+  left: 12px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #06b6d4;
+  border-radius: 4px;
+  color: #38bdf8;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 6px;
+  font-weight: 700;
+  text-align: center;
+  padding: 3px 0;
+  letter-spacing: 0.5px;
+}
+
+/* Photo Box Placement */
+.card-photo-box {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20mm;
+  height: 25mm;
+  border: 2px solid #38bdf8;
+  border-radius: 6px;
+  background-color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Info Box Placement */
+.card-info-box {
+  position: absolute;
+  top: 122px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #38bdf8;
+}
+
+.card-info-box .info-group {
+  margin-bottom: 2px;
+}
+
+.card-info-box .label {
+  display: block;
+  font-size: 6.5px;
+  color: #38bdf8;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.card-info-box .value {
+  display: block;
+  font-size: 8.5px;
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* QR Code Box Placement */
+.card-qr-box {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px;
+  background: #ffffff;
+  border: 2px solid #38bdf8;
+  border-radius: 6px;
+}
+
+.qr-container canvas, .qr-container img {
+  width: 24mm !important;
+  height: 24mm !important;
+}
+
+/* Footer Text Placement */
+.card-footer-text {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 6.5px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 1px;
+}
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-4 md:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
