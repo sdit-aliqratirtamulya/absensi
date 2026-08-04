@@ -283,43 +283,59 @@
 
       <h3 class="font-tech text-cyan-400 font-bold text-sm">PRATINJAU KARTU PELAJAR</h3>
 
-      <!-- CONTAINER AREA KARTU POTRAIT -->
-      <div class="flex justify-center">
-        <div id="print-area">
-          <div class="id-card-potrait">
-            <!-- Header Logos & Title -->
-            <div class="text-center space-y-1">
-              <div class="flex justify-center items-center gap-1.5 border-b border-cyan-500/30 pb-1">
-                <img src="logo-karawang.png" class="h-4 w-auto">
-                <img src="logo-disdik.png" class="h-4 w-auto">
-                <img src="logo-sekolah.png" class="h-4 w-auto">
-              </div>
-              <p class="font-tech text-[7px] text-cyan-400 tracking-tighter">KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA</p>
-            </div>
+<!-- CONTAINER PRINT AREA KARTU POTRAIT -->
+<div class="flex justify-center">
+  <div id="print-area">
+    <!-- Template Background Wrapper -->
+    <div class="id-card-potrait-exact">
+      
+      <!-- 1. HEADER LOGO -->
+      <div class="card-header-logos">
+        <img src="logo-karawang.png" class="h-5 w-auto">
+        <img src="logo-disdik.png" class="h-5 w-auto">
+        <img src="logo-sekolah.png" class="h-5 w-auto">
+      </div>
 
-            <!-- Foto Siswa -->
-            <div class="flex justify-center my-1">
-              <div class="w-16 h-20 border border-cyan-400 rounded bg-slate-900 flex items-center justify-center overflow-hidden">
-                <img id="card-photo" src="" class="w-full h-full object-cover hidden">
-                <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-2xl"></i>
-              </div>
-            </div>
+      <!-- 2. JUDUL KARTU -->
+      <div class="card-title-box">
+        KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA
+      </div>
 
-            <!-- Detail Data Siswa -->
-            <div class="text-center space-y-0.5 text-[9px]">
-              <p class="text-cyan-400 font-semibold uppercase leading-tight" id="card-name">-</p>
-              <p class="text-slate-300 font-tech">NIS: <span id="card-nis">-</span></p>
-              <p class="text-slate-400" id="card-jk">-</p>
-            </div>
+      <!-- 3. FOTO SISWA -->
+      <div class="card-photo-box">
+        <img id="card-photo" src="" class="w-full h-full object-cover hidden">
+        <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-3xl"></i>
+      </div>
 
-            <!-- QR Code Murni -->
-            <div class="flex flex-col items-center mt-1">
-              <div id="card-qrcode" class="bg-white p-1 rounded border border-cyan-400"></div>
-              <p class="text-[6px] font-tech text-cyan-400 mt-1">SCAN UNTUK ABSENSI</p>
-            </div>
-          </div>
+      <!-- 4. INFORMASI SISWA -->
+      <div class="card-info-box">
+        <div class="info-group">
+          <span class="label">NAMA:</span>
+          <span class="value" id="card-name">[PLACEHOLDER SISWA]</span>
+        </div>
+        <div class="info-group">
+          <span class="label">NIS:</span>
+          <span class="value" id="card-nis">[PLACEHOLDER]</span>
+        </div>
+        <div class="info-group">
+          <span class="label">JENIS KELAMIN:</span>
+          <span class="value" id="card-jk">[L/P]</span>
         </div>
       </div>
+
+      <!-- 5. AREA QR CODE -->
+      <div class="card-qr-box">
+        <div id="card-qrcode" class="qr-container"></div>
+      </div>
+
+      <!-- 6. FOOTER TEXT -->
+      <div class="card-footer-text">
+        SCAN UNTUK ABSENSI
+      </div>
+
+    </div>
+  </div>
+</div>
 
       <!-- Form Upload Foto & Button Cetak -->
       <div class="space-y-2 pt-2 border-t border-slate-800">
