@@ -52,135 +52,22 @@
     }
 
    /* KARTU PELAJAR EXACT MATCH DESIGN */
-.id-card-potrait-exact {
-  width: 53.9mm !important;
-  height: 85.6mm !important;
-  position: relative !important;
-  background-image: url('bg-kartu-potrait.png') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  font-family: 'Rajdhani', sans-serif !important;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-/* 1. Header Logo (Diperbesar) */
-.card-header-logos {
-  position: absolute;
-  top: 8px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.card-header-logos img {
-  height: 24px !important; /* Diperbesar dari sebelumnya 20px */
-  width: auto;
-  object-fit: contain;
-}
-
-/* 2. Judul Kartu (Font Diperbesar & Tebal) */
-.card-title-box {
-  position: absolute;
-  top: 36px;
-  left: 10px;
-  right: 10px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid #06b6d4;
-  border-radius: 4px;
-  color: #38bdf8;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 7.5px !important; /* Diperbesar */
-  font-weight: 800 !important; /* Extra Bold */
-  text-align: center;
-  padding: 3px 0;
-  letter-spacing: 0.5px;
-}
-
-/* 3. Foto Siswa Box */
-.card-photo-box {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20mm;
-  height: 25mm;
-  border: 2px solid #38bdf8;
-  border-radius: 6px;
-  background-color: #1e293b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* 4. Informasi Siswa (Font Diperbesar & Serba Tebal) */
-.card-info-box {
-  position: absolute;
-  top: 120px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #38bdf8;
-}
-
-.card-info-box .info-group {
-  margin-bottom: 3px;
-}
-
-.card-info-box .label {
-  display: block;
-  font-size: 8px !important; /* Diperbesar */
-  color: #38bdf8;
-  font-weight: 800 !important; /* Bold */
-  letter-spacing: 0.5px;
-}
-
-.card-info-box .value {
-  display: block;
-  font-size: 10px !important; /* Diperbesar */
-  color: #ffffff;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 800 !important; /* Bold */
-  text-transform: uppercase;
-}
-
-/* 5. QR Code Box */
-.card-qr-box {
-  position: absolute;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 3px;
-  background: #ffffff;
-  border: 2px solid #38bdf8;
-  border-radius: 6px;
-}
-
-.qr-container canvas, .qr-container img {
-  width: 23mm !important;
-  height: 23mm !important;
-}
-
-/* 6. Footer Text (Font Diperbesar & Tebal) */
-.card-footer-text {
-  position: absolute;
-  bottom: 7px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 7.5px !important; /* Diperbesar */
-  font-weight: 800 !important; /* Extra Bold */
-  color: #38bdf8;
-  letter-spacing: 1px;
-}
+/* Standar Kartu Potrait CR80 */
+    .id-card-potrait {
+      width: 53.9mm;
+      height: 85.6mm;
+      background: #0f172a;
+      border: 2px solid #06b6d4;
+      border-radius: 8px;
+      padding: 8px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-4 md:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
