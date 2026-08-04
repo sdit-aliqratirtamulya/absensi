@@ -51,130 +51,22 @@
       }
     }
 
-/* KARTU PELAJAR EXACT MATCH DESIGN */
-.id-card-potrait-exact {
-  width: 53.9mm !important;
-  height: 85.6mm !important;
-  position: relative !important;
-  background-image: url('bg-kartu-potrait.png') !important; /* Menggunakan Background Hasil Desain */
-  background-size: cover !important;
-  background-position: center !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  font-family: 'Rajdhani', sans-serif !important;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-/* Header Logo Placement */
-.card-header-logos {
-  position: absolute;
-  top: 10px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Title Box Placement */
-.card-title-box {
-  position: absolute;
-  top: 36px;
-  left: 12px;
-  right: 12px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid #06b6d4;
-  border-radius: 4px;
-  color: #38bdf8;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 6px;
-  font-weight: 700;
-  text-align: center;
-  padding: 3px 0;
-  letter-spacing: 0.5px;
-}
-
-/* Photo Box Placement */
-.card-photo-box {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20mm;
-  height: 25mm;
-  border: 2px solid #38bdf8;
-  border-radius: 6px;
-  background-color: #1e293b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Info Box Placement */
-.card-info-box {
-  position: absolute;
-  top: 122px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #38bdf8;
-}
-
-.card-info-box .info-group {
-  margin-bottom: 2px;
-}
-
-.card-info-box .label {
-  display: block;
-  font-size: 6.5px;
-  color: #38bdf8;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.card-info-box .value {
-  display: block;
-  font-size: 8.5px;
-  color: #ffffff;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-/* QR Code Box Placement */
-.card-qr-box {
-  position: absolute;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 3px;
-  background: #ffffff;
-  border: 2px solid #38bdf8;
-  border-radius: 6px;
-}
-
-.qr-container canvas, .qr-container img {
-  width: 24mm !important;
-  height: 24mm !important;
-}
-
-/* Footer Text Placement */
-.card-footer-text {
-  position: absolute;
-  bottom: 8px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 6.5px;
-  font-weight: 700;
-  color: #38bdf8;
-  letter-spacing: 1px;
-}
+    /* Standar Kartu Potrait CR80 */
+    .id-card-potrait {
+      width: 53.9mm;
+      height: 85.6mm;
+      background: #0f172a;
+      border: 2px solid #06b6d4;
+      border-radius: 8px;
+      padding: 8px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-4 md:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
@@ -263,59 +155,44 @@
 
       <h3 class="font-tech text-cyan-400 font-bold text-sm">KARTU PELAJAR DIGITAL</h3>
 
-<!-- CONTAINER PRINT AREA KARTU POTRAIT -->
-<div class="flex justify-center">
-  <div id="print-area">
-    <!-- Template Background Wrapper -->
-    <div class="id-card-potrait-exact">
-      
-      <!-- 1. HEADER LOGO -->
-      <div class="card-header-logos">
-        <img src="logo-karawang.png" class="h-5 w-auto">
-        <img src="logo-disdik.png" class="h-5 w-auto">
-        <img src="logo-sekolah.png" class="h-5 w-auto">
-      </div>
+      <!-- CONTAINER PRINT AREA KARTU POTRAIT -->
+      <div class="flex justify-center">
+        <div id="print-area">
+          <div class="id-card-potrait">
+            <!-- Header Logos & Title -->
+            <div class="text-center space-y-1">
+              <div class="flex justify-center items-center gap-1.5 border-b border-cyan-500/30 pb-1">
+                <img src="logo-karawang.png" class="h-4 w-auto">
+                <img src="logo-disdik.png" class="h-4 w-auto">
+                <img src="logo-sekolah.png" class="h-4 w-auto">
+              </div>
+              <p class="font-tech text-[7px] text-cyan-400 tracking-tighter">KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA</p>
+            </div>
 
-      <!-- 2. JUDUL KARTU -->
-      <div class="card-title-box">
-        KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA
-      </div>
+            <!-- Foto Siswa -->
+            <div class="flex justify-center my-1">
+              <div class="w-16 h-20 border border-cyan-400 rounded bg-slate-900 flex items-center justify-center overflow-hidden">
+                <img id="card-photo" src="" class="w-full h-full object-cover hidden">
+                <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-2xl"></i>
+              </div>
+            </div>
 
-      <!-- 3. FOTO SISWA -->
-      <div class="card-photo-box">
-        <img id="card-photo" src="" class="w-full h-full object-cover hidden">
-        <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-3xl"></i>
-      </div>
+            <!-- Detail Data Siswa -->
+            <div class="text-center space-y-0.5 text-[9px]">
+              <p class="text-cyan-400 font-semibold uppercase leading-tight" id="card-name">-</p>
+              <p class="text-slate-300 font-tech">NIS: <span id="card-nis">-</span></p>
+              <p class="text-slate-400" id="card-jk">-</p>
+            </div>
 
-      <!-- 4. INFORMASI SISWA -->
-      <div class="card-info-box">
-        <div class="info-group">
-          <span class="label">NAMA:</span>
-          <span class="value" id="card-name">[PLACEHOLDER SISWA]</span>
-        </div>
-        <div class="info-group">
-          <span class="label">NIS:</span>
-          <span class="value" id="card-nis">[PLACEHOLDER]</span>
-        </div>
-        <div class="info-group">
-          <span class="label">JENIS KELAMIN:</span>
-          <span class="value" id="card-jk">[L/P]</span>
+            <!-- QR Code Murni -->
+            <div class="flex flex-col items-center mt-1">
+              <div id="card-qrcode" class="bg-white p-1 rounded border border-cyan-400"></div>
+              <p class="text-[6px] font-tech text-cyan-400 mt-1">SCAN UNTUK ABSENSI</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 5. AREA QR CODE -->
-      <div class="card-qr-box">
-        <div id="card-qrcode" class="qr-container"></div>
-      </div>
-
-      <!-- 6. FOOTER TEXT -->
-      <div class="card-footer-text">
-        SCAN UNTUK ABSENSI
-      </div>
-
-    </div>
-  </div>
-</div>
       <!-- FORM UPLOAD FOTO (BISA OLEH ORANG TUA JIKA BELUM DILENGKAPI) -->
       <div class="space-y-3 pt-2 border-t border-slate-800 text-left">
         <div>
