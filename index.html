@@ -40,104 +40,238 @@
       color: #06b6d4;
     }
 
-    /* KARTU PELAJAR POTRAIT PRINT STYLE */
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #print-area, #print-area * {
-        visibility: visible;
-      }
-      #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+    /* KARTU PELAJAR EXACT MATCH DESIGN */
+    .id-card-potrait-exact {
+      width: 53.9mm !important;
+      height: 85.6mm !important;
+      position: relative !important;
+      background-image: url('bg-kartu-potrait.png') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      border: 2px solid #06b6d4 !important;
+      outline: 1px solid #080c14 !important;
+      border-radius: 10px !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      font-family: 'Rajdhani', sans-serif !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
 
-/* KARTU PELAJAR EXACT MATCH DESIGN */
-.id-card-potrait {
-      width: 53.9mm;
-      height: 85.6mm;
-      background: #0f172a;
-      border: 2px solid #06b6d4;
-      border-radius: 8px;
-      padding: 8px;
-      color: #fff;
+    .card-header-logos {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      right: 0;
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      box-sizing: border-box;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-header-logos img {
+      height: 24px !important;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .card-title-box {
+      position: absolute;
+      top: 36px;
+      left: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid #06b6d4;
+      border-radius: 4px;
+      color: #38bdf8;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 7.5px !important;
+      font-weight: 800 !important;
+      text-align: center;
+      padding: 3px 0;
+      letter-spacing: 0.5px;
+    }
+
+    .card-photo-box {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20mm;
+      height: 25mm;
+      border: 2px solid #38bdf8;
+      border-radius: 6px;
+      background-color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
+    }
+
+    .card-info-box {
+      position: absolute;
+      top: 120px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #38bdf8;
+    }
+
+    .card-info-box .info-group {
+      margin-bottom: 3px;
+    }
+
+    .card-info-box .label {
+      display: block;
+      font-size: 8px !important;
+      color: #38bdf8;
+      font-weight: 800 !important;
+      letter-spacing: 0.5px;
+    }
+
+    .card-info-box .value {
+      display: block;
+      font-size: 10px !important;
+      color: #ffffff;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800 !important;
+      text-transform: uppercase;
+    }
+
+    .card-qr-box {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 3px;
+      background: #ffffff;
+      border: 2px solid #38bdf8;
+      border-radius: 6px;
+    }
+
+    .qr-container canvas, .qr-container img {
+      width: 23mm !important;
+      height: 23mm !important;
+    }
+
+    .card-footer-text {
+      position: absolute;
+      bottom: 7px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 7.5px !important;
+      font-weight: 800 !important;
+      color: #38bdf8;
+      letter-spacing: 1px;
+    }
+
+    /* PRINT MEDIA OVERRIDE */
+    @media print {
+      @page {
+        size: portrait;
+        margin: 0;
+      }
+
+      body * {
+        visibility: hidden !important;
+        background: none !important;
+      }
+
+      #print-area, #print-area * {
+        visibility: visible !important;
+      }
+
+      #print-area {
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: auto !important;
+        height: auto !important;
+      }
+
+      .id-card-potrait-exact {
+        border: 2.5px solid #06b6d4 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
     }
   </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex flex-col h-screen overflow-hidden">
 
-  <!-- SIDEBAR -->
-  <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-50">
-    <div>
-      <!-- Header Logos -->
-      <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-center gap-2">
-        <img src="logo-karawang.png" alt="Karawang" class="h-8 w-auto object-contain">
-        <img src="logo-disdik.png" alt="Disdik" class="h-8 w-auto object-contain">
-        <img src="logo-sekolah.png" alt="Sekolah" class="h-8 w-auto object-contain">
-      </div>
+  <!-- TOP HEADER -->
+  <header class="p-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/60 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <!-- TOMBOL TOGGLE SIDEBAR (HIDE/SHOW) -->
+      <button onclick="toggleSidebar()" class="bg-slate-900 hover:bg-slate-800 text-cyan-400 border border-slate-700 p-2 rounded-xl transition flex items-center justify-center">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
 
-      <div class="p-4 text-center">
-        <h1 class="font-tech text-base font-bold text-cyan-400">SDIT AL-IQRA</h1>
-        <p class="text-[10px] text-slate-400">Cyber Attendance System</p>
-      </div>
-
-      <!-- Navigation -->
-      <nav class="mt-2 space-y-1">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-active w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold hover:text-cyan-400 transition">
-          <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i> Dashboard
-        </button>
-        <button onclick="switchTab('siswa')" id="nav-siswa" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
-          <i class="fa-solid fa-users w-5 text-center text-lg"></i> Data Siswa
-        </button>
-        <button onclick="switchTab('absensi')" id="nav-absensi" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
-          <i class="fa-solid fa-qrcode w-5 text-center text-lg"></i> Absensi
-        </button>
-        <button onclick="switchTab('laporan')" id="nav-laporan" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
-          <i class="fa-solid fa-file-invoice w-5 text-center text-lg"></i> Laporan
-        </button>
-      </nav>
-    </div>
-
-    <!-- Status Server Footer -->
-    <div class="p-4 border-t border-slate-800/80 bg-slate-900/30">
-      <div class="flex items-center gap-2">
-        <span class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
-        </span>
-        <span class="text-xs font-tech text-slate-400">SYSTEM ONLINE</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT AREA -->
-  <main class="flex-1 flex flex-col overflow-y-auto relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
-
-    <!-- TOP HEADER -->
-    <header class="p-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40 backdrop-blur sticky top-0 z-40">
       <div>
-        <h2 id="page-title" class="font-tech text-xl font-bold text-white tracking-wide">DASHBOARD OVERVIEW</h2>
-        <p class="text-xs text-slate-400">Sistem Presensi SDIT Al-Iqra Tirtamulya</p>
+        <h2 id="page-title" class="font-tech text-base md:text-xl font-bold text-white tracking-wide">DASHBOARD OVERVIEW</h2>
+        <p class="text-[10px] md:text-xs text-slate-400">Sistem Presensi SDIT Al-Iqra Tirtamulya</p>
       </div>
-      <div id="clock" class="font-tech text-sm text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-3 py-1.5 rounded">
-        00:00:00 WIB
-      </div>
-    </header>
+    </div>
 
-    <div class="p-6 space-y-6">
+    <div id="clock" class="font-tech text-xs md:text-sm text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-3 py-1.5 rounded">
+      00:00:00 WIB
+    </div>
+  </header>
+
+  <!-- OVERLAY BACKGROUND UNTUK SLIDE SIDEBAR HP -->
+  <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+  <div class="flex flex-1 relative overflow-hidden">
+
+    <!-- SIDEBAR MENU -->
+    <aside id="sidebar-menu" class="fixed lg:static top-0 left-0 h-full w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out z-50 transform -translate-x-full lg:translate-x-0 shrink-0">
+      <div>
+        <!-- Header Logos Sidebar -->
+        <div class="p-4 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-center gap-2">
+          <img src="logo-karawang.png" alt="Karawang" class="h-8 w-auto object-contain">
+          <img src="logo-disdik.png" alt="Disdik" class="h-8 w-auto object-contain">
+          <img src="logo-sekolah.png" alt="Sekolah" class="h-8 w-auto object-contain">
+        </div>
+
+        <div class="p-4 text-center">
+          <h1 class="font-tech text-base font-bold text-cyan-400">SDIT AL-IQRA</h1>
+          <p class="text-[10px] text-slate-400">Cyber Attendance System</p>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="mt-2 space-y-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-active w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold transition">
+            <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i> Dashboard
+          </button>
+          <button onclick="switchTab('siswa')" id="nav-siswa" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
+            <i class="fa-solid fa-users w-5 text-center text-lg"></i> Data Siswa
+          </button>
+          <button onclick="switchTab('absensi')" id="nav-absensi" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
+            <i class="fa-solid fa-qrcode w-5 text-center text-lg"></i> Absensi
+          </button>
+          <button onclick="switchTab('laporan')" id="nav-laporan" class="w-full flex items-center gap-4 px-6 py-3.5 text-left text-sm font-semibold text-slate-400 hover:text-cyan-400 transition">
+            <i class="fa-solid fa-file-invoice w-5 text-center text-lg"></i> Laporan
+          </button>
+        </nav>
+      </div>
+
+      <!-- Status Server Footer -->
+      <div class="p-4 border-t border-slate-800/80 bg-slate-900/30">
+        <div class="flex items-center gap-2">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+          </span>
+          <span class="text-xs font-tech text-slate-400">SYSTEM ONLINE</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col overflow-y-auto relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black p-4 md:p-6 space-y-6">
 
       <!-- SECTION: DASHBOARD -->
       <section id="sec-dashboard" class="space-y-6">
@@ -164,13 +298,13 @@
       <!-- SECTION: DATA SISWA -->
       <section id="sec-siswa" class="hidden space-y-4">
         <div class="cyber-card p-4 rounded-xl flex justify-between items-center">
-          <input type="text" id="search-siswa" onkeyup="filterSiswaTable()" placeholder="Cari NIS atau Nama Siswa..." class="bg-slate-900 border border-slate-700 text-sm rounded-lg px-4 py-2 w-72 focus:outline-none focus:border-cyan-500 text-white">
-          <button onclick="loadDataSiswa()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">
-            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Data
+          <input type="text" id="search-siswa" onkeyup="filterSiswaTable()" placeholder="Cari NIS atau Nama..." class="bg-slate-900 border border-slate-700 text-sm rounded-lg px-4 py-2 w-full md:w-72 focus:outline-none focus:border-cyan-500 text-white">
+          <button onclick="loadDataSiswa()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition ml-2 shrink-0">
+            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
           </button>
         </div>
 
-        <div class="cyber-card rounded-xl overflow-hidden">
+        <div class="cyber-card rounded-xl overflow-x-auto">
           <table class="w-full text-left text-sm text-slate-300">
             <thead class="bg-slate-900/80 text-cyan-400 font-tech uppercase text-xs border-b border-slate-800">
               <tr>
@@ -188,40 +322,34 @@
         </div>
       </section>
 
-     <!-- SECTION: ABSENSI -->
-<section id="sec-absensi" class="hidden space-y-6">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- SECTION: ABSENSI -->
+      <section id="sec-absensi" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-    <!-- QR SCANNER -->
-    <div class="cyber-card p-5 rounded-xl space-y-4">
-      <div class="flex flex-wrap justify-between items-center gap-2">
-        <h3 class="font-tech text-cyan-400 font-bold">SCANNER QR CODE</h3>
-        
-        <!-- Group Tombol Kontrol Kamera -->
-        <div class="flex items-center gap-2">
-          <!-- Tombol Switch Kamera -->
-          <button onclick="switchCamera()" class="bg-slate-800 hover:bg-slate-700 text-xs text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-            <i class="fa-solid fa-camera-rotate"></i>
-            <span>Switch</span>
-          </button>
-          
-          <!-- Tombol On/Off Kamera -->
-          <button id="btn-toggle-cam" onclick="toggleCamera()" class="bg-rose-950 hover:bg-rose-900 text-xs text-rose-400 border border-rose-800 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-            <i class="fa-solid fa-video-slash" id="icon-toggle-cam"></i>
-            <span id="text-toggle-cam">Matikan Kamera</span>
-          </button>
-        </div>
-      </div>
-      
-      <!-- Area Viewfinder Kamera -->
-      <div id="reader" class="bg-black rounded-lg overflow-hidden border border-slate-800 relative min-h-[250px] flex items-center justify-center"></div>
-      <p class="text-xs text-slate-400 text-center">Arahkan Kartu QR Siswa ke area kamera.</p>
-    </div>
+          <!-- QR SCANNER -->
+          <div class="cyber-card p-5 rounded-xl space-y-4">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <h3 class="font-tech text-cyan-400 font-bold">SCANNER QR CODE</h3>
+              
+              <!-- TOMBOL SWITCH & ON/OFF KAMERA -->
+              <div class="flex items-center gap-2">
+                <button onclick="switchCamera()" class="bg-slate-800 hover:bg-slate-700 text-xs text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-camera-rotate"></i> Switch
+                </button>
+                <button id="btn-toggle-cam" onclick="toggleCamera()" class="bg-rose-950 hover:bg-rose-900 text-xs text-rose-400 border border-rose-800 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-video-slash" id="icon-toggle-cam"></i>
+                  <span id="text-toggle-cam">Matikan Kamera</span>
+                </button>
+              </div>
+            </div>
+            
+            <div id="reader" class="bg-black rounded-lg overflow-hidden border border-slate-800 relative min-h-[250px]"></div>
+            <p class="text-xs text-slate-400 text-center">Arahkan Kartu QR Siswa ke area kamera.</p>
+          </div>
 
           <!-- MANUAL ABSENSI -->
           <div class="cyber-card p-5 rounded-xl space-y-4">
             <h3 class="font-tech text-cyan-400 font-bold">ABSENSI MANUAL</h3>
-            
             <div class="space-y-3">
               <div>
                 <label class="text-xs text-slate-400">Filter Kelas</label>
@@ -261,11 +389,11 @@
         <div class="cyber-card p-4 rounded-xl flex justify-between items-center">
           <h3 class="font-tech text-cyan-400 font-bold">LOG PRESENSI SISWA</h3>
           <button onclick="loadDataLaporan()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">
-            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Laporan
+            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
           </button>
         </div>
 
-        <div class="cyber-card rounded-xl overflow-hidden">
+        <div class="cyber-card rounded-xl overflow-x-auto">
           <table class="w-full text-left text-sm text-slate-300">
             <thead class="bg-slate-900/80 text-cyan-400 font-tech uppercase text-xs border-b border-slate-800">
               <tr>
@@ -284,10 +412,10 @@
         </div>
       </section>
 
-    </div>
-  </main>
+    </main>
+  </div>
 
-  <!-- MODAL CETAK KARTU SISWA -->
+  <!-- MODAL CETAK KARTU PELAJAR EXACT MATCH -->
   <div id="modal-card" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="cyber-card p-6 rounded-2xl max-w-sm w-full border border-cyan-500/30 space-y-4 text-center relative">
       <button onclick="closeCardModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
@@ -296,46 +424,55 @@
 
       <h3 class="font-tech text-cyan-400 font-bold text-sm">PRATINJAU KARTU PELAJAR</h3>
 
-      <!-- CONTAINER AREA KARTU POTRAIT -->
+      <!-- CONTAINER PRINT AREA KARTU POTRAIT -->
       <div class="flex justify-center">
         <div id="print-area">
-          <div class="id-card-potrait">
-            <!-- Header Logos & Title -->
-            <div class="text-center space-y-1">
-              <div class="flex justify-center items-center gap-1.5 border-b border-cyan-500/30 pb-1">
-                <img src="logo-karawang.png" class="h-4 w-auto">
-                <img src="logo-disdik.png" class="h-4 w-auto">
-                <img src="logo-sekolah.png" class="h-4 w-auto">
+          <div class="id-card-potrait-exact">
+            
+            <div class="card-header-logos">
+              <img src="logo-karawang.png">
+              <img src="logo-disdik.png">
+              <img src="logo-sekolah.png">
+            </div>
+
+            <div class="card-title-box">
+              KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA
+            </div>
+
+            <div class="card-photo-box">
+              <img id="card-photo" src="" class="w-full h-full object-cover hidden">
+              <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-3xl"></i>
+            </div>
+
+            <div class="card-info-box">
+              <div class="info-group">
+                <span class="label">NAMA:</span>
+                <span class="value" id="card-name">-</span>
               </div>
-              <p class="font-tech text-[7px] text-cyan-400 tracking-tighter">KARTU PELAJAR | SDIT AL-IQRA TIRTAMULYA</p>
-            </div>
-
-            <!-- Foto Siswa -->
-            <div class="flex justify-center my-1">
-              <div class="w-16 h-20 border border-cyan-400 rounded bg-slate-900 flex items-center justify-center overflow-hidden">
-                <img id="card-photo" src="" class="w-full h-full object-cover hidden">
-                <i id="card-photo-placeholder" class="fa-solid fa-user text-slate-600 text-2xl"></i>
+              <div class="info-group">
+                <span class="label">NIS:</span>
+                <span class="value" id="card-nis">-</span>
+              </div>
+              <div class="info-group">
+                <span class="label">JENIS KELAMIN:</span>
+                <span class="value" id="card-jk">-</span>
               </div>
             </div>
 
-            <!-- Detail Data Siswa -->
-            <div class="text-center space-y-0.5 text-[9px]">
-              <p class="text-cyan-400 font-semibold uppercase leading-tight" id="card-name">-</p>
-              <p class="text-slate-300 font-tech">NIS: <span id="card-nis">-</span></p>
-              <p class="text-slate-400" id="card-jk">-</p>
+            <div class="card-qr-box">
+              <div id="card-qrcode" class="qr-container"></div>
             </div>
 
-            <!-- QR Code Murni -->
-            <div class="flex flex-col items-center mt-1">
-              <div id="card-qrcode" class="bg-white p-1 rounded border border-cyan-400"></div>
-              <p class="text-[6px] font-tech text-cyan-400 mt-1">SCAN UNTUK ABSENSI</p>
+            <div class="card-footer-text">
+              SCAN UNTUK ABSENSI
             </div>
+
           </div>
         </div>
       </div>
 
-      <!-- Form Upload Foto & Button Cetak -->
-      <div class="space-y-2 pt-2 border-t border-slate-800">
+      <!-- FORM UPLOAD FOTO & BUTTON CETAK -->
+      <div class="space-y-2 pt-2 border-t border-slate-800 text-left">
         <input type="file" id="input-foto" accept="image/*" onchange="previewUploadedPhoto(event)" class="text-xs text-slate-400 w-full file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-slate-800 file:text-cyan-400 hover:file:bg-slate-700">
         
         <div class="flex gap-2">
@@ -352,10 +489,12 @@
   </div>
 
   <script>
+    // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxPDJzBTk8IDjIH6DnR00CVTkNmY3x5SmNmelyB0ZOpq6g8Lrn5HhKIOgvC3KzjAu7o/exec";
 
     let html5QrCode = null;
     let currentCameraFacingMode = "environment";
+    let isCameraActive = false;
     let globalDataSiswa = [];
     let selectedStudentForCard = null;
 
@@ -372,6 +511,24 @@
       }, 1000);
     }
 
+    // TOGGLE SIDEBAR HIDE / SHOW
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar-menu');
+      const overlay = document.getElementById('sidebar-overlay');
+
+      if (window.innerWidth < 1024) {
+        if (sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.remove('-translate-x-full');
+          overlay.classList.remove('hidden');
+        } else {
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('hidden');
+        }
+      } else {
+        sidebar.classList.toggle('hidden');
+      }
+    }
+
     function switchTab(tab) {
       const tabs = ['dashboard', 'siswa', 'absensi', 'laporan'];
       tabs.forEach(t => {
@@ -384,6 +541,16 @@
       document.getElementById(`nav-${tab}`).classList.add('sidebar-active');
       document.getElementById(`nav-${tab}`).classList.remove('text-slate-400');
       document.getElementById(`page-title`).innerText = tab.toUpperCase() + " OVERVIEW";
+
+      // Tutup Sidebar otomatis jika di HP
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('sidebar-menu');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('hidden');
+        }
+      }
 
       if (tab === 'absensi') initQRScanner();
       else stopQRScanner();
@@ -448,7 +615,6 @@
     function populateKelasDropdown(data) {
       const selectKelas = document.getElementById('select-kelas');
       const kelasSet = [...new Set(data.map(item => item[2]))];
-      
       selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
       kelasSet.forEach(k => {
         if(k) selectKelas.innerHTML += `<option value="${k}">${k}</option>`;
@@ -458,10 +624,8 @@
     function filterManualSiswaOptions() {
       const selectedKelas = document.getElementById('select-kelas').value;
       const selectSiswa = document.getElementById('select-siswa');
-      
       selectSiswa.innerHTML = '<option value="">-- Pilih Siswa --</option>';
       const filtered = globalDataSiswa.filter(s => s[2] === selectedKelas);
-      
       filtered.forEach(s => {
         selectSiswa.innerHTML += `<option value="${s[0]}">${s[1]} (${s[0]})</option>`;
       });
@@ -491,7 +655,6 @@
         placeholderEl.classList.remove('hidden');
       }
 
-      // Generate QR Code Murni (Ukuran 65x65 px)
       document.getElementById('card-qrcode').innerHTML = '';
       new QRCode(document.getElementById('card-qrcode'), {
         text: nis.toString(),
@@ -545,7 +708,7 @@
       });
     }
 
-    // Submit Absensi
+    // ABSENSI & KAMERA SCANNER
     function submitAbsen(nis, status = "Hadir") {
       fetch(GAS_API_URL, {
         method: "POST",
@@ -568,34 +731,78 @@
       submitAbsen(nis, status);
     }
 
-    // Scanner QR Code
     function initQRScanner() {
-      if (html5QrCode) stopQRScanner();
-      html5QrCode = new Html5Qrcode("reader");
+      if (html5QrCode && html5QrCode.isScanning) {
+        stopQRScanner().then(() => startQRScanner());
+      } else {
+        startQRScanner();
+      }
+    }
+
+    function startQRScanner() {
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
       const config = { fps: 10, qrbox: { width: 220, height: 220 } };
 
       html5QrCode.start(
         { facingMode: currentCameraFacingMode }, 
         config, 
         onScanSuccess
-      ).catch(err => console.error(err));
+      ).then(() => {
+        isCameraActive = true;
+        updateCameraButtonUI(true);
+      }).catch(err => {
+        console.error(err);
+        isCameraActive = false;
+        updateCameraButtonUI(false);
+      });
     }
 
     function stopQRScanner() {
       if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => html5QrCode.clear());
+        return html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+          isCameraActive = false;
+          updateCameraButtonUI(false);
+        });
       }
+      return Promise.resolve();
+    }
+
+    function toggleCamera() {
+      if (isCameraActive) stopQRScanner();
+      else startQRScanner();
     }
 
     function switchCamera() {
       currentCameraFacingMode = (currentCameraFacingMode === "environment") ? "user" : "environment";
-      initQRScanner();
+      if (isCameraActive) initQRScanner();
+      else startQRScanner();
+    }
+
+    function updateCameraButtonUI(active) {
+      const btn = document.getElementById('btn-toggle-cam');
+      const icon = document.getElementById('icon-toggle-cam');
+      const text = document.getElementById('text-toggle-cam');
+
+      if (!btn || !icon || !text) return;
+
+      if (active) {
+        btn.className = "bg-rose-950 hover:bg-rose-900 text-xs text-rose-400 border border-rose-800 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5";
+        icon.className = "fa-solid fa-video-slash";
+        text.innerText = "Matikan Kamera";
+      } else {
+        btn.className = "bg-emerald-950 hover:bg-emerald-900 text-xs text-emerald-400 border border-emerald-800 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5";
+        icon.className = "fa-solid fa-video";
+        text.innerText = "Nyalakan Kamera";
+      }
     }
 
     function onScanSuccess(decodedText) {
       stopQRScanner();
       submitAbsen(decodedText, "Hadir");
-      setTimeout(() => initQRScanner(), 3000);
+      setTimeout(() => startQRScanner(), 3000);
     }
 
     function loadDataLaporan() {
